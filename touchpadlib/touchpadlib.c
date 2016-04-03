@@ -808,10 +808,10 @@ int fetch_touchpad_event(int fd, struct touchpad_event *touchpad_event)
     int i, rd;
 
     rd = read(fd, ev, sizeof(struct input_event) * 64);
-    printf("%d\n", rd);
+    //printf("%d\n", rd);
 
     if (rd < (int) sizeof(struct input_event)) {
-        printf("expected %d bytes, got %d\n", (int) sizeof(struct input_event), rd);
+        //printf("expected %d bytes, got %d\n", (int) sizeof(struct input_event), rd);
         perror("\nevtest: error reading");
         return 1;
     }
@@ -838,14 +838,14 @@ int fetch_touchpad_event(int fd, struct touchpad_event *touchpad_event)
             } else if (code == ABS_PRESSURE) {
                 touchpad_event->pressure = ev[i].value;
             } else {
-                fprintf(stderr, "Not interesting event "
+                /*fprintf(stderr, "Not interesting event "
                         "of type %d (%s) and code %d (%s).\n",
-                        type, typename(type), code, codename(type, code));
+                        type, typename(type), code, codename(type, code));*/
             }
         } else {
-            fprintf(stderr, "Not interesting event "
+           /* fprintf(stderr, "Not interesting event "
                     "of type %d (%s) and code %d (%s).\n",
-                    type, typename(type), code, codename(type, code));
+                    type, typename(type), code, codename(type, code));*/
         }
     }
     return 0;
@@ -925,4 +925,26 @@ error:
 int has_root_privileges(void)
 {
     return getuid() == 0;
+}
+
+struct touchpad_event *new_event() {
+    return malloc(sizeof(struct touchpad_event));
+}
+void erase_event(struct touchpad_event *event) {
+    free(event);
+}
+int get_x(struct touchpad_event *event) {
+    return event -> x;
+}
+int get_y(struct touchpad_event *event) {
+    return event -> y;
+}
+int get_pressure(struct touchpad_event *event) {
+    return event -> pressure;
+}
+int get_seconds(struct touchpad_event *event) {
+    return event -> seconds;
+}
+int get_useconds(struct touchpad_event *event) {
+    return event -> useconds;
 }
