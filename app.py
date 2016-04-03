@@ -3,11 +3,11 @@
 import _thread
 import queue
 import time
-MAX_NUMBER_OF_POINTS_IN_GROUP = 3
+from ctypes import cdll
+MAX_NUMBER_OF_POINTS_IN_GROUP = 3000
 MAX_DURATION_OF_GROUP = 4
 MAX_BREAK_BETWEEN_TWO_SIGNALS = 0.3
 
-# TODO modification of signal structure
 # signal structure
 class TouchpadSignal:
 	def __init__(self, x, y, pressure, time):
@@ -28,30 +28,36 @@ class TouchpadSignal:
 # signal queue
 queue = queue.Queue()
 
+lib = cdll.LoadLibrary('./touchpadlib.so') # TODO error handle
+touchpad_signal_object = lib.new_event()
+fd = lib.initalize_touchpadlib_usage() # TODO error handle
+
 # thread which catches signals from touchpad and put it on queue 
 def listener_thread() :
-	# TODO touchpadlib init
-	while 0: # change to "while 1" when it will be ready
-		# TODO touchpad_signal = get signal from touchpadlib
+	while 1: 
+		lib.fetch_touchpad_event(fd, touchpad_signal_object) # TODO error handle
+		x = lib.get_x(touchpad_signal_object)
+		y = lib.get_y(touchpad_signal_object)
+		pressure = lib.get_pressure(touchpad_signal_object)
+		time = lib.get_seconds(touchpad_signal_object) + 0.000001 * lib.get_useconds(touchpad_signal_object) 
+		#print("%d %d %d %.8f" % (x, y, pressure, time) )
+		touchpad_signal = TouchpadSignal(x, y, pressure, time)
 		queue.put(touchpad_signal, True)
-	# temporary
-	counter = 0
-	while counter < 11:
-		counter += 1
-		counter %= 100
-		time.sleep(.2)
-		if counter % 5 == 0:
-			queue.put(TouchpadSignal(0, 0, 0.5, time.time()), True)
-		else:
-			queue.put(TouchpadSignal(2, 3, 3, time.time()), True)
 
-# here will be parsing and sending list of signals to interpreter, for now printing points
+# here will be parsing and sending list of signals to interpreter, for now printing first 10 points
 def send_points_to_interpreter(signal_list):
 	if not signal_list:
 		return
 	print ("new portion of points:")
+	counter = 0
+	le = len(signal_list)
 	for one_signal in signal_list:
-		print ("x: %d y: %d" % ( one_signal.get_x(), one_signal.get_y() ) )
+		counter += 1
+		if counter == 11:
+			print("...")
+			break
+		print ("%d / %d x: %d y: %d" % (counter, le, one_signal.get_x(), one_signal.get_y() ) )
+	print()
 
 # list of signals (points) to interpret
 signal_list = []
@@ -77,6 +83,9 @@ def too_much_time_passed(new_signal_time):
 		return True
 	return False
 
+def proper_signal_of_point(touchpad_signal):
+	return touchpad_signal.get_x() >= 0 and touchpad_signal.get_y() >= 0
+
 # thread, which selects portion of signals from queue, and sends it to the interpreter
 def application_thread():
 
@@ -96,9 +105,11 @@ def application_thread():
 		elif too_much_time_passed(touchpad_signal.get_time()):
 			send_points_to_interpreter(signal_list)
 			init_signal_list()
-			add_signal_to_list_and_remove_too_old_signals(touchpad_signal)
+			if proper_signal_of_point(touchpad_signal):
+				add_signal_to_list_and_remove_too_old_signals(touchpad_signal)
 		else:
-			add_signal_to_list_and_remove_too_old_signals(touchpad_signal)
+			if proper_signal_of_point(touchpad_signal):
+				add_signal_to_list_and_remove_too_old_signals(touchpad_signal)
 			
 
 
@@ -106,6 +117,8 @@ def application_thread():
 
 _thread.start_new_thread(listener_thread, () )
 application_thread()
+
+# TODO erase touchpad_signal_object on stop stript
 
 
 
