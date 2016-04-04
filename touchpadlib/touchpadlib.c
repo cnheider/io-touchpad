@@ -76,24 +76,6 @@
 
 #define NAME_ELEMENT(element) [element] = #element
 
-enum evtest_mode {
-	MODE_CAPTURE,
-	MODE_QUERY,
-	MODE_VERSION,
-};
-
-static const struct query_mode {
-	const char *name;
-	int event_type;
-	int max;
-	int rq;
-} query_modes[] = {
-	{ "EV_KEY", EV_KEY, KEY_MAX, EVIOCGKEY(KEY_MAX) },
-	{ "EV_LED", EV_LED, LED_MAX, EVIOCGLED(LED_MAX) },
-	{ "EV_SND", EV_SND, SND_MAX, EVIOCGSND(SND_MAX) },
-	{ "EV_SW",  EV_SW, SW_MAX, EVIOCGSW(SW_MAX) },
-};
-
 static const char * const events[EV_MAX + 1] = {
 	[0 ... EV_MAX] = NULL,
 	NAME_ELEMENT(EV_SYN),			NAME_ELEMENT(EV_KEY),
@@ -768,15 +750,7 @@ int fetch_touchpad_event(int fd, struct touchpad_event *touchpad_event)
                 touchpad_event->y = ev[i].value;
             } else if (code == ABS_PRESSURE) {
                 touchpad_event->pressure = ev[i].value;
-            } else {
-                /*fprintf(stderr, "Not interesting event "
-                        "of type %d (%s) and code %d (%s).\n",
-                        type, typename(type), code, codename(type, code));*/
             }
-        } else {
-           /* fprintf(stderr, "Not interesting event "
-                    "of type %d (%s) and code %d (%s).\n",
-                    type, typename(type), code, codename(type, code));*/
         }
     }
     return 0;
