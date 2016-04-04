@@ -28,18 +28,18 @@ class TouchpadSignal:
 # signal queue
 queue = queue.Queue()
 
-lib = cdll.LoadLibrary('./touchpadlib.so') # TODO error handle
+lib = cdll.LoadLibrary('./lib/touchpadlib.so') # TODO error handle
 touchpad_signal_object = lib.new_event()
 fd = lib.initalize_touchpadlib_usage() # TODO error handle
 
-# thread which catches signals from touchpad and put it on queue 
+# thread which catches signals from touchpad and put it on queue
 def listener_thread() :
-	while 1: 
+	while 1:
 		lib.fetch_touchpad_event(fd, touchpad_signal_object) # TODO error handle
 		x = lib.get_x(touchpad_signal_object)
 		y = lib.get_y(touchpad_signal_object)
 		pressure = lib.get_pressure(touchpad_signal_object)
-		time = lib.get_seconds(touchpad_signal_object) + 0.000001 * lib.get_useconds(touchpad_signal_object) 
+		time = lib.get_seconds(touchpad_signal_object) + 0.000001 * lib.get_useconds(touchpad_signal_object)
 		#print("%d %d %d %.8f" % (x, y, pressure, time) )
 		touchpad_signal = TouchpadSignal(x, y, pressure, time)
 		queue.put(touchpad_signal, True)
@@ -75,7 +75,7 @@ def need_to_remove_first_signal_from_list(touchpad_signal_to_add):
 def add_signal_to_list_and_remove_too_old_signals(touchpad_signal):
 	global signal_list
 	while need_to_remove_first_signal_from_list(touchpad_signal):
-		signal_list.pop(0)   
+		signal_list.pop(0)
 	signal_list.append(touchpad_signal)
 
 def too_much_time_passed(new_signal_time):
@@ -96,7 +96,7 @@ def application_thread():
 
 		is_new_signal = not (queue.empty())
 
-		if is_new_signal: 
+		if is_new_signal:
 			touchpad_signal = queue.get()
 
 		if not(is_new_signal) or touchpad_signal.is_it_stop_signal():
@@ -110,7 +110,7 @@ def application_thread():
 		else:
 			if proper_signal_of_point(touchpad_signal):
 				add_signal_to_list_and_remove_too_old_signals(touchpad_signal)
-			
+
 
 
 # running both threads
