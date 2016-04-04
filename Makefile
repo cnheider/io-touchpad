@@ -12,5 +12,5 @@ touchpadlib.o: touchpadlib/touchpadlib.c touchpadlib/touchpadlib.h
 	$(CC) $(CFLAGS) -o touchpadlib.o touchpadlib/touchpadlib.c
 
 clean:
-	rm -f *.o lib/touchpadlib.so
-	rmdir lib
+	-@rm -f *.o lib/touchpadlib.so 2>/dev/null || true
+	-@rmdir lib 2>/dev/null || true
