@@ -37,6 +37,10 @@ except OSError:
 	sys.exit(1)
 
 touchpad_signal_object = lib.new_event()
+if touchpad_signal_object is None:
+	print("Cannot alloc memory.")
+	sys.exit(1)
+
 fd = lib.initalize_touchpadlib_usage()
 if fd == -1:
 	print("Touchpadlib initalize error.")
@@ -46,7 +50,7 @@ if fd == -1:
 def listener_thread() :
 	while 1:
 		ret = lib.fetch_touchpad_event(fd, touchpad_signal_object)
-		if ret == -1:
+		if ret == 1:
 			print("Touchpad fetch error.")
 			sys.exit(1)
 		x = lib.get_x(touchpad_signal_object)
