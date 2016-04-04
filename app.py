@@ -63,7 +63,7 @@ class TouchpadSignal:
 def handler(signum, frame):
     """Free memory after touchpad_signal_object when SIGINT call."""
     print("\nClosing the application...")
-    'touchpad_signal_object' in globals():
+    if 'touchpad_signal_object' in globals():
         lib.erase_event(touchpad_signal_object)
     sys.exit(0)
 
