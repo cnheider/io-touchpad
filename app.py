@@ -3,6 +3,8 @@
 import _thread
 import queue
 import time
+import signal
+import sys
 from ctypes import cdll
 MAX_NUMBER_OF_POINTS_IN_GROUP = 3000
 MAX_DURATION_OF_GROUP = 4
@@ -33,6 +35,15 @@ queue = queue.Queue()
 lib = cdll.LoadLibrary('./lib/touchpadlib.so') # TODO error handle
 touchpad_signal_object = lib.new_event()
 fd = lib.initalize_touchpadlib_usage() # TODO error handle
+
+# Free memory after touchpad_signal_object when SIGINT call
+def handler(signum, frame):
+	print("");
+	print("ending...")
+	lib.erase_event(touchpad_signal_object)
+	sys.exit(0)
+
+signal.signal(signal.SIGINT, handler)
 
 # thread which catches signals from touchpad and put it on queue
 def listener_thread() :
