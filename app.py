@@ -182,6 +182,9 @@ def application_thread():
                 collection.add_new_signal_and_remove_too_old_signals(signal)
 
 
+# SIGINT signal handler.
+signal.signal(signal.SIGINT, handler)
+
 # Global variables.
 queue = queue.Queue()
 collection = SignalCollection()
@@ -202,9 +205,6 @@ fd = lib.initalize_touchpadlib_usage()
 if fd == -1:
     print("Touchpadlib initalize error.")
     sys.exit(1)
-
-# SIGINT signal handler.
-signal.signal(signal.SIGINT, handler)
 
 # Run both threads.
 _thread.start_new_thread(listener_thread, ())
