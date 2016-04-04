@@ -47,14 +47,6 @@ class TouchpadSignal:
     def is_it_proper_signal_of_point(self):
         return self.x >= 0 and self.y >= 0
 
-# Signal queue.
-queue = queue.Queue()
-
-# Connecting with touchpadlib.
-lib = cdll.LoadLibrary('./lib/touchpadlib.so') # TODO error handle
-touchpad_signal_object = lib.new_event()
-fd = lib.initalize_touchpadlib_usage() # TODO error handle
-
 
 def handler(signum, frame):
     """Free memory after touchpad_signal_object when SIGINT call."""
@@ -64,7 +56,6 @@ def handler(signum, frame):
     sys.exit(0)
 
 
-signal.signal(signal.SIGINT, handler)
 
 
 def combine_seconds_and_useconds(seconds, useconds):
@@ -145,9 +136,6 @@ class SignalCollection:
         return self.signal_list
 
 
-signal_collection = SignalCollection()
-
-
 def application_thread():
     """The application thread.
 
@@ -177,7 +165,19 @@ def application_thread():
                 signal_collection.add_new_signal_and_remove_too_old_signals(touchpad_signal)
 
 
-# Run both threads.
+# Global variables.
+queue = queue.Queue()
+signal_collection = SignalCollection()
 
+# Connect with touchpadlib.
+lib = cdll.LoadLibrary('./lib/touchpadlib.so') # TODO error handle
+touchpad_signal_object = lib.new_event()
+fd = lib.initalize_touchpadlib_usage() # TODO error handle
+
+# SIGINT signal handler.
+signal.signal(signal.SIGINT, handler)
+
+
+# Run both threads.
 _thread.start_new_thread(listener_thread, () )
 application_thread()
