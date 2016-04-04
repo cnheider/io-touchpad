@@ -23,11 +23,13 @@ class TouchpadSignal:
 		return self.time
 	def is_it_stop_signal(self):
 		return False  # we could set condition pressure<1 but for now the only reason to end the group is a long break between signals
-
+	def is_it_proper_signal_of_point(self):
+		return self.x >= 0 and self.y >= 0
 
 # signal queue
 queue = queue.Queue()
 
+#connecting with touchpadlib
 lib = cdll.LoadLibrary('./lib/touchpadlib.so') # TODO error handle
 touchpad_signal_object = lib.new_event()
 fd = lib.initalize_touchpadlib_usage() # TODO error handle
@@ -59,39 +61,46 @@ def send_points_to_interpreter(signal_list):
 		print ("%d / %d x: %d y: %d" % (counter, le, one_signal.get_x(), one_signal.get_y() ) )
 	print()
 
-# list of signals (points) to interpret
-signal_list = []
+# collection of signals (points) to interpret
+class SignalCollection:
 
-def init_signal_list():
-	global signal_list
-	signal_list = []
+	def __init__(self):
+		self.reset()
 
-def need_to_remove_first_signal_from_list(touchpad_signal_to_add):
-	global signal_list
-	if not signal_list:
+	def reset(self):
+		self.signal_list = []
+
+	def need_to_remove_first_signal_from_list(self, touchpad_signal_to_add):
+		if not self.signal_list:
+			return False
+		if len(self.signal_list) >= MAX_NUMBER_OF_POINTS_IN_GROUP:
+			return True
+		if touchpad_signal_to_add.get_time() - self.signal_list[0].get_time() > MAX_DURATION_OF_GROUP:
+			return True
 		return False
-	return len(signal_list) >= MAX_NUMBER_OF_POINTS_IN_GROUP or touchpad_signal_to_add.get_time() - signal_list[0].get_time() > MAX_DURATION_OF_GROUP
 
-def add_signal_to_list_and_remove_too_old_signals(touchpad_signal):
-	global signal_list
-	while need_to_remove_first_signal_from_list(touchpad_signal):
-		signal_list.pop(0)
-	signal_list.append(touchpad_signal)
+	def add_new_signal_and_remove_too_old_signals(self, touchpad_signal):
+		while self.need_to_remove_first_signal_from_list(touchpad_signal):
+			self.signal_list.pop(0)
+		self.signal_list.append(touchpad_signal)
 
-def too_much_time_passed(new_signal_time):
-	if signal_list and new_signal_time - signal_list[-1].get_time() > MAX_BREAK_BETWEEN_TWO_SIGNALS:
-		return True
-	return False
+	def too_much_time_passed(self, new_signal_time):
+		if self.signal_list and new_signal_time - self.signal_list[-1].get_time() > MAX_BREAK_BETWEEN_TWO_SIGNALS:
+			return True
+		return False
 
-def proper_signal_of_point(touchpad_signal):
-	return touchpad_signal.get_x() >= 0 and touchpad_signal.get_y() >= 0
+	def as_list(self):
+		return self.signal_list
+
+signal_collection = SignalCollection()
+
 
 # thread, which selects portion of signals from queue, and sends it to the interpreter
 def application_thread():
 
 	# main loop - in every iteration one signal is read, or too long break in signal streaming is captured
 	while 1:
-		while queue.empty() and not (too_much_time_passed(time.time())):
+		while queue.empty() and not (signal_collection.too_much_time_passed(time.time())):
 			pass
 
 		is_new_signal = not (queue.empty())
@@ -100,16 +109,16 @@ def application_thread():
 			touchpad_signal = queue.get()
 
 		if not(is_new_signal) or touchpad_signal.is_it_stop_signal():
-			send_points_to_interpreter(signal_list)
-			init_signal_list()
-		elif too_much_time_passed(touchpad_signal.get_time()):
-			send_points_to_interpreter(signal_list)
-			init_signal_list()
-			if proper_signal_of_point(touchpad_signal):
-				add_signal_to_list_and_remove_too_old_signals(touchpad_signal)
+			send_points_to_interpreter(signal_collection.as_list())
+			signal_collection.reset()
+		elif signal_collection.too_much_time_passed(touchpad_signal.get_time()):
+			send_points_to_interpreter(signal_collection.as_list())
+			signal_collection.reset()
+			if touchpad_signal.is_it_proper_signal_of_point():
+				signal_collection.add_signal_and_remove_too_old_signals(touchpad_signal)
 		else:
-			if proper_signal_of_point(touchpad_signal):
-				add_signal_to_list_and_remove_too_old_signals(touchpad_signal)
+			if touchpad_signal.is_it_proper_signal_of_point():
+				signal_collection.add_new_signal_and_remove_too_old_signals(touchpad_signal)
 
 
 
