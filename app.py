@@ -211,5 +211,6 @@ if fd == -1:
     sys.exit(1)
 
 # Run both threads.
+print("\nUse your touchpad as usual. Have a nice day!")
 _thread.start_new_thread(listener_thread, ())
 application_thread()
