@@ -204,6 +204,7 @@ if touchpad_signal_object == 0:
 fd = lib.initalize_touchpadlib_usage()
 if fd == -1:
     print("Touchpadlib initalize error.")
+    lib.erase_event(touchpad_signal_object)
     sys.exit(1)
 
 # Run both threads.
