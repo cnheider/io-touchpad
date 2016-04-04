@@ -4,6 +4,7 @@
 
 import _thread
 import queue
+import sys
 import time
 import signal
 import sys
@@ -56,8 +57,6 @@ def handler(signum, frame):
     sys.exit(0)
 
 
-
-
 def combine_seconds_and_useconds(seconds, useconds):
     """Combine seconds and miliseconds into one variable."""
     return seconds + 0.000001 * useconds
@@ -70,6 +69,11 @@ def listener_thread() :
     the queue.
     """
     while 1:
+        ret = lib.fetch_touchpad_event(fd, touchpad_signal_object)
+        if ret == 1 :
+            print("Touchpad fetch error.")
+            sys.exit(1)
+
         lib.fetch_touchpad_event(fd, touchpad_signal_object) # TODO error handle
         x        = lib.get_x(touchpad_signal_object)
         y        = lib.get_y(touchpad_signal_object)
@@ -142,7 +146,8 @@ def application_thread():
     It receives signals/events from the listener thread using a queue and then
     interprets the data.
     """
-    # main loop - in every iteration one signal is read, or too long break in signal streaming is captured
+    # main loop - in every iteration one signal is read,
+    # or too long break in signal streaming is captured
     while 1:
         while queue.empty() and not signal_collection.too_much_time_passed(time.time()):
             pass
@@ -170,9 +175,22 @@ queue = queue.Queue()
 signal_collection = SignalCollection()
 
 # Connect with touchpadlib.
-lib = cdll.LoadLibrary('./lib/touchpadlib.so') # TODO error handle
+try:
+	lib = cdll.LoadLibrary('./lib/touchpadlib.so')
+except OSError:
+	#There is no such library as above
+	print("No such library as touchpadlib.so.")
+	sys.exit(1)
+
 touchpad_signal_object = lib.new_event()
-fd = lib.initalize_touchpadlib_usage() # TODO error handle
+if touchpad_signal_object == 0:
+	print("Cannot alloc memory in new_event.")
+	sys.exit(1)
+
+fd = lib.initalize_touchpadlib_usage()
+if fd == -1:
+	print("Touchpadlib initalize error.")
+	sys.exit(1)
 
 # SIGINT signal handler.
 signal.signal(signal.SIGINT, handler)
