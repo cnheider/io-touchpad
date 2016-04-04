@@ -810,8 +810,8 @@ int initalize_touchpadlib_usage()
     if (!isatty(fileno(stdout)))
         setbuf(stdout, NULL);
 
-    if (print_device_info(fd))
-        goto error;
+    // if (print_device_info(fd))
+    //     goto error;
 
     if (test_grab(fd))
         goto error;
