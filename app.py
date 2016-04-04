@@ -176,7 +176,7 @@ def application_thread():
             send_points_to_interpreter(collection.as_list())
             collection.reset()
             if signal.is_it_proper_signal_of_point():
-                collection.add_signal_and_remove_too_old_signals(signal)
+                collection.add_new_signal(signal)
         else:
             if signal.is_it_proper_signal_of_point():
                 collection.add_new_signal_and_remove_too_old_signals(signal)
