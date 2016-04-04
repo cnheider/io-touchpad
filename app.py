@@ -28,14 +28,26 @@ class TouchpadSignal:
 # signal queue
 queue = queue.Queue()
 
-lib = cdll.LoadLibrary('./lib/touchpadlib.so') # TODO error handle
+try:
+	lib = cdll.LoadLibrary('./lib/touchpadlib.so')
+except OSError:
+	#There is no such library as above
+	print("No such library")
+	exit()
+
 touchpad_signal_object = lib.new_event()
-fd = lib.initalize_touchpadlib_usage() # TODO error handle
+fd = lib.initalize_touchpadlib_usage()
+if fd == -1:
+	print("Touchpadlib initalize error")
+	exit()
 
 # thread which catches signals from touchpad and put it on queue
 def listener_thread() :
 	while 1:
-		lib.fetch_touchpad_event(fd, touchpad_signal_object) # TODO error handle
+		ret = lib.fetch_touchpad_event(fd, touchpad_signal_object) # TODO error handle
+		if ret == -1:
+			print("Touchpad fetch error")
+			exit()
 		x = lib.get_x(touchpad_signal_object)
 		y = lib.get_y(touchpad_signal_object)
 		pressure = lib.get_pressure(touchpad_signal_object)
