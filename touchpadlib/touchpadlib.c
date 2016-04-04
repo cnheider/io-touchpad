@@ -119,17 +119,6 @@ static const int maxval[EV_MAX + 1] = {
 	[EV_FF_STATUS] = FF_STATUS_MAX,
 };
 
-
-#ifdef INPUT_PROP_SEMI_MT
-static const char * const props[INPUT_PROP_MAX + 1] = {
-	[0 ... INPUT_PROP_MAX] = NULL,
-	NAME_ELEMENT(INPUT_PROP_POINTER),
-	NAME_ELEMENT(INPUT_PROP_DIRECT),
-	NAME_ELEMENT(INPUT_PROP_BUTTONPAD),
-	NAME_ELEMENT(INPUT_PROP_SEMI_MT),
-};
-#endif
-
 static const char * const keys[KEY_MAX + 1] = {
 	[0 ... KEY_MAX] = NULL,
 	NAME_ELEMENT(KEY_RESERVED),		NAME_ELEMENT(KEY_ESC),
@@ -604,7 +593,7 @@ static char* scan_devices(void)
 			continue;
 		ioctl(fd, EVIOCGNAME(sizeof(name)), name);
 
-        // @TODO We can try to detect touchpad devide here if we examine name for the 'touchpad' substring.
+        // @TODO We can try to detect touchpad device here if we examine name for the 'touchpad' substring.
 
 		fprintf(stderr, "%s:	%s\n", fname, name);
 		close(fd);
@@ -624,44 +613,6 @@ static char* scan_devices(void)
 	return filename;
 }
 
-// static int version(void)
-// {
-// #ifndef PACKAGE_VERSION
-// #define PACKAGE_VERSION "<version undefined>"
-// #endif
-//     printf("%s %s\n", program_invocation_short_name, PACKAGE_VERSION);
-//     return EXIT_SUCCESS;
-// }
-
-
-/**
- * Print usage information.
- */
-// static int usage(void)
-// {
-//     printf("USAGE:\n");
-//     printf(" Grab mode:\n");
-//     printf("   %s /dev/input/eventX\n", program_invocation_short_name);
-//     printf("\n");
-//     printf(" Query mode: (check exit code)\n");
-//     printf("   %s --query /dev/input/eventX <type> <value>\n",
-//         program_invocation_short_name);
-
-//     printf("\n");
-//     printf("<type> is one of: EV_KEY, EV_SW, EV_LED, EV_SND\n");
-//     printf("<value> can either be a numerical value, or the textual name of the\n");
-//     printf("key/switch/LED/sound being queried (e.g. SW_DOCK).\n");
-
-//     return EXIT_FAILURE;
-// }
-
-/**
- * Print additional information for absolute axes (min/max, current value,
- * etc.).
- *
- * @param fd The file descriptor to the device.
- * @param axis The axis identifier (e.g. ABS_X).
- */
 static void print_absdata(int fd, int axis)
 {
 	int abs[6] = {0};
@@ -697,13 +648,6 @@ static inline const char* codename(unsigned int type, unsigned int code)
 	return (type <= EV_MAX && code <= maxval[type] && names[type] && names[type][code]) ? names[type][code] : "?";
 }
 
-#ifdef INPUT_PROP_SEMI_MT
-static inline const char* propname(unsigned int prop)
-{
-	return (prop <= INPUT_PROP_MAX && props[prop]) ? props[prop] : "?";
-}
-#endif
-
 /**
  * Print static device information (no events). This information includes
  * version numbers, device name and all bits supported by this device.
@@ -713,14 +657,11 @@ static inline const char* propname(unsigned int prop)
  */
 static int print_device_info(int fd)
 {
-	unsigned int type, code, prop;
+	unsigned int type, code;
 	int version;
 	unsigned short id[4];
 	char name[256] = "Unknown";
 	unsigned long bit[EV_MAX][NBITS(KEY_MAX)];
-#ifdef INPUT_PROP_SEMI_MT
-	unsigned long propbits[INPUT_PROP_MAX];
-#endif
 
 	if (ioctl(fd, EVIOCGVERSION, &version)) {
 		perror("evtest: can't get version");
@@ -760,16 +701,6 @@ static int print_device_info(int fd)
 		printf("  Repeat type %d (%s)\n", EV_REP, events[EV_REP] ?  events[EV_REP] : "?");
 		print_repdata(fd);
 	}
-#ifdef INPUT_PROP_SEMI_MT
-	memset(propbits, 0, sizeof(propbits));
-	ioctl(fd, EVIOCGPROP(sizeof(propbits)), propbits);
-	printf("Properties:\n");
-	for (prop = 0; prop < INPUT_PROP_MAX; prop++) {
-		if (test_bit(prop, propbits))
-			printf("  Property type %d (%s)\n", prop, propname(prop));
-	}
-#endif
-
 	return 0;
 }
 
