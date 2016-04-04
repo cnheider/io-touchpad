@@ -37,8 +37,8 @@ except OSError:
 	sys.exit(1)
 
 touchpad_signal_object = lib.new_event()
-if touchpad_signal_object is None:
-	print("Cannot alloc memory.")
+if touchpad_signal_object == 0:
+	print("Cannot alloc memory in new_event.")
 	sys.exit(1)
 
 fd = lib.initalize_touchpadlib_usage()
