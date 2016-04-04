@@ -14,6 +14,9 @@ MAX_NUMBER_OF_POINTS_IN_GROUP = 3000
 MAX_DURATION_OF_GROUP = 4
 MAX_BREAK_BETWEEN_TWO_SIGNALS = 0.3
 
+LIB_DIRECTORY = "./lib"
+TOUCHPADLIB_SHARED_LIBRARY = LIB_DIRECTORY + "/touchpadlib.so"
+
 
 class TouchpadSignal:
     """Wrapper for the struct touchpad_event from touchpadlib.
@@ -69,12 +72,10 @@ def listener_thread() :
     the queue.
     """
     while 1:
-        ret = lib.fetch_touchpad_event(fd, touchpad_signal_object)
-        if ret == 1 :
+        if lib.fetch_touchpad_event(fd, touchpad_signal_object) == 1:
             print("Touchpad fetch error.")
             sys.exit(1)
 
-        lib.fetch_touchpad_event(fd, touchpad_signal_object) # TODO error handle
         x        = lib.get_x(touchpad_signal_object)
         y        = lib.get_y(touchpad_signal_object)
         pressure = lib.get_pressure(touchpad_signal_object)
@@ -104,7 +105,7 @@ def send_points_to_interpreter(signal_list):
         if counter == 11:
             print("...")
             break
-        print ("%d / %d x: %d y: %d" % (counter, le, one_signal.get_x(), one_signal.get_y() ) )
+        print ("Event #%d out of %d in the list. x: %d y: %d" % (counter, le, one_signal.get_x(), one_signal.get_y()))
     print()
 
 
@@ -176,25 +177,23 @@ signal_collection = SignalCollection()
 
 # Connect with touchpadlib.
 try:
-	lib = cdll.LoadLibrary('./lib/touchpadlib.so')
+    lib = cdll.LoadLibrary(TOUCHPADLIB_SHARED_LIBRARY)
 except OSError:
-	#There is no such library as above
-	print("No such library as touchpadlib.so.")
-	sys.exit(1)
+    print("No such library as touchpadlib.so.")
+    sys.exit(1)
 
 touchpad_signal_object = lib.new_event()
 if touchpad_signal_object == 0:
-	print("Cannot alloc memory in new_event.")
-	sys.exit(1)
+    print("Cannot allocate memory in new_event.")
+    sys.exit(1)
 
 fd = lib.initalize_touchpadlib_usage()
 if fd == -1:
-	print("Touchpadlib initalize error.")
-	sys.exit(1)
+    print("Touchpadlib initalize error.")
+    sys.exit(1)
 
 # SIGINT signal handler.
 signal.signal(signal.SIGINT, handler)
-
 
 # Run both threads.
 _thread.start_new_thread(listener_thread, () )
