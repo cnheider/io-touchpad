@@ -81,6 +81,7 @@ def listener_thread():
     while 1:
         if lib.fetch_touchpad_event(fd, touchpad_signal_object) == 1:
             print("Touchpad fetch error.")
+            lib.erase_event(touchpad_signal_object)
             sys.exit(1)
 
         x = lib.get_x(touchpad_signal_object)
@@ -199,6 +200,7 @@ except OSError:
 touchpad_signal_object = lib.new_event()
 if touchpad_signal_object == 0:
     print("Cannot allocate memory in new_event.")
+    lib.erase_event(touchpad_signal_object)
     sys.exit(1)
 
 fd = lib.initalize_touchpadlib_usage()
