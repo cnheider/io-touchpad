@@ -2,6 +2,7 @@
 #-*- coding: utf-8 -*-
 import _thread
 import queue
+import sys
 import time
 from ctypes import cdll
 MAX_NUMBER_OF_POINTS_IN_GROUP = 3000
@@ -32,22 +33,22 @@ try:
 	lib = cdll.LoadLibrary('./lib/touchpadlib.so')
 except OSError:
 	#There is no such library as above
-	print("No such library")
-	exit()
+	print("No such library as touchpadlib.so.")
+	sys.exit(1)
 
 touchpad_signal_object = lib.new_event()
 fd = lib.initalize_touchpadlib_usage()
 if fd == -1:
-	print("Touchpadlib initalize error")
-	exit()
+	print("Touchpadlib initalize error.")
+	sys.exit(1)
 
 # thread which catches signals from touchpad and put it on queue
 def listener_thread() :
 	while 1:
-		ret = lib.fetch_touchpad_event(fd, touchpad_signal_object) # TODO error handle
+		ret = lib.fetch_touchpad_event(fd, touchpad_signal_object)
 		if ret == -1:
-			print("Touchpad fetch error")
-			exit()
+			print("Touchpad fetch error.")
+			sys.exit(1)
 		x = lib.get_x(touchpad_signal_object)
 		y = lib.get_y(touchpad_signal_object)
 		pressure = lib.get_pressure(touchpad_signal_object)
