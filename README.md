@@ -17,7 +17,7 @@
         recognizes to a special "stop" signal (type of event)) it also cuts the stream of points if it is too  
         long (in time) and sends what he has to symbol_interpreter, this is implemented so that if someone randomly draws
         shapes on touchpad without intention to send symbol, then he won't overflow memory. Currently symbol_interpreter
-        can only count the number of events and write coordinates (it is used as a touchpadlib test).
+        can only count the number of events and write coordinates of first 10 received (it is used as a touchpadlib test).
     
     
 ### Usage
