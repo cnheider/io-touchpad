@@ -12,12 +12,12 @@
     used to synchronize threads)
     
    second is taking the oldest event from the queue and analyzes it. That means he either adds it to a collection of
-    points representing symbol currently being drawn, or it determines that the symbol was finished. It       
-    does by checking if difference between signals is higher then 0.3s. (we're planning to add a possibility to
-    recognize by a special "stop" signal (type of event)) It also cuts the stream of points if it is too  
-    long (in time) and sends what he has to symbol_interpreter. This is implemented so that if someone randomly draws
-    shapes on touchpad without intention to send symbol, then he won't overflow memory. Currently symbol_interpreter
-    can only count the number of events and write coordinates of first 10 received (it is used as a touchpadlib test).
+    points representing symbol currently being drawn, or it determines that the symbol was finished. It does by checking
+    if difference between signals is higher then 0.3s. (we're planning to add a possibility to recognize by a special
+    "stop" signal (type of event)) It also cuts the stream of points if it is too long (in time) and sends what he has 
+    to symbol_interpreter. This is implemented so that if someone randomly draws shapes on touchpad without intention 
+    to send symbol, then they won't overflow memory. Currently symbol_interpreter can only count the number of events and
+    write coordinates of first 10 received (it is used as a test for now).
     
     
 ### Usage
