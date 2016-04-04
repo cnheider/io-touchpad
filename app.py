@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 
-# Encoding: UTF-8
+""" io-touchpad application.
+
+This application will learn to associate symbols you draw on your touchpad
+with certain actions you bound to those symbols.
+
+Your finger's absolute position is fetched using a library called touchpadlib
+which is based on evtest (version 1.32).
+
+Source code encoding: UTF-8
+"""
 
 import _thread
 import queue
 import sys
 import time
 import signal
-import sys
 from ctypes import cdll
 
 MAX_NUMBER_OF_POINTS_IN_GROUP = 3000
@@ -43,7 +51,7 @@ class TouchpadSignal:
         return self.time
 
     def is_it_stop_signal(self):
-        # TODO Implement this method.
+        # TODO Implement this method. Not in the first iteration.
         # We could set condition pressure<1 but for now the only reason
         # to end the group is a long break between signals.
         return False
@@ -54,8 +62,7 @@ class TouchpadSignal:
 
 def handler(signum, frame):
     """Free memory after touchpad_signal_object when SIGINT call."""
-    print("");
-    print("ending...")
+    print("\nClosing the application...")
     lib.erase_event(touchpad_signal_object)
     sys.exit(0)
 
@@ -65,7 +72,7 @@ def combine_seconds_and_useconds(seconds, useconds):
     return seconds + 0.000001 * useconds
 
 
-def listener_thread() :
+def listener_thread():
     """The main function of the listener thread.
 
     The listener thread fetches events from the touchpad and pushes them onto
@@ -76,10 +83,10 @@ def listener_thread() :
             print("Touchpad fetch error.")
             sys.exit(1)
 
-        x        = lib.get_x(touchpad_signal_object)
-        y        = lib.get_y(touchpad_signal_object)
+        x = lib.get_x(touchpad_signal_object)
+        y = lib.get_y(touchpad_signal_object)
         pressure = lib.get_pressure(touchpad_signal_object)
-        seconds  = lib.get_seconds(touchpad_signal_object)
+        seconds = lib.get_seconds(touchpad_signal_object)
         useconds = lib.get_useconds(touchpad_signal_object)
 
         time = combine_seconds_and_useconds(seconds, useconds)
@@ -97,15 +104,16 @@ def send_points_to_interpreter(signal_list):
     """
     if not signal_list:
         return
-    print ("new portion of points:")
+    print("New portion of events:")
     counter = 0
-    le = len(signal_list)
+    length = len(signal_list)
     for one_signal in signal_list:
         counter += 1
         if counter == 11:
             print("...")
             break
-        print ("Event #%d out of %d in the list. x: %d y: %d" % (counter, le, one_signal.get_x(), one_signal.get_y()))
+        print("Event #", counter, "\tout of", length, "in the list. x:",
+              one_signal.get_x(), "y:", one_signal.get_y())
     print()
 
 
@@ -118,12 +126,13 @@ class SignalCollection:
     def reset(self):
         self.signal_list = []
 
-    def need_to_remove_first_signal_from_list(self, touchpad_signal_to_add):
+    def need_to_remove_first_signal_from_list(self, signal):
         if not self.signal_list:
             return False
         if len(self.signal_list) >= MAX_NUMBER_OF_POINTS_IN_GROUP:
             return True
-        if touchpad_signal_to_add.get_time() - self.signal_list[0].get_time() > MAX_DURATION_OF_GROUP:
+        duration = signal.get_time() - self.signal_list[0].get_time()
+        if duration > MAX_DURATION_OF_GROUP:
             return True
         return False
 
@@ -133,8 +142,10 @@ class SignalCollection:
         self.signal_list.append(touchpad_signal)
 
     def too_much_time_passed(self, new_signal_time):
-        if self.signal_list and new_signal_time - self.signal_list[-1].get_time() > MAX_BREAK_BETWEEN_TWO_SIGNALS:
-            return True
+        if self.signal_list:
+            duration = new_signal_time - self.signal_list[-1].get_time()
+            if duration > MAX_BREAK_BETWEEN_TWO_SIGNALS:
+                return True
         return False
 
     def as_list(self):
@@ -150,30 +161,30 @@ def application_thread():
     # main loop - in every iteration one signal is read,
     # or too long break in signal streaming is captured
     while 1:
-        while queue.empty() and not signal_collection.too_much_time_passed(time.time()):
+        while queue.empty() and not collection.too_much_time_passed(time.time()):
             pass
 
-        is_new_signal = not (queue.empty())
+        is_new_signal = not queue.empty()
 
         if is_new_signal:
-            touchpad_signal = queue.get()
+            signal = queue.get()
 
-        if not(is_new_signal) or touchpad_signal.is_it_stop_signal():
-            send_points_to_interpreter(signal_collection.as_list())
-            signal_collection.reset()
-        elif signal_collection.too_much_time_passed(touchpad_signal.get_time()):
-            send_points_to_interpreter(signal_collection.as_list())
-            signal_collection.reset()
-            if touchpad_signal.is_it_proper_signal_of_point():
-                signal_collection.add_signal_and_remove_too_old_signals(touchpad_signal)
+        if not(is_new_signal) or signal.is_it_stop_signal():
+            send_points_to_interpreter(collection.as_list())
+            collection.reset()
+        elif collection.too_much_time_passed(signal.get_time()):
+            send_points_to_interpreter(collection.as_list())
+            collection.reset()
+            if signal.is_it_proper_signal_of_point():
+                collection.add_signal_and_remove_too_old_signals(signal)
         else:
-            if touchpad_signal.is_it_proper_signal_of_point():
-                signal_collection.add_new_signal_and_remove_too_old_signals(touchpad_signal)
+            if signal.is_it_proper_signal_of_point():
+                collection.add_new_signal_and_remove_too_old_signals(signal)
 
 
 # Global variables.
 queue = queue.Queue()
-signal_collection = SignalCollection()
+collection = SignalCollection()
 
 # Connect with touchpadlib.
 try:
@@ -196,5 +207,5 @@ if fd == -1:
 signal.signal(signal.SIGINT, handler)
 
 # Run both threads.
-_thread.start_new_thread(listener_thread, () )
+_thread.start_new_thread(listener_thread, ())
 application_thread()
