@@ -109,13 +109,13 @@ def send_points_to_interpreter(signal_list):
     print("New portion of events:")
     counter = 0
     length = len(signal_list)
-    for one_signal in signal_list:
-        counter += 1
-        if counter == 11:
-            print("...")
-            break
-        print("Event #", counter, "\tout of", length, "in the list. x:",
-              one_signal.get_x(), "y:", one_signal.get_y())
+
+    with open('tools/matrix-analyser/data/coordinates.data','w') as file:
+        for one_signal in signal_list:
+            counter += 1
+            file.write("%d %d\n" % (one_signal.get_x(), one_signal.get_y()))
+            print("Event #", counter, "\tout of", length, "in the list. x:",
+                one_signal.get_x(), "y:", one_signal.get_y())
     print()
 
 
