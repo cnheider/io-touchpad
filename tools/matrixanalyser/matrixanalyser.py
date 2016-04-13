@@ -34,7 +34,7 @@ class Touchpad:
 
     """
 
-    def __init__(self, touchpad, tolerance):
+    def __init__(self, touchpad, tolerance=None):
         """
         Calls the initialize function with the parameters for the
         given touchpad.
@@ -48,9 +48,11 @@ class Touchpad:
                 avoid out of range errors.
         """
         if touchpad == 'haseeq540s':
+            tolerance = tolerance if tolerance else 300
             self._initialize(1472, 5472, 1408, 4448, tolerance)
         else:
-            print("You should change the laptop's model you are asking for")
+            print("You should change the laptop's model you are asking for." \
+                    "Or specify a new one in the code on your own.")
             sys.exit(1)
 
     def _initialize(self, min_x, max_x, min_y, max_y, tolerance):
@@ -72,10 +74,23 @@ class Touchpad:
         self.y_range = max_y - min_y
 
 
+def usage():
+    """Basic usage information.
+    """
+    print("Usage: ./matrixanalyzer <laptop model> [tolerance]")
+
+
 def main():
     """The main function.
     """
-    touchpad = Touchpad('haseeq540s', 300)
+    if len(sys.argv) == 1:
+        usage()
+        sys.exit(1)
+
+    touchpad_model = sys.argv[1]
+    tolerance = sys.argv[2] if len(sys.argv) == 3 else None
+
+    touchpad = Touchpad(touchpad_model, tolerance)
     x_coordinates = []
     y_coordinates = []
 
