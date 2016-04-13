@@ -110,7 +110,7 @@ def send_points_to_interpreter(signal_list):
     counter = 0
     length = len(signal_list)
 
-    with open('tools/matrix-analyser/data/coordinates.data','w') as file:
+    with open('tools/matrixanalyser/data/coordinates.data','w') as file:
         for one_signal in signal_list:
             counter += 1
             file.write("%d %d\n" % (one_signal.get_x(), one_signal.get_y()))
