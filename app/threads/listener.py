@@ -10,6 +10,8 @@ LIB_DIRECTORY = "../lib"
 TOUCHPADLIB_SHARED_LIBRARY = LIB_DIRECTORY + "/touchpadlib.so"
 
 def start(queue):
+    global lib
+    global touchpad_signal_object
     # Connect with touchpadlib.
     try:
         lib = cdll.LoadLibrary(TOUCHPADLIB_SHARED_LIBRARY)
@@ -57,3 +59,7 @@ def listener_thread(queue, lib, fd, touchpad_signal_object):
 def combine_seconds_and_useconds(seconds, useconds):
     """Combine seconds and miliseconds into one variable."""
     return seconds + 0.000001 * useconds
+
+def clean():
+    if 'touchpad_signal_object' in globals():
+        lib.erase_event(touchpad_signal_object)

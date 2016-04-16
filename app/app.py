@@ -12,29 +12,16 @@ which is based on evtest (version 1.32).
 Source code encoding: UTF-8
 """
 
-import _thread
 import queue
-import sys
-import signal
 
+from terminationhandler import terminationhandler
 from touchpadsignal import touchpadsignal
 from signalcollection import signalcollection
 from threads import application
 from threads import listener
 
-
-
-def handler(signum, frame):
-    """Free memory after touchpad_signal_object when SIGINT call."""
-    print("\nClosing the application...")
-    if 'touchpad_signal_object' in globals():
-        lib.erase_event(touchpad_signal_object)
-    sys.exit(0)
-
-
-
 # SIGINT signal handler.
-signal.signal(signal.SIGINT, handler)
+terminationhandler.setup()
 
 # Global variables.
 queue = queue.Queue()
