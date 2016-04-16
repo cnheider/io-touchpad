@@ -6,12 +6,19 @@ import signal
 import sys
 from touchpadsignal import touchpadsignal
 
+
 # pylint: disable=unused-argument
 def handler(signum, frame):
-    """Free the memory after touchpadlib after SIGINT."""
+    """Free the memory after touchpadlib after SIGINT.
+
+    Args:
+        signum (int): Unused.
+        frame (int): Unused.
+    """
     print("\nClosing the application...")
     touchpadsignal.TouchpadSignal.clean()
     sys.exit(0)
+
 
 def setup():
     """Set up a SIGINT handler."""
