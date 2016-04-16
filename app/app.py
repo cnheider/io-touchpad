@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 """ io-touchpad application.
 
@@ -22,7 +23,7 @@ MAX_NUMBER_OF_POINTS_IN_GROUP = 3000
 MAX_DURATION_OF_GROUP = 4
 MAX_BREAK_BETWEEN_TWO_SIGNALS = 0.3
 
-LIB_DIRECTORY = "./lib"
+LIB_DIRECTORY = "../lib"
 TOUCHPADLIB_SHARED_LIBRARY = LIB_DIRECTORY + "/touchpadlib.so"
 
 
