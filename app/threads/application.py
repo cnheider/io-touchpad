@@ -1,43 +1,61 @@
-import queue
-import time
-def application_thread(collection, queue):
-    """The application thread.
+# -*- coding: utf-8 -*-
+"""The application thread function.
 
-    It receives signals/events from the listener thread using a queue and then
-    interprets the data.
+It receives signals/events from the listener thread using a queue and then
+interprets the data.
+"""
+
+import time
+from signalcollection import signalcollection
+
+
+def application_thread(queue):
+    """The application thread function.
+
+    Every iteration of the while loop one signal is read from the queue.
+    The signals are sent to the interpreter if there is a longer pause between
+    signals or if there is a signal meaning that the hand has been lifted.
+
+    At the moment only the pause is meaningful for us.
+
+    Variables:
+        collection (SignalCollection): A collection of signals sent by
+            the listener thread. Mostly touchpad events but not necessarily.
+
+    Args:
+        queue (Queue): A inter-thread queue to pass signals between the
+            listener and the application.
     """
-    # main loop - in every iteration one signal is read,
-    # or too long break in signal streaming is captured
+    collection = signalcollection.SignalCollection()
+
     while 1:
-        while queue.empty() and not collection.too_much_time_passed(time.time()):
+        while queue.empty() and collection.is_recent_enough(time.time()):
             pass
 
-        is_new_signal = not queue.empty()
-
-        if is_new_signal:
-            signal = queue.get()
-
-        if not(is_new_signal) or signal.is_it_stop_signal():
+        if not collection.is_recent_enough(time.time()):
             send_points_to_interpreter(collection.as_list())
             collection.reset()
-        elif collection.too_much_time_passed(signal.get_time()):
+
+        if queue.empty():
+            continue
+
+        signal = queue.get()
+
+        if signal.is_stop_signal():
             send_points_to_interpreter(collection.as_list())
             collection.reset()
-            if signal.is_it_proper_signal_of_point():
-                collection.add_new_signal(signal)
-        else:
-            if signal.is_it_proper_signal_of_point():
-                collection.add_new_signal_and_remove_too_old_signals(signal)
-
+        elif signal.is_proper_signal_of_point():
+            collection.add_and_maintain(signal)
 
 
 def send_points_to_interpreter(signal_list):
     """Interpret the signals from the signal list.
 
     At the moment the function is not interpreting anything. It just prints the
-    first 10 points/events/signals from the signal_list.
+    first 10 signals from the signal_list. All of them are points.
 
-    :param signal_list: List of read events.
+    Args:
+        signal_list (List): List of signals captured from the touchpad.
     """
     if not signal_list:
         return
