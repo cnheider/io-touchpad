@@ -15,7 +15,6 @@ Source code encoding: UTF-8
 import queue
 
 from terminationhandler import terminationhandler
-from signalcollection import signalcollection
 from threads import application
 from threads import listener
 
@@ -25,14 +24,12 @@ def main():
     # SIGINT signal handler.
     terminationhandler.setup()
 
-    # Global variables.
     thread_queue = queue.Queue()
-    collection = signalcollection.SignalCollection()
 
     # Run both threads.
     print("\nUse your touchpad as usual. Have a nice day!")
 
     listener.start(thread_queue)
-    application.application_thread(collection, thread_queue)
+    application.application_thread(thread_queue)
 
 main()
