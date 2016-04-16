@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 
+"""This module is a simple wrapper for signal handling."""
+
 import signal
 import sys
-import threads.listener
+from touchpadsignal import touchpadsignal
 
+# pylint: disable=unused-argument
 def handler(signum, frame):
-    """Free memory after touchpad_signal_object when SIGINT call."""
+    """Free the memory after touchpadlib after SIGINT."""
     print("\nClosing the application...")
-    threads.listener.clean()
+    touchpadsignal.TouchpadSignal.clean()
     sys.exit(0)
 
 def setup():
+    """Set up a SIGINT handler."""
     signal.signal(signal.SIGINT, handler)
