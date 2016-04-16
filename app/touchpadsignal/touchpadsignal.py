@@ -33,7 +33,7 @@ class TouchpadSignal:
 
         Firstly, it initialises the needed resources: touchpadlib,
         touchpad_event and touchpad_file_descriptor. Although it will be done
-        only once the initalize() function checks whether everythign is ok.
+        only once the initialize() function checks whether everythign is ok.
 
         Secondly, fetch_touchpad_event() captures the latest event from the
         touchpad.
@@ -121,9 +121,9 @@ class TouchpadSignal:
         Set the touchpad_file_descriptor.
         """
         cls.touchpad_file_descriptor = \
-            cls.touchpadlib.initalize_touchpadlib_usage()
+            cls.touchpadlib.initialize_touchpadlib_usage()
         if cls.touchpad_file_descriptor == -1:
-            print("ERROR: touchpadlib initalize error.")
+            print("ERROR: touchpadlib initialize error.")
             cls.free_touchpad_event()
             sys.exit(1)
 
