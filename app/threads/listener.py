@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 """The listener thread.
 
 This module has code of the listener thread.
