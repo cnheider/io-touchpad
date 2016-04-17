@@ -14,7 +14,8 @@ TOUCHPADLIB_SHARED_LIBRARY = LIB_DIRECTORY + "/touchpadlib.so"
 
 
 class TouchpadEvent(Structure):
-    """The Pythonic version of the touchpad_event struct"""
+    """The Pythonic version of the touchpad_event struct."""
+
     _fields_ = [("x", c_long),
                 ("y", c_long),
                 ("pressure", c_long),
