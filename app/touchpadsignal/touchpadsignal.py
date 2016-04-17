@@ -7,10 +7,19 @@ This module communicates with the touchpadlib directly.
 """
 
 import sys
-from ctypes import cdll
+from ctypes import cdll, Structure, c_long, POINTER
 
 LIB_DIRECTORY = "../lib"
 TOUCHPADLIB_SHARED_LIBRARY = LIB_DIRECTORY + "/touchpadlib.so"
+
+
+class TouchpadEvent(Structure):
+    """The Pythonic version of the touchpad_event struct"""
+    _fields_ = [("x", c_long),
+                ("y", c_long),
+                ("pressure", c_long),
+                ("seconds", c_long),
+                ("useconds", c_long)]
 
 
 class TouchpadSignal:
@@ -103,6 +112,7 @@ class TouchpadSignal:
     @classmethod
     def create_touchpad_event(cls):
         """Get a C language struct from the touchpadlib."""
+        cls.touchpadlib.new_event.restype = POINTER(TouchpadEvent)
         cls.touchpad_event = cls.touchpadlib.new_event()
         if cls.touchpad_event == 0:
             print("ERROR: Cannot allocate memory in new_event().")
