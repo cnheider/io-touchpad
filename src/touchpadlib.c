@@ -607,20 +607,6 @@ static void extract_absolute_data(int fd, int axis, int32_t *min, int32_t *max)
     }
 }
 
-static void print_repdata(int fd)
-{
-    int i;
-    unsigned int rep[2];
-
-    ioctl(fd, EVIOCGREP, rep);
-
-    for (i = 0; i <= REP_MAX; i++) {
-        printf("    Repeat code %d (%s)\n", i, names[EV_REP] ? (names[EV_REP][i] ? names[EV_REP][i] : "?") : "?");
-        printf("      Value %6d\n", rep[i]);
-    }
-
-}
-
 static inline const char* typename(unsigned int type)
 {
     return (type <= EV_MAX && events[type]) ? events[type] : "?";
@@ -655,13 +641,11 @@ struct touchpad_specification *new_specification(void)
  * @param fd The file descriptor to the device.
  * @return 0 on success, 2 on struct touchpad_specification allocation fail.
  */
-int get_touchpad_specification(const int fd,
+int fetch_touchpad_specification(int fd,
         struct touchpad_specification *specification)
 {
     unsigned int type, code;
     int version;
-    unsigned short id[4];
-    char name[256] = "Unknown";
     unsigned long bit[EV_MAX][NBITS(KEY_MAX)];
 
     if (ioctl(fd, EVIOCGVERSION, &version)) {
@@ -671,39 +655,37 @@ int get_touchpad_specification(const int fd,
 
     memset(bit, 0, sizeof(bit));
     ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);
-    printf("Supported events:\n"); //@FIXME
+    /* printf("Supported events:\n"); //@FIXME */
 
     for (type = 0; type < EV_MAX; type++) {
         if (test_bit(type, bit[0])) {
-            printf("  Event type %d (%s)\n", type, typename(type)); //@FIXME
+            /* printf("  Event type %d (%s)\n", type, typename(type)); //@FIXME */
             if (type != EV_ABS) continue;
             ioctl(fd, EVIOCGBIT(type, KEY_MAX), bit[type]);
-            for (code = 0; code < KEY_MAX; code++)
+            for (code = 0; code < KEY_MAX; code++) {
                 if (test_bit(code, bit[type])) {
-                    printf("    Event code %d (%s)\n", code, codename(type, code)); //@FIXME
+                    /* printf("    Event code %d (%s)\n", code, codename(type, code)); //@FIXME */
                     if (type != EV_ABS)
                         continue;
                     const char *parameter_name = codename(type, code);
-                    if (parameter_name == "ABS_X") {
-                        extract_absolute_data(fd, code, &specification->min_x,
+                    if (strncmp(parameter_name, "ABS_X", 5) == 0) {
+                        extract_absolute_data(fd, code,
+                                &specification->min_x,
                                 &specification->max_x);
-                    } else if (parameter_name == "ABS_Y") {
-                        extract_absolute_data(fd, code, &specification->min_y,
+                    } else if (strncmp(parameter_name, "ABS_Y", 5) == 0 ) {
+                        extract_absolute_data(fd, code,
+                                &specification->min_y,
                                 &specification->max_y);
-                    } else if (parameter_name == "ABS_PRESSURE") {
+                    } else if (strncmp(parameter_name, "ABS_PRESSURE", 12) == 0) {
                         extract_absolute_data(fd, code,
                                 &specification->min_pressure,
                                 &specification->max_pressure);
                     }
                 }
+            }
         }
     }
 
-    // @FIXME
-    // printf("%d, %d, %d, %d, %d, %d\n",
-    //         specification->min_x, specification->max_x,
-    //         specification->min_y, specification->max_y,
-    //         specification->min_pressure, specification->max_pressure);
 
     return 0;
 }

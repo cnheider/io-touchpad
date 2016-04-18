@@ -32,12 +32,12 @@ struct touchpad_specification {
 
 /* struct touchpad_specification interface*/
 void free_specification(struct touchpad_specification *specification);
-int get_touchpad_specification(const int fd,
-        struct touchpad_specification *specification);
 struct touchpad_specification *new_specification(void);
 
 /* touchpadlib interface */
 int fetch_touchpad_event(int fd, struct touchpad_event *event);
+int fetch_touchpad_specification(int fd,
+        struct touchpad_specification *specification);
 int has_root_privileges(void);
 int initialize_touchpadlib_usage(void);
 void print_event(const struct touchpad_event *event);
