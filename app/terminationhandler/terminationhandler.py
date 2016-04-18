@@ -4,7 +4,7 @@
 
 import signal
 import sys
-from touchpadsignal import touchpadsignal
+from touchpadlib import touchpadlib
 
 
 # pylint: disable=unused-argument
@@ -16,7 +16,7 @@ def handler(signum, frame):
         frame (int): Unused.
     """
     print("\nClosing the application...")
-    touchpadsignal.TouchpadSignal.clean()
+    touchpadlib.Touchpadlib.clean()
     sys.exit(0)
 
 
