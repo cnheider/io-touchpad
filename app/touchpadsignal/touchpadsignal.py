@@ -7,6 +7,7 @@ This module communicates with the touchpadlib directly.
 """
 
 import sys
+import _thread
 from ctypes import cdll, Structure, c_long, POINTER
 
 LIB_DIRECTORY = "../lib"
@@ -108,7 +109,7 @@ class TouchpadSignal:
             cls.touchpadlib = cdll.LoadLibrary(TOUCHPADLIB_SHARED_LIBRARY)
         except OSError:
             print("ERROR: No such library as touchpadlib.so.")
-            sys.exit(1)
+            cls.interrupt_and_finish()
 
     @classmethod
     def create_touchpad_event(cls):
@@ -117,8 +118,7 @@ class TouchpadSignal:
         cls.touchpad_event = cls.touchpadlib.new_event()
         if cls.touchpad_event == 0:
             print("ERROR: Cannot allocate memory in new_event().")
-            cls.free_touchpad_event()
-            sys.exit(1)
+            cls.interrupt_and_finish()
 
     @classmethod
     def free_touchpad_event(cls):
@@ -135,19 +135,15 @@ class TouchpadSignal:
             cls.touchpadlib.initialize_touchpadlib_usage()
         if cls.touchpad_file_descriptor == -1:
             print("ERROR: touchpadlib initialize error.")
-            cls.free_touchpad_event()
-            sys.exit(1)
+            cls.interrupt_and_finish()
 
     @classmethod
     def fetch_touchpad_event(cls):
         """Fetch the next event from the touchpad."""
-        touchpadlib = cls.touchpadlib
-        file_descriptor = cls.touchpad_file_descriptor
-        if touchpadlib.fetch_touchpad_event(file_descriptor,
-                                            cls.touchpad_event) == 1:
+        if cls.touchpadlib.fetch_touchpad_event(cls.touchpad_file_descriptor,
+                                                cls.touchpad_event) == 1:
             print("ERROR: touchpadlib fetch error.")
-            cls.free_touchpad_event()
-            sys.exit(1)
+            cls.interrupt_and_finish()
 
     @classmethod
     def clean(cls):
@@ -160,6 +156,18 @@ class TouchpadSignal:
         """
         if cls.touchpad_event is not None:
             cls.free_touchpad_event()
+
+    @classmethod
+    def interrupt_and_finish(cls):
+        """Interrupt the main thread and exit.
+
+        Clean the C language data structures.
+
+        Exit thread with the exit code of 1.
+        """
+        cls.clean()
+        _thread.interrupt_main()
+        sys.exit(1)
 
     @staticmethod
     def combine_seconds_and_useconds(seconds, useconds):
