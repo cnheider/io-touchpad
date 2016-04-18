@@ -27,7 +27,7 @@ def main():
     thread_queue = queue.Queue()
 
     # Run both threads.
-    print("\nUse your touchpad as usual. Have a nice day!")
+    print("Use your touchpad as usual. Have a nice day!")
 
     listener.start(thread_queue)
     application.application_thread(thread_queue)
