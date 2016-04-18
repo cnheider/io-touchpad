@@ -17,6 +17,7 @@ import queue
 from terminationhandler import terminationhandler
 from threads import application
 from threads import listener
+from touchpadlib import touchpadlib
 
 
 def main():
@@ -25,6 +26,17 @@ def main():
     terminationhandler.setup()
 
     thread_queue = queue.Queue()
+
+    touchpad_specification = touchpadlib.Touchpadlib.get_specification()
+
+    print("Touchpad specification: "
+          "min/max x: %d/%d, min/max y: %d/%d, min/max pressure %d/%d." %
+          (touchpad_specification['min_x'],
+           touchpad_specification['max_x'],
+           touchpad_specification['min_y'],
+           touchpad_specification['max_y'],
+           touchpad_specification['min_pressure'],
+           touchpad_specification['max_pressure']))
 
     # Run both threads.
     print("Use your touchpad as usual. Have a nice day!")
