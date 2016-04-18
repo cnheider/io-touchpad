@@ -6,22 +6,7 @@ A wraper for the touchpad events from the touchpadlib.
 This module communicates with the touchpadlib directly.
 """
 
-import sys
-import _thread
-from ctypes import cdll, Structure, c_long, POINTER
-
-LIB_DIRECTORY = "../lib"
-TOUCHPADLIB_SHARED_LIBRARY = LIB_DIRECTORY + "/touchpadlib.so"
-
-
-class TouchpadEvent(Structure):
-    """The Pythonic version of the touchpad_event struct."""
-
-    _fields_ = [("x", c_long),
-                ("y", c_long),
-                ("pressure", c_long),
-                ("seconds", c_long),
-                ("useconds", c_long)]
+from touchpadlib import touchpadlib
 
 
 class TouchpadSignal:
@@ -35,10 +20,6 @@ class TouchpadSignal:
         touchpad_file_descriptor: The descriptor to the touchpad device.
     """
 
-    touchpadlib = None
-    touchpad_event = None
-    touchpad_file_descriptor = None
-
     def __init__(self):
         """Constructor.
 
@@ -49,17 +30,19 @@ class TouchpadSignal:
         Secondly, fetch_touchpad_event() captures the latest event from the
         touchpad.
         """
-        TouchpadSignal.initialize()
-        TouchpadSignal.fetch_touchpad_event()
+        #  TouchpadSignal.initialize()
+        #  TouchpadSignal.fetch_touchpad_event()
 
-        touchpadlib = TouchpadSignal.touchpadlib
-        touchpad_event = TouchpadSignal.touchpad_event
+        #  touchpadlib = TouchpadSignal.touchpadlib
+        #  touchpad_event = TouchpadSignal.touchpad_event
 
-        self.x_value = touchpadlib.get_x(touchpad_event)
-        self.y_value = touchpadlib.get_x(touchpad_event)
-        self.pressure = touchpadlib.get_pressure(touchpad_event)
-        seconds = touchpadlib.get_seconds(touchpad_event)
-        useconds = touchpadlib.get_useconds(touchpad_event)
+        touchpad_event = touchpadlib.Touchpadlib.get_event()
+
+        self.x_value = touchpad_event['x']
+        self.y_value = touchpad_event['y']
+        self.pressure = touchpad_event['pressure']
+        seconds = touchpad_event['seconds']
+        useconds = touchpad_event['useconds']
         self.time = self.combine_seconds_and_useconds(seconds, useconds)
 
     def get_x(self):
@@ -91,83 +74,6 @@ class TouchpadSignal:
         x_value and y_value can be -1 if the event was missing one of them.
         """
         return self.x_value >= 0 and self.y_value >= 0
-
-    @classmethod
-    def initialize(cls):
-        """Initialize the static variables."""
-        if cls.touchpadlib is None:
-            cls.conncect_to_library()
-        if cls.touchpad_event is None:
-            cls.create_touchpad_event()
-        if cls.touchpad_file_descriptor is None:
-            cls.initialize_touchpadlib()
-
-    @classmethod
-    def conncect_to_library(cls):
-        """Conncet to the touchpadlib."""
-        try:
-            cls.touchpadlib = cdll.LoadLibrary(TOUCHPADLIB_SHARED_LIBRARY)
-        except OSError:
-            print("ERROR: No such library as touchpadlib.so.")
-            cls.interrupt_and_finish()
-
-    @classmethod
-    def create_touchpad_event(cls):
-        """Get a C language struct from the touchpadlib."""
-        cls.touchpadlib.new_event.restype = POINTER(TouchpadEvent)
-        cls.touchpad_event = cls.touchpadlib.new_event()
-        if cls.touchpad_event == 0:
-            print("ERROR: Cannot allocate memory in new_event().")
-            cls.interrupt_and_finish()
-
-    @classmethod
-    def free_touchpad_event(cls):
-        """Free the memory allocated for the touchpad_event."""
-        cls.touchpadlib.free_event(cls.touchpad_event)
-
-    @classmethod
-    def initialize_touchpadlib(cls):
-        """Initialize the touchpadlib library.
-
-        Set the touchpad_file_descriptor.
-        """
-        cls.touchpad_file_descriptor = \
-            cls.touchpadlib.initialize_touchpadlib_usage()
-        if cls.touchpad_file_descriptor == -1:
-            print("ERROR: touchpadlib initialize error.")
-            cls.interrupt_and_finish()
-
-    @classmethod
-    def fetch_touchpad_event(cls):
-        """Fetch the next event from the touchpad."""
-        if cls.touchpadlib.fetch_touchpad_event(cls.touchpad_file_descriptor,
-                                                cls.touchpad_event) == 1:
-            print("ERROR: touchpadlib fetch error.")
-            cls.interrupt_and_finish()
-
-    @classmethod
-    def clean(cls):
-        """Securily free the touchpad_event.
-
-        A function for other modules to be able to free the touchpad_event
-        in an emergency.
-
-        terminationhandler uses it.
-        """
-        if cls.touchpad_event is not None:
-            cls.free_touchpad_event()
-
-    @classmethod
-    def interrupt_and_finish(cls):
-        """Interrupt the main thread and exit.
-
-        Clean the C language data structures.
-
-        Exit thread with the exit code of 1.
-        """
-        cls.clean()
-        _thread.interrupt_main()
-        sys.exit(1)
 
     @staticmethod
     def combine_seconds_and_useconds(seconds, useconds):
