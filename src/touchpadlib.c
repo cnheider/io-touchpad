@@ -586,15 +586,25 @@ static char* scan_devices(void)
     return filename;
 }
 
-static void print_absdata(int fd, int axis)
+/**
+ * @TODO
+ */
+static void extract_absolute_data(int fd, int axis, int32_t *min, int32_t *max)
 {
     int abs[6] = {0};
     int k;
-
     ioctl(fd, EVIOCGABS(axis), abs);
-    for (k = 0; k < 6; k++)
-        if ((k < 3) || abs[k])
-            printf("      %s %6d\n", absval[k], abs[k]);
+    for (k = 0; k < 6; k++) {
+        if ((k < 3) || abs[k]) {
+            if (strlen(absval[k]) < 3)
+                continue;
+            if (strncmp(absval[k], "Min", 3) == 0) {
+                *min = abs[k];
+            } else if (strncmp(absval[k], "Max", 3) == 0) {
+                *max = abs[k];
+            }
+        }
+    }
 }
 
 static void print_repdata(int fd)
@@ -622,13 +632,31 @@ static inline const char* codename(unsigned int type, unsigned int code)
 }
 
 /**
+ * @TODO
+ */
+void free_specification(struct touchpad_specification *specification)
+{
+    free(specification);
+}
+
+/**
+ * @TODO
+ */
+struct touchpad_specification *new_specification(void)
+{
+    return malloc(sizeof(struct touchpad_specification));
+}
+
+/**
+ * @TODO
  * Print static device information (no events). This information includes
  * version numbers, device name and all bits supported by this device.
  *
  * @param fd The file descriptor to the device.
- * @return 0 on success or 1 otherwise.
+ * @return 0 on success, 2 on struct touchpad_specification allocation fail.
  */
-static int print_device_info(int fd)
+int get_touchpad_specification(const int fd,
+        struct touchpad_specification *specification)
 {
     unsigned int type, code;
     int version;
@@ -637,43 +665,46 @@ static int print_device_info(int fd)
     unsigned long bit[EV_MAX][NBITS(KEY_MAX)];
 
     if (ioctl(fd, EVIOCGVERSION, &version)) {
-        perror("evtest: can't get version");
+        perror("touchpad: can't get version");
         return 1;
     }
 
-    printf("Input driver version is %d.%d.%d\n",
-        version >> 16, (version >> 8) & 0xff, version & 0xff);
-
-    ioctl(fd, EVIOCGID, id);
-    printf("Input device ID: bus 0x%x vendor 0x%x product 0x%x version 0x%x\n",
-        id[ID_BUS], id[ID_VENDOR], id[ID_PRODUCT], id[ID_VERSION]);
-
-    ioctl(fd, EVIOCGNAME(sizeof(name)), name);
-    printf("Input device name: \"%s\"\n", name);
-
     memset(bit, 0, sizeof(bit));
     ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);
-    printf("Supported events:\n");
+    printf("Supported events:\n"); //@FIXME
 
     for (type = 0; type < EV_MAX; type++) {
-        if (test_bit(type, bit[0]) && type != EV_REP) {
-            printf("  Event type %d (%s)\n", type, typename(type));
-            if (type == EV_SYN) continue;
+        if (test_bit(type, bit[0])) {
+            printf("  Event type %d (%s)\n", type, typename(type)); //@FIXME
+            if (type != EV_ABS) continue;
             ioctl(fd, EVIOCGBIT(type, KEY_MAX), bit[type]);
             for (code = 0; code < KEY_MAX; code++)
                 if (test_bit(code, bit[type])) {
-                    printf("    Event code %d (%s)\n", code, codename(type, code));
-                    if (type == EV_ABS)
-                        print_absdata(fd, code);
+                    printf("    Event code %d (%s)\n", code, codename(type, code)); //@FIXME
+                    if (type != EV_ABS)
+                        continue;
+                    const char *parameter_name = codename(type, code);
+                    if (parameter_name == "ABS_X") {
+                        extract_absolute_data(fd, code, &specification->min_x,
+                                &specification->max_x);
+                    } else if (parameter_name == "ABS_Y") {
+                        extract_absolute_data(fd, code, &specification->min_y,
+                                &specification->max_y);
+                    } else if (parameter_name == "ABS_PRESSURE") {
+                        extract_absolute_data(fd, code,
+                                &specification->min_pressure,
+                                &specification->max_pressure);
+                    }
                 }
         }
     }
 
-    if (test_bit(EV_REP, bit[0])) {
-        printf("Key repeat handling:\n");
-        printf("  Repeat type %d (%s)\n", EV_REP, events[EV_REP] ?  events[EV_REP] : "?");
-        print_repdata(fd);
-    }
+    // @FIXME
+    // printf("%d, %d, %d, %d, %d, %d\n",
+    //         specification->min_x, specification->max_x,
+    //         specification->min_y, specification->max_y,
+    //         specification->min_pressure, specification->max_pressure);
+
     return 0;
 }
 
@@ -809,9 +840,6 @@ int initialize_touchpadlib_usage()
 
     if (!isatty(fileno(stdout)))
         setbuf(stdout, NULL);
-
-    // if (print_device_info(fd))
-    //     goto error;
 
     if (test_grab(fd))
         goto error;
