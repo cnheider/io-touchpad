@@ -13,6 +13,7 @@ Source code encoding: UTF-8
 """
 
 import queue
+import sys
 
 from terminationhandler import terminationhandler
 from threads import application
@@ -38,10 +39,15 @@ def main():
            touchpad_specification['min_pressure'],
            touchpad_specification['max_pressure']))
 
+    training_size = 0
+    learning_mode = len(sys.argv) > 1
+    if learning_mode:
+        training_size = int(sys.argv[1])
+
     # Run both threads.
     print("Use your touchpad as usual. Have a nice day!")
 
     listener.start(thread_queue)
-    application.application_thread(thread_queue)
+    application.application_thread(thread_queue, learning_mode, training_size)
 
 main()
