@@ -1,31 +1,49 @@
 # -*- coding: utf-8 -*-
+"""C language touchpadlib library interface for Python."""
 
 import sys
 import _thread
-from ctypes import cdll, Structure, c_long, POINTER
+import ctypes
 
 LIB_DIRECTORY = "../lib"
 TOUCHPADLIB_SHARED_LIBRARY = LIB_DIRECTORY + "/touchpadlib.so"
 
-class TouchpadEvent(Structure):
-    """The Pythonic version of the touchpad_event struct."""
 
-    _fields_ = [("x", c_long),
-                ("y", c_long),
-                ("pressure", c_long),
-                ("seconds", c_long),
-                ("useconds", c_long)]
+class TouchpadEvent(ctypes.Structure):
+    """The Pythonic version of the struct touchpad_event."""
 
-class TouchpadSpecification(Structure):
+    _fields_ = [("x", ctypes.c_int32),
+                ("y", ctypes.c_int32),
+                ("pressure", ctypes.c_int32),
+                ("seconds", ctypes.c_long),
+                ("useconds", ctypes.c_long)]
 
-    _fields_ = [("min_x", c_long),
-                ("max_x", c_long),
-                ("min_y", c_long),
-                ("max_y", c_long),
-                ("min_pressure", c_long),
-                ("max_pressure", c_long)]
+
+class TouchpadSpecification(ctypes.Structure):
+    """The Pythonic version of the struct touchpad_specification."""
+
+    _fields_ = [("min_x", ctypes.c_int32),
+                ("max_x", ctypes.c_int32),
+                ("min_y", ctypes.c_int32),
+                ("max_y", ctypes.c_int32),
+                ("min_pressure", ctypes.c_int32),
+                ("max_pressure", ctypes.c_int32)]
+
 
 class Touchpadlib:
+    """touchpadlib library wrapper.
+
+    Attributes:
+        touchpadlib (shared library): The touchpadlib shared library loaded
+            with the ctypes module.
+        touchpad_event (ctypes.POINTER(TouchpadEvent)): A pointer to the
+            class which is a pythonic representation of struct touchpad_event.
+        touchpad_specification (ctypes.POINTER(TouchpadSpecification)):
+            A pointer to the class which is a pythonic representation of
+            struct touchpad_specification.
+        touchpad_file_descriptor (ctypes.c_int): A file descriptor to the
+            touchpad device.
+    """
 
     touchpadlib = None
     touchpad_event = None
@@ -34,25 +52,38 @@ class Touchpadlib:
 
     @classmethod
     def get_event(cls):
+        """Get the next event from the touchpad.
+
+        Returns:
+            Dictionary: It has got the fields of a TouchpadEvent: x, y,
+                pressure, seconds and useconds.
+        """
         cls.initialize()
         cls.fetch_touchpad_event()
-        return { 'x': cls.touchpad_event.contents.x,
-                 'y': cls.touchpad_event.contents.y,
-                 'pressure': cls.touchpad_event.contents.pressure,
-                 'seconds': cls.touchpad_event.contents.seconds,
-                 'useconds': cls.touchpad_event.contents.useconds }
+        contents = cls.touchpad_event.contents
+        return {'x': contents.x,
+                'y': contents.y,
+                'pressure': contents.pressure,
+                'seconds': contents.seconds,
+                'useconds': contents.useconds}
 
     @classmethod
     def get_specification(cls):
+        """Get the specification of a touchpad.
+
+        Returns:
+            Dictionary: It has got the fields of a TouchpadSpecification:
+                min_x, max_x, min_y, max_y, min_pressure, max_pressure.
+        """
         cls.initialize()
         cls.fetch_touchpad_specification()
         contents = cls.touchpad_specification.contents
-        return { 'min_x': contents.min_x,
-                 'max_x': contents.max_x,
-                 'min_y': contents.min_y,
-                 'max_y': contents.max_y,
-                 'min_pressure': contents.min_pressure,
-                 'max_pressure': contents.max_pressure }
+        return {'min_x': contents.min_x,
+                'max_x': contents.max_x,
+                'min_y': contents.min_y,
+                'max_y': contents.max_y,
+                'min_pressure': contents.min_pressure,
+                'max_pressure': contents.max_pressure}
 
     @classmethod
     def initialize(cls):
@@ -70,15 +101,16 @@ class Touchpadlib:
     def conncect_to_library(cls):
         """Conncet to the touchpadlib."""
         try:
-            cls.touchpadlib = cdll.LoadLibrary(TOUCHPADLIB_SHARED_LIBRARY)
+            cls.touchpadlib = \
+                    ctypes.cdll.LoadLibrary(TOUCHPADLIB_SHARED_LIBRARY)
         except OSError:
             print("ERROR: No such library as touchpadlib.so.")
             cls.interrupt_and_finish()
 
     @classmethod
     def create_touchpad_event(cls):
-        """Get a C language struct from the touchpadlib."""
-        cls.touchpadlib.new_event.restype = POINTER(TouchpadEvent)
+        """Get a C language struct touchpad_event from the touchpadlib."""
+        cls.touchpadlib.new_event.restype = ctypes.POINTER(TouchpadEvent)
         cls.touchpad_event = cls.touchpadlib.new_event()
         if cls.touchpad_event == 0:
             print("ERROR: Cannot allocate memory in new_event().")
@@ -86,11 +118,12 @@ class Touchpadlib:
 
     @classmethod
     def create_touchpad_specification(cls):
+        """Get the touchpad specification struct from the touchpadlib."""
         cls.touchpadlib.new_specification.restype = \
-            POINTER(TouchpadSpecification)
+            ctypes.POINTER(TouchpadSpecification)
         cls.touchpad_specification = cls.touchpadlib.new_specification()
         if cls.touchpad_specification == 0:
-            print("ERROR: Cannto allocate memory in new_specification().")
+            print("ERROR: Cannot allocate memory in new_specification().")
             cls.interrupt_and_finish()
 
     @classmethod
@@ -107,26 +140,32 @@ class Touchpadlib:
     def initialize_touchpadlib(cls):
         """Initialize the touchpadlib library.
 
-        Set the touchpad_file_descriptor.
+        Sets the touchpad_file_descriptor.
         """
+        cls.touchpadlib.initialize_touchpadlib_usage.restype = ctypes.c_int
         cls.touchpad_file_descriptor = \
             cls.touchpadlib.initialize_touchpadlib_usage()
-        if cls.touchpad_file_descriptor == -1:
+        if cls.touchpad_file_descriptor == ctypes.c_int(-1):
             print("ERROR: touchpadlib initialize error.")
             cls.interrupt_and_finish()
 
     @classmethod
     def fetch_touchpad_event(cls):
         """Fetch the next event from the touchpad."""
-        if cls.touchpadlib.fetch_touchpad_event(cls.touchpad_file_descriptor,
-                                                cls.touchpad_event) == 1:
+        fetch_event = cls.touchpadlib.fetch_touchpad_event
+        file_descriptor = cls.touchpad_file_descriptor
+        event = cls.touchpad_event
+        if fetch_event(file_descriptor, event) == ctypes.c_int(1):
             print("ERROR: touchpadlib fetch error.")
             cls.interrupt_and_finish()
 
     @classmethod
     def fetch_touchpad_specification(cls):
-        if cls.touchpadlib.fetch_touchpad_specification(
-                cls.touchpad_file_descriptor, cls.touchpad_specification) != 0:
+        """Fetch the touchpad specification."""
+        fetch_specification = cls.touchpadlib.fetch_touchpad_specification
+        file_descriptor = cls.touchpad_file_descriptor
+        specification = cls.touchpad_specification
+        if fetch_specification(file_descriptor, specification) != 0:
             print("ERROR: Can't get the touchpad specification.")
             cls.interrupt_and_finish()
 
@@ -141,8 +180,10 @@ class Touchpadlib:
         """
         if cls.touchpad_event is not None:
             cls.free_touchpad_event()
+            cls.touchpad_event = None
         if cls.touchpad_specification is not None:
             cls.free_touchpad_specification()
+            cls.touchpad_specification = None
 
     @classmethod
     def interrupt_and_finish(cls):
@@ -155,4 +196,3 @@ class Touchpadlib:
         cls.clean()
         _thread.interrupt_main()
         sys.exit(1)
-
