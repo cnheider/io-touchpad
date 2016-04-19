@@ -56,7 +56,7 @@ class TouchpadSignal:
         touchpad_event = TouchpadSignal.touchpad_event
 
         self.x_value = touchpadlib.get_x(touchpad_event)
-        self.y_value = touchpadlib.get_x(touchpad_event)
+        self.y_value = touchpadlib.get_y(touchpad_event)
         self.pressure = touchpadlib.get_pressure(touchpad_event)
         seconds = touchpadlib.get_seconds(touchpad_event)
         useconds = touchpadlib.get_useconds(touchpad_event)
