@@ -155,7 +155,7 @@ class Touchpadlib:
         fetch_event = cls.touchpadlib.fetch_touchpad_event
         file_descriptor = cls.touchpad_file_descriptor
         event = cls.touchpad_event
-        if fetch_event(file_descriptor, event) == ctypes.c_int(1):
+        if fetch_event(file_descriptor, event) == 1:
             print("ERROR: touchpadlib fetch error.")
             cls.interrupt_and_finish()
 

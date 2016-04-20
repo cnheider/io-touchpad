@@ -124,7 +124,7 @@ static const char * const * const names[EV_MAX + 1] = {
 /**
  * Filter for the AutoDevProbe scandir on /dev/input.
  *
- * @param dir The current directory entry provided by scandir.
+ * @param dir [in] The current directory entry provided by scandir.
  *
  * @return Non-zero if the given directory entry starts with "event", or zero
  * otherwise.
@@ -165,7 +165,8 @@ static char* scan_devices(void)
             continue;
         ioctl(fd, EVIOCGNAME(sizeof(name)), name);
 
-        // @TODO We can try to detect touchpad device here if we examine name for the 'touchpad' substring.
+        // @TODO We can try to detect touchpad device here
+        // if we examine name for the 'touchpad' substring.
 
         fprintf(stderr, "%s:    %s\n", fname, name);
         close(fd);
@@ -186,7 +187,15 @@ static char* scan_devices(void)
 }
 
 /**
- * @TODO
+ * Extracts minimal and maximal values of an event parameter from the device.
+ *
+ * @param fd [in] The file descriptor to the touchpad.
+ * @param axis [in] The code name. We will get the list of parameters for this
+ *      code.
+ * @param min [out] An allocated pointer where the minimal value will be
+ *      stored.
+ * @param max [out] An allocated pointer where the maximal value will be
+ *      stored.
  */
 static void extract_absolute_data(int fd, int axis, int32_t *min, int32_t *max)
 {
@@ -199,25 +208,43 @@ static void extract_absolute_data(int fd, int axis, int32_t *min, int32_t *max)
                 continue;
             if (strncmp(absval[k], "Min", 3) == 0) {
                 *min = abs[k];
-            } else if (strncmp(absval[k], "Max", 3) == 0) {
+            }
+            else if (strncmp(absval[k], "Max", 3) == 0) {
                 *max = abs[k];
             }
         }
     }
 }
 
+/**
+ * Resolve a typename from a type.
+ *
+ * @param type [in] The type we want to resolve.
+ *
+ * @result: The type's name if found a "?" character otherwise.
+ */
 static inline const char* typename(unsigned int type)
 {
     return (type <= EV_MAX && events[type]) ? events[type] : "?";
 }
 
+/**
+ * Resolve a codename from a type and a code.
+ *
+ * @param type [in] The parameter's type.
+ * @param code [in] The parameter's code.
+ *
+ * @result: The code's name if found or a "?" character otherwise.
+ */
 static inline const char* codename(unsigned int type, unsigned int code)
 {
     return (type <= EV_MAX && code <= maxval[type] && names[type] && names[type][code]) ? names[type][code] : "?";
 }
 
 /**
- * @TODO
+ * Free the allocated struct touchpad_specification.
+ *
+ * @param touchpad_specification [in/out] The struct we want to free.
  */
 void free_specification(struct touchpad_specification *specification)
 {
@@ -225,7 +252,9 @@ void free_specification(struct touchpad_specification *specification)
 }
 
 /**
- * @TODO
+ * Allocate struct touchpad_specification.
+ *
+ * @result: An allocated struct.
  */
 struct touchpad_specification *new_specification(void)
 {
@@ -233,12 +262,13 @@ struct touchpad_specification *new_specification(void)
 }
 
 /**
- * @TODO
- * Print static device information (no events). This information includes
- * version numbers, device name and all bits supported by this device.
+ * Return static device information (no events). This information includes
+ * all ABS bits/parameters supported by the touchpad.
  *
- * @param fd The file descriptor to the device.
- * @return 0 on success, 2 on struct touchpad_specification allocation fail.
+ * @param fd [in] The file descriptor to the device.
+ * @param specification [in/out] The allocated structure where the information
+ *      will be stored.
+ * @return 0 on success or 1 otherwise.
  */
 int fetch_touchpad_specification(int fd,
         struct touchpad_specification *specification)
@@ -254,28 +284,30 @@ int fetch_touchpad_specification(int fd,
 
     memset(bit, 0, sizeof(bit));
     ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);
-    /* printf("Supported events:\n"); //@FIXME */
 
     for (type = 0; type < EV_MAX; type++) {
         if (test_bit(type, bit[0])) {
-            /* printf("  Event type %d (%s)\n", type, typename(type)); //@FIXME */
             if (type != EV_ABS) continue;
             ioctl(fd, EVIOCGBIT(type, KEY_MAX), bit[type]);
+
             for (code = 0; code < KEY_MAX; code++) {
                 if (test_bit(code, bit[type])) {
-                    /* printf("    Event code %d (%s)\n", code, codename(type, code)); //@FIXME */
                     if (type != EV_ABS)
                         continue;
+
                     const char *parameter_name = codename(type, code);
+
                     if (strncmp(parameter_name, "ABS_X", 5) == 0) {
                         extract_absolute_data(fd, code,
                                 &specification->min_x,
                                 &specification->max_x);
-                    } else if (strncmp(parameter_name, "ABS_Y", 5) == 0 ) {
+                    }
+                    else if (strncmp(parameter_name, "ABS_Y", 5) == 0 ) {
                         extract_absolute_data(fd, code,
                                 &specification->min_y,
                                 &specification->max_y);
-                    } else if (strncmp(parameter_name, "ABS_PRESSURE", 12) == 0) {
+                    }
+                    else if (strncmp(parameter_name, "ABS_PRESSURE", 12) == 0) {
                         extract_absolute_data(fd, code,
                                 &specification->min_pressure,
                                 &specification->max_pressure);
@@ -284,7 +316,6 @@ int fetch_touchpad_specification(int fd,
             }
         }
     }
-
 
     return 0;
 }
@@ -331,7 +362,7 @@ int fetch_touchpad_event(int fd, struct touchpad_event *event)
     rd = read(fd, ev, sizeof(struct input_event) * 64);
 
     if (rd < (int) sizeof(struct input_event)) {
-        fprintf(stderr, "ERROR: Expected %d bytes, got %d.\n",
+        fprintf(stderr, "ERROR: touchpadlib: Expected %d bytes, got %d.\n",
                 (int) sizeof(struct input_event), rd);
         perror("\nERROR: touchpadlib: error reading.");
         return 1;
@@ -354,9 +385,11 @@ int fetch_touchpad_event(int fd, struct touchpad_event *event)
         if (type == EV_ABS) {
             if (code == ABS_X) {
                 event->x = ev[i].value;
-            } else if (code == ABS_Y) {
+            }
+            else if (code == ABS_Y) {
                 event->y = ev[i].value;
-            } else if (code == ABS_PRESSURE) {
+            }
+            else if (code == ABS_PRESSURE) {
                 event->pressure = ev[i].value;
             }
         }
@@ -403,7 +436,9 @@ int initialize_touchpadlib_usage()
     char *filename = NULL;
 
     if (!has_root_privileges())
-        fprintf(stderr, "WARNING: Not running as root, no devices may be available.\n");
+        fprintf(stderr,
+                "WARNING: touchpadlib: "
+                "Not running as root, no devices may be available.\n");
 
     filename = scan_devices();
 
@@ -411,10 +446,10 @@ int initialize_touchpadlib_usage()
         return EXIT_FAILURE;
 
     if ((fd = open(filename, O_RDONLY)) < 0) {
-        perror("ERROR: touchpadlib");
+        perror("ERROR: touchpadlib:");
         if (errno == EACCES && getuid() != 0)
-            fprintf(stderr, "ERROR: You do not have access to %s. Try "
-                    "running as root instead.\n",
+            fprintf(stderr, "ERROR: touchpadlib: You do not have access to %s. "
+                    "Try running as root instead.\n",
                     filename);
         goto error;
     }
