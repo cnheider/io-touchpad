@@ -44,9 +44,13 @@ def main():
     if learning_mode:
         training_size = int(sys.argv[1])
 
-    # Run both threads.
-    print("Use your touchpad as usual. Have a nice day!")
+    # Greating.
+    if learning_mode:
+        print("Welcome in learning mode. Please draw %d versions of the symbol." % (training_size))
+    else:
+        print("Use your touchpad as usual. Have a nice day!")
 
+    # Run both threads.
     listener.start(thread_queue)
     application.application_thread(thread_queue, learning_mode, training_size)
 
