@@ -14,7 +14,6 @@ class Classifier:
         file_with_model = open('nn-model', 'rb')
         self.learning_model = pickle.load(file_with_model)
         file_with_model.close()
-        self.tolerance_distance = 15
         file_with_tolerance_distance = open('tolerance_distance', 'r')
         self.tolerance_distance = float(file_with_tolerance_distance.readline())
         file_with_tolerance_distance.close()
@@ -59,17 +58,18 @@ class Classifier:
 
     def calculate_feature_vector(self, signal_list):
         #temporal stupid features:
-        le = len(signal_list) % 5
+        le = len(signal_list)
         li = []
-        for i in range(0,100):
-            li.append((le+i) % 5);
+        for i in range(0,30):
+            li.append(signal_list[i % le].get_x());
+            li.append(signal_list[i % le].get_y());
         return li
 
     def classify(self, signal_list):
         print("classyfing...")
         feature_vector = self.calculate_feature_vector(signal_list)
         #TODO normalizing features by variance or spread
-        distances, indices = self.learning_model.kneighbors(np.array([feature_vector]))
+        distances, _ = self.learning_model.kneighbors(np.array([feature_vector]))
         mean_distance = np.mean(distances[0])
         if mean_distance < self.tolerance_distance:
             return 1
@@ -78,7 +78,7 @@ class Classifier:
 
     def compute_tolerance_distance(self, sample):
         nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree').fit(sample) 
-        distances, indices = nbrs.kneighbors(sample)
+        distances, _ = nbrs.kneighbors(sample)
         print(distances)
         means = []
         for distances_row in distances:
