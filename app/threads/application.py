@@ -79,6 +79,6 @@ def send_points_to_interpreter(signal_list, learning_mode, clsf):
         clsf.add_to_training_set(signal_list)
     else: 
         item = clsf.classify(signal_list)
-        if item != None:
+        if item is not None:
             #TODO execution
-            pass
+            print("execution")
