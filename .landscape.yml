@@ -1,0 +1,10 @@
+# Configuration details: https://github.com/landscapeio/landscape-docs/blob/master/configuration.rst
+autodetect: yes
+doc-warnings: yes
+max-line-length: 80
+pep8:
+    full: true
+python-targets:  3
+# requirements:
+strictness: veryhigh
+test-warnings: yes
