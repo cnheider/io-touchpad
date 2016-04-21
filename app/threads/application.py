@@ -9,7 +9,8 @@ import time
 from signalcollection import signalcollection
 from classifier import classifier
 
-def application_thread(queue, learning_mode = False, training_size = 0):
+
+def application_thread(queue, learning_mode=False, training_size=0):
     """The application thread function.
 
     Every iteration of the while loop one signal is read from the queue.
@@ -29,7 +30,7 @@ def application_thread(queue, learning_mode = False, training_size = 0):
     clsf = classifier.Classifier()
     if learning_mode:
         clsf.reset_training_set(training_size)
-   
+
     collection = signalcollection.SignalCollection()
 
     while 1:
@@ -77,8 +78,10 @@ def send_points_to_interpreter(signal_list, learning_mode, clsf):
     print()
     if learning_mode:
         clsf.add_to_training_set(signal_list)
-    else: 
+    else:
         item = clsf.classify(signal_list)
         if item is not None:
-            #TODO execution
+            # TODO execution
             print("execution")
+        else:
+            print("not similar")
