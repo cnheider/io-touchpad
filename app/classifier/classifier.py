@@ -6,6 +6,7 @@ import pickle
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import sys
+import math
 
 class Classifier:
 
@@ -14,9 +15,9 @@ class Classifier:
         self.learning_model = pickle.load(file_with_model)
         file_with_model.close()
         self.tolerance_distance = 15
-        #file_with_tolerance_distance = open('tolerance_distance', 'rb')
-        #self.tolerance_distance = pickle.load(file_with_tolerance_distance)
-        #file_with_tolerance_distance.close()
+        file_with_tolerance_distance = open('tolerance_distance', 'r')
+        self.tolerance_distance = float(file_with_tolerance_distance.readline())
+        file_with_tolerance_distance.close()
 
     def load_training_set(self):
         self.file_with_sizes = open('drawings-sizes', 'r')
@@ -47,13 +48,13 @@ class Classifier:
         for element in signal_list:
             pickle.dump(element, self.file_with_signals)
         self.training_size += 1
+        print("ok")
         if self.training_size == self.ultimate_training_size:
             self.file_with_sizes.close()
             self.file_with_signals.close()
             self.learn()
             _thread.interrupt_main()
             sys.exit(0)
-        print("ok")
         print()
 
     def calculate_feature_vector(self, signal_list):
@@ -68,14 +69,28 @@ class Classifier:
         print("classyfing...")
         feature_vector = self.calculate_feature_vector(signal_list)
         #TODO normalizing features by variance or spread
-        distances, indices = self.learning_model.kneighbors(np.array(feature_vector))
-        print(distances)
-        print(indices)
+        distances, indices = self.learning_model.kneighbors(np.array([feature_vector]))
         mean_distance = np.mean(distances[0])
         if mean_distance < self.tolerance_distance:
             return 1
         else:
             return None
+
+    def compute_tolerance_distance(self, sample):
+        nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree').fit(sample) 
+        distances, indices = nbrs.kneighbors(sample)
+        print(distances)
+        means = []
+        for distances_row in distances:
+            row = np.delete(distances_row, [0])
+            means.append(np.mean(row))
+        means.sort()
+        critical_index = math.ceil(0.8 * len(means)) - 1
+        self.tolerance_distance = means[critical_index] * 1.3
+        print("tolerance distance: %.16f" % (self.tolerance_distance))
+        file_with_tolerance_distance = open('tolerance_distance', 'w')
+        file_with_tolerance_distance.write("%.16f\n" % (self.tolerance_distance))
+        file_with_tolerance_distance.close()
         
     def learn(self):
         print("learning...")
@@ -89,4 +104,4 @@ class Classifier:
         file_with_model = open('nn-model', 'wb')
         pickle.dump(nbrs, file_with_model)
         file_with_model.close()
-        #TODO compute "tolerance distance" and save
+        self.compute_tolerance_distance(sample)

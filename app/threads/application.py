@@ -9,7 +9,6 @@ import time
 from signalcollection import signalcollection
 from classifier import classifier
 
-
 def application_thread(queue, learning_mode = False, training_size = 0):
     """The application thread function.
 
