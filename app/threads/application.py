@@ -63,6 +63,7 @@ def send_points_to_interpreter(signal_list, learning_mode, clsf):
     """
     if not signal_list:
         return
+    print()
     print("New portion of events:")
     counter = 0
     length = len(signal_list)

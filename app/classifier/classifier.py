@@ -61,8 +61,9 @@ class Classifier:
         le = len(signal_list)
         li = []
         for i in range(0,30):
-            li.append(signal_list[i % le].get_x());
-            li.append(signal_list[i % le].get_y());
+            index = int((le * i)/30)
+            li.append(signal_list[index].get_x());
+            li.append(signal_list[index].get_y());
         return li
 
     def classify(self, signal_list):
