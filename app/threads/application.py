@@ -8,6 +8,7 @@ interprets the data.
 import time
 from signalcollection import signalcollection
 from classifier import classifier
+from executor import executor
 
 
 def application_thread(queue, learning_mode=False, training_size=0):
@@ -83,5 +84,6 @@ def send_points_to_interpreter(signal_list, learning_mode, clsf):
         if item is not None:
             # TODO execution
             print("execution")
+            executor.execute(item)
         else:
             print("not similar")
