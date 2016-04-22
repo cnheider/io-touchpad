@@ -5,7 +5,6 @@
 ## Installation
 
     apt-get update
-    apt-get install gfortran gfortran-4.9 libgfortran-4.9-dev libblas-dev liblapack-dev
     apt-get install build-essential libatlas-dev libatlas3gf-base
     apt-get install python3-dev python3-setuptools python3-numpy python3-scipy python3-pip
     pip3 install scikit-learn
