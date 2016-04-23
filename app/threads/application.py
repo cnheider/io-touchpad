@@ -28,7 +28,7 @@ def application_thread(queue, learning_mode=False, training_size=0):
         queue (Queue): A inter-thread queue to pass signals between the
             listener and the application.
     """
-    clsf = classifier.Classifier()
+    clsf = classifier.Classifier(learning_mode=learning_mode)
     if learning_mode:
         clsf.reset_training_set(training_size)
 

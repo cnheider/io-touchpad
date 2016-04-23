@@ -21,14 +21,15 @@ class Classifier:
 
 
 
-    def __init__(self):
+    def __init__(self, learning_mode=False):
         """Constructor. Loads learning model from file."""
-        file_with_model = open(MODEL_FILE, 'rb')
-        self.learning_model = pickle.load(file_with_model)
-        file_with_model.close()
-        file_with_tolerance_distance = open(DISTANCE_TOLERANCE_FILE, 'r')
-        self.tolerance_distance = float(file_with_tolerance_distance.readline())
-        file_with_tolerance_distance.close()
+        if not learning_mode:
+            file_with_model = open(MODEL_FILE, 'rb')
+            self.learning_model = pickle.load(file_with_model)
+            file_with_model.close()
+            file_with_tolerance_distance = open(DISTANCE_TOLERANCE_FILE, 'r')
+            self.tolerance_distance = float(file_with_tolerance_distance.readline())
+            file_with_tolerance_distance.close()
         self.training_size = 0
         self.ultimate_training_size = 0
         self.file_with_sizes = None
