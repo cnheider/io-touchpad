@@ -7,6 +7,7 @@ from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import sys
 import math
+from classifier import normalizer
 
 
 class Classifier:
@@ -81,7 +82,7 @@ class Classifier:
     def classify(self, signal_list):
         """Classify the symbol to some item id or return None if similirity is to weak."""
         print("classyfing...")
-        feature_vector = self.calculate_feature_vector(signal_list)
+        feature_vector = normalizer.get_features(signal_list)
         # TODO normalizing features by variance or spread
         distances, _ = self.learning_model.kneighbors(np.array([feature_vector]))
         mean_distance = np.mean(distances[0])
@@ -114,7 +115,7 @@ class Classifier:
         feature_vectors = []
         for training_element in training_set:
             # TODO normalizing fetaures by variance or spread
-            feature_vectors.append(self.calculate_feature_vector(training_element))
+            feature_vectors.append(normalizer.get_features(training_element))
         sample = np.array(feature_vectors)
         nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(sample)
         file_with_model = open('nn-model', 'wb')
