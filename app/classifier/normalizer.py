@@ -46,8 +46,14 @@ def calculate_normalization_values(signal_list):
         whole_mass_x += center_x*length
         whole_mass_y += center_y*length
 
+
    #last point was not included yet
    point= signal_list[len(signal_list)-1].get_x(),signal_list[len(signal_list)-1].get_y() #last point can change min and max values
+   if(len(signal_list)==1):
+       minX = point[0]
+       maxX = point[0]
+       minY = point[1]
+       maxY = point[1]
    if point[0]<minX:
        minX = point[0]
    if point[0]>maxX:
@@ -59,7 +65,6 @@ def calculate_normalization_values(signal_list):
 
    if (len(signal_list)==1): return (minX,minY),minX,minY,maxX,maxY,0
    center_of_mass = whole_mass_x/curve_length,whole_mass_y/curve_length
-   print(center_of_mass[0],center_of_mass[1])
    return center_of_mass,minX,minY,maxX,maxY,curve_length
 
 
@@ -70,14 +75,22 @@ def ratio_point_of_line(point1,point2,ratio):
 def scale_point(point,minX,minY,maxX,maxY,origin):
     #moves the point to the place where it would be on properly scaled and moved plane (scales only squarely, not rectangularly)
     moved_point = point[0] - origin[0],point[1] - origin[1]
-    drawn_scale =maxX-minX
-    return moved_point[0]/drawn_scale*SCALE,moved_point[1]/drawn_scale*SCALE
-
+    diffX = maxX - minX
+    diffY = maxY - minY
+    if(diffX>diffY):
+        drawn_scale = diffX
+        if(diffX!=0):
+            return moved_point[0]/drawn_scale*SCALE,moved_point[1]/drawn_scale*SCALE
+    else:
+        drawn_scale = diffY
+        if(diffY!=0):
+            return moved_point[0]/drawn_scale*SCALE,moved_point[1]/drawn_scale*SCALE
+    return 0,0
 
 def create_normalized_list_of_points(center_of_mass, minX, minY, maxX, maxY, curve_length, signal_list): #list of signals from evtest
     #creates list of equdistant NUMBER_OF_POINTS points that represents the same shape as signal_list list
 
-    length_of_one_line = (curve_length-1)/NUMBER_OF_POINTS #curve_length-1 to be sure there are NUMBER_OF_POINTS points
+    length_of_one_line = (curve_length)/NUMBER_OF_POINTS #curve_length-1 to be sure there are NUMBER_OF_POINTS points
     new_points = []
 
     travelled_distance = 0
@@ -98,8 +111,11 @@ def create_normalized_list_of_points(center_of_mass, minX, minY, maxX, maxY, cur
             section_length = length_of_line(point,next_point)
             new_points.append(scale_point(point,minX,minY,maxX,maxY,center_of_mass))
             #new_points.append(point)
-    return new_points
 
+    while(len(new_points)!=NUMBER_OF_POINTS):
+        point = signal_list[len(signal_list)-1].get_x(),signal_list[len(signal_list)-1].get_y()
+        new_points.append(scale_point(point,minX,minY,maxX,maxY,center_of_mass))
+    return new_points
 
 def draw_new_points(list_of_points):
     #testing function, to use with matrixanalyser
@@ -114,8 +130,11 @@ def draw_new_points(list_of_points):
 
 
 def get_angle_between_line_and_xaxis(point1,point2): #xaxis joint to point2, angle on the left side
-    return atan((point2[1]-point1[1])/(point2[0]-point1[0]))
-
+    if((point2[0]!=point1[0])):
+        return atan((point2[1]-point1[1])/(point2[0]-point1[0]))
+    if((point2[1]!=point1[1])):
+        return (pi/2)*(point2[1]-point1[1])/abs(point2[1]-point1[1])
+    return 0
 
 def dotProduct(vector1,vector2):
     return vector1[0]*vector2[0]+vector1[1]+vector2[1]
@@ -164,5 +183,6 @@ def get_features(list_of_points):
     new_points = create_normalized_list_of_points(center_of_mass,minX,minY,maxX,maxY,curve_length,list_of_points)
     angles = get_angle_list(new_points)
     feature_list = join_features(new_points,angles)
+    print(len(feature_list))
 
     return feature_list
