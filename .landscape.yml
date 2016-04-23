@@ -2,6 +2,9 @@
 autodetect: yes
 doc-warnings: yes
 max-line-length: 80
+pep257:
+    disable:
+        - D203
 pep8:
     full: true
 python-targets:
