@@ -8,6 +8,7 @@ interprets the data.
 import time
 from signalcollection import signalcollection
 from classifier import classifier
+from executor import executor
 
 
 def application_thread(queue, learning_mode=False, training_size=0):
@@ -56,11 +57,17 @@ def application_thread(queue, learning_mode=False, training_size=0):
 def send_points_to_interpreter(signal_list, learning_mode, clsf):
     """Interpret the signals from the signal list.
 
-    At the moment the function is not interpreting anything. It just prints the
-    first 10 signals from the signal_list. All of them are points.
+    It prints the first 10 signals from the signal_list. All of them are
+    points.
+
+    If the symbol has been recognized by the classifier module
+    then the command_id is passed to executor which tries to find and run an
+    appropriate command.
 
     Args:
-        signal_list (List): List of signals captured from the touchpad.
+        signal_list (list): List of signals captured from the touchpad.
+        learning_mode (bool): Tells if it is a learning session or not.
+        clsf (Classifier): The Classifier class.
     """
     if not signal_list:
         return
@@ -81,7 +88,7 @@ def send_points_to_interpreter(signal_list, learning_mode, clsf):
     else:
         item = clsf.classify(signal_list)
         if item is not None:
-            # TODO execution
             print("execution")
+            executor.execute(item)
         else:
             print("not similar")
