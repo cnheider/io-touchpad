@@ -33,5 +33,6 @@ def execute(command_id):
               "is missing.")
         return False
     else:
-        subprocess.Popen([command, arguments])
+        DEVNULL = subprocess.DEVNULL
+        subprocess.Popen([command, arguments], stdout=DEVNULL, stderr=DEVNULL)
         return True
