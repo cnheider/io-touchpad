@@ -2,6 +2,20 @@
 
 [![Code Health](https://landscape.io/github/0mp/io-touchpad/master/landscape.svg?style=flat-square)](https://landscape.io/github/0mp/io-touchpad/master)
 
+## Installation
+
+    apt-get update
+    apt-get install build-essential libatlas-dev libatlas3gf-base
+    apt-get install python3-dev python3-setuptools python3-numpy python3-scipy python3-pip
+    pip3 install scikit-learn
+    make
+
+## Usage
+
+    cd app
+    sudo ./app.py
+
+
 ## Description
 
  touchpadlib and app.py was implemented and linked.
@@ -22,12 +36,6 @@
     to send symbol, then they won't overflow memory. Currently symbol_interpreter can only count the number of events and
     write coordinates of first 10 received (it is used as a test for now).
 
-
-### Usage
-
-    make
-    sudo python3 ./app.py
-
 ## Tools
 
 ### matrixanalyser.py
@@ -45,4 +53,3 @@
 
 All generated figures of the drawn symbols are stored inside
 the `app/tools/data/matrixanalyser/figures` directory.
-
