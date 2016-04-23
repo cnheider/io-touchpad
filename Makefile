@@ -1,21 +1,29 @@
 CC=gcc
 CFLAGS=-c -fPIC
 LDFLAGS=-shared
-LIBDIR=lib
-OBJDIR=obj
-SRCDIR=src
+LIB_DIR=lib
+OBJ_DIR=obj
+SRC_DIR=src
+APP_CLASSIFIER_DATA_DIR=./app/classifier/data
 
-all: $(LIBDIR)/touchpadlib.so
+.PHONY: clean directories
 
-$(LIBDIR)/touchpadlib.so: $(OBJDIR)/touchpadlib.o
-	-@mkdir $(LIBDIR) 2>/dev/null || true
-	$(CC) $(LDFLAGS) -Wl,-soname,touchpadlib.so -o $(LIBDIR)/touchpadlib.so $(OBJDIR)/touchpadlib.o
+all: directories $(LIB_DIR)/touchpadlib.so
 
-$(OBJDIR)/touchpadlib.o: $(SRCDIR)/touchpadlib.c $(SRCDIR)/touchpadlib.h
-	-@mkdir $(OBJDIR) 2>/dev/null || true
-	$(CC) $(CFLAGS) -o $(OBJDIR)/touchpadlib.o $(SRCDIR)/touchpadlib.c
+directories: $(APP_CLASSIFIER_DATA_DIR)
+
+$(APP_CLASSIFIER_DATA_DIR):
+	-@mkdir $(APP_CLASSIFIER_DATA_DIR) 2>/dev/null || true
+
+$(LIB_DIR)/touchpadlib.so: $(OBJ_DIR)/touchpadlib.o
+	-@mkdir $(LIB_DIR) 2>/dev/null || true
+	$(CC) $(LDFLAGS) -Wl,-soname,touchpadlib.so -o $(LIB_DIR)/touchpadlib.so $(OBJ_DIR)/touchpadlib.o
+
+$(OBJ_DIR)/touchpadlib.o: $(SRC_DIR)/touchpadlib.c $(SRC_DIR)/touchpadlib.h
+	-@mkdir $(OBJ_DIR) 2>/dev/null || true
+	$(CC) $(CFLAGS) -o $(OBJ_DIR)/touchpadlib.o $(SRC_DIR)/touchpadlib.c
 
 clean:
-	-@rm -f $(OBJDIR)/*.o $(LIBDIR)/touchpadlib.so 2>/dev/null || true
-	-@rmdir $(LIBDIR) 2>/dev/null || true
-	-@rmdir $(OBJDIR) 2>/dev/null || true
+	-@rm -f $(OBJ_DIR)/*.o $(LIB_DIR)/touchpadlib.so 2>/dev/null || true
+	-@rmdir $(LIB_DIR) 2>/dev/null || true
+	-@rmdir $(OBJ_DIR) 2>/dev/null || true

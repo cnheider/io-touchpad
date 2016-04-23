@@ -8,17 +8,24 @@ import numpy as np
 import sys
 import math
 
+DATA_PATH = 'classifier/data/'
+DISTANCE_TOLERANCE_FILE = DATA_PATH + 'distance-tolerance.dat'
+MODEL_FILE = DATA_PATH + 'nn-model.dat'
+DRAWINGS_SIZES_FILE = DATA_PATH + 'drawings-sizes.dat'
+DRAWINGS_SIGNALS_FILE = DATA_PATH + 'drawings-signals.dat'
 
 class Classifier:
 
     """Class for learning and classifying drawn symbols."""
 
+
+
     def __init__(self):
         """Constructor. Loads learning model from file."""
-        file_with_model = open('nn-model', 'rb')
+        file_with_model = open(MODEL_FILE, 'rb')
         self.learning_model = pickle.load(file_with_model)
         file_with_model.close()
-        file_with_tolerance_distance = open('tolerance_distance', 'r')
+        file_with_tolerance_distance = open(DISTANCE_TOLERANCE_FILE, 'r')
         self.tolerance_distance = float(file_with_tolerance_distance.readline())
         file_with_tolerance_distance.close()
         self.training_size = 0
@@ -28,8 +35,8 @@ class Classifier:
 
     def load_training_set(self):
         """Load traning symbols from file."""
-        self.file_with_sizes = open('drawings-sizes', 'r')
-        self.file_with_signals = open('drawings-signals', 'rb')
+        self.file_with_sizes = open(DRAWINGS_SIZES_FILE, 'r')
+        self.file_with_signals = open(DRAWINGS_SIGNALS_FILE, 'rb')
         number_of_symbols = int(self.file_with_sizes.readline())
         training_set = []
         for _ in range(0, number_of_symbols):
@@ -47,9 +54,9 @@ class Classifier:
         """Start the new training set."""
         self.ultimate_training_size = new_training_size
         self.training_size = 0
-        self.file_with_sizes = open('drawings-sizes', 'w')
+        self.file_with_sizes = open(DRAWINGS_SIZES_FILE, 'w')
         self.file_with_sizes.write("%d\n" % (new_training_size))
-        self.file_with_signals = open('drawings-signals', 'wb')
+        self.file_with_signals = open(DRAWINGS_SIGNALS_FILE, 'wb')
 
     def add_to_training_set(self, signal_list):
         """Add the symbol to training set."""
@@ -103,7 +110,7 @@ class Classifier:
         critical_index = math.ceil(0.8 * len(means)) - 1
         self.tolerance_distance = means[critical_index] * 1.3
         print("tolerance distance: %.16f" % (self.tolerance_distance))
-        file_with_tolerance_distance = open('tolerance_distance', 'w')
+        file_with_tolerance_distance = open(DISTANCE_TOLERANCE_FILE, 'w')
         file_with_tolerance_distance.write("%.16f\n" % (self.tolerance_distance))
         file_with_tolerance_distance.close()
 
@@ -117,7 +124,7 @@ class Classifier:
             feature_vectors.append(self.calculate_feature_vector(training_element))
         sample = np.array(feature_vectors)
         nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(sample)
-        file_with_model = open('nn-model', 'wb')
+        file_with_model = open(MODEL_FILE, 'wb')
         pickle.dump(nbrs, file_with_model)
         file_with_model.close()
         self.compute_tolerance_distance(sample)
