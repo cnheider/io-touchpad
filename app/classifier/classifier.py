@@ -19,8 +19,6 @@ class Classifier:
 
     """Class for learning and classifying drawn symbols."""
 
-
-
     def __init__(self, learning_mode=False):
         """Constructor. Loads learning model from file."""
         if not learning_mode:
@@ -28,7 +26,8 @@ class Classifier:
             self.learning_model = pickle.load(file_with_model)
             file_with_model.close()
             file_with_tolerance_distance = open(DISTANCE_TOLERANCE_FILE, 'r')
-            self.tolerance_distance = float(file_with_tolerance_distance.readline())
+            self.tolerance_distance = \
+                    float(file_with_tolerance_distance.readline())
             file_with_tolerance_distance.close()
         self.training_size = 0
         self.ultimate_training_size = 0
@@ -89,7 +88,7 @@ class Classifier:
 
     def classify(self, signal_list):
         """Classify the symbol to some item id or return None if similirity is to weak."""
-        print("classyfing...")
+        print("classifing...")
         feature_vector = normalizer.get_features(signal_list)
         # TODO normalizing features by variance or spread
         distances, _ = self.learning_model.kneighbors(np.array([feature_vector]))
