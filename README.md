@@ -28,3 +28,14 @@
     make
     sudo python3 ./app.py
 
+## Tests
+
+### Installation
+
+    apt-get update
+    apt-get install python3-pytest
+
+### Usage
+
+    cd app/test
+    py.test-3
