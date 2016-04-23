@@ -15,6 +15,7 @@ MODEL_FILE = DATA_PATH + 'nn-model.dat'
 DRAWINGS_SIZES_FILE = DATA_PATH + 'drawings-sizes.dat'
 DRAWINGS_SIGNALS_FILE = DATA_PATH + 'drawings-signals.dat'
 
+
 class Classifier:
 
     """Class for learning and classifying drawn symbols."""
@@ -27,7 +28,7 @@ class Classifier:
             file_with_model.close()
             file_with_tolerance_distance = open(DISTANCE_TOLERANCE_FILE, 'r')
             self.tolerance_distance = \
-                    float(file_with_tolerance_distance.readline())
+                float(file_with_tolerance_distance.readline())
             file_with_tolerance_distance.close()
         self.training_size = 0
         self.ultimate_training_size = 0
