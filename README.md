@@ -28,3 +28,21 @@
     make
     sudo python3 ./app.py
 
+## Tools
+
+### matrixanalyser.py
+
+#### Installation
+
+    apt-get install python3-matplotlib
+    cd app/tools
+    make
+
+#### Usage
+
+    cd app
+    sudo ./tools/matrixanalyser.py [--tolerance TOLERANCE]
+
+All generated figures of the drawn symbols are stored inside
+the `app/tools/data/matrixanalyser/figures` directory.
+
