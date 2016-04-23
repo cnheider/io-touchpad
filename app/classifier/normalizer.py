@@ -11,6 +11,7 @@ def length_of_line(point1,point2):
 
 SCALE = 1000
 NUMBER_OF_POINTS = 40
+ANGLE_DOWNSCALE = 20
 
 
 def calculate_normalization_values(signal_list):
@@ -157,7 +158,7 @@ def get_angle_list(list_of_points):
          angle = get_angle_between_line_and_xaxis(point,next_point)
 
          #scaling angle
-         angle = angle/pi*(SCALE/8)
+         angle = angle/pi*(SCALE/ANGLE_DOWNSCALE)
 
          #appends absolute value of the angle
          feature_list.append(fabs(angle))
