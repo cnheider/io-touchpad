@@ -63,7 +63,7 @@ class Command(object):
 
 _USER_DEFINED_COMMANDS = {}
 _BUILTIN_COMMANDS = {
-    '1': Command('gedit', ''),
+    '1': Command('x-www-browser', ''),
 }
 
 
