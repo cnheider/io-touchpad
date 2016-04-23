@@ -28,3 +28,17 @@ def test_get_pressure():
     touchpad.pressure = 0.10123
     assert touchpad.get_pressure() == 0.10123
 
+def test_is_proper_signal_of_point():
+    for x in range(-1,1):
+        for y in range(-1,1):
+            touchpad.x_value = x
+            touchpad.y_value = y
+            ans = True
+
+            if x == -1 or y == -1:
+                ans = False
+
+            assert touchpad.is_proper_signal_of_point() == ans
+
+
+
