@@ -86,6 +86,6 @@ def main():
     # Run both threads.
     listener.start(thread_queue)
     application.application_thread(thread_queue, learning_mode, training_size,
-                                   args.system_bitness)
+                                   system_bitness)
 
 main()
