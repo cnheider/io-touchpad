@@ -48,7 +48,7 @@ $(OBJ_DIR)/touchpadlib.o: $(SRC_DIR)/touchpadlib.c $(SRC_DIR)/touchpadlib.h
 	$(CC) $(CFLAGS) -o $(OBJ_DIR)/touchpadlib.o $(SRC_DIR)/touchpadlib.c
 
 
-clean: cleanpychache cleanclassifierdatauserdefined
+clean: cleanpychache clean_classifier_data_userdefined
 	-@rm $(OBJ_DIR)/*.o $(LIB_DIR)/touchpadlib.so $(SILENCE_ERROR_MESSAGES)
 	-@rmdir $(LIB_DIR) $(SILENCE_ERROR_MESSAGES)
 	-@rmdir $(OBJ_DIR) $(SILENCE_ERROR_MESSAGES)
