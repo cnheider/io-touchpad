@@ -7,7 +7,7 @@ from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import sys
 import math
-from classifier import normalizer
+from classifier import featureExtractor
 
 DATA_PATH = 'classifier/data/'
 DISTANCE_TOLERANCE_FILE = DATA_PATH + 'distance-tolerance.dat'
@@ -83,9 +83,10 @@ class Classifier:
     def classify(self, signal_list):
         """Classify the symbol to some item id or return None if similirity is to weak."""
         print("classifing...")
-        feature_vector = normalizer.get_features(signal_list)
+        feature_vector = featureExtractor.get_features(signal_list)
         distances, _ = self.learning_model.kneighbors(np.array([feature_vector]))
         mean_distance = np.mean(distances[0])
+        print(mean_distance)
         if mean_distance < self.tolerance_distance:
             return 1
         else:
@@ -118,7 +119,7 @@ class Classifier:
         training_set = self.load_training_set()
         feature_vectors = []
         for training_element in training_set:
-            feature_vectors.append(normalizer.get_features(training_element))
+            feature_vectors.append(featureExtractor.get_features(training_element))
         sample = np.array(feature_vectors)
         nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(sample)
         file_with_model = open(MODEL_FILE, 'wb')
