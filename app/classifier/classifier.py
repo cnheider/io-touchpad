@@ -26,7 +26,7 @@ class Classifier:
             try:
                 file_with_model = open(MODEL_FILE, 'rb')
             except FileNotFoundError:
-                print("File with learning-model doesn't exist, please do learning.");
+                print("File with learning-model doesn't exist, please do learning.")
                 _thread.interrupt_main()
                 sys.exit(1)
 
@@ -36,10 +36,10 @@ class Classifier:
             try:
                 file_with_tolerance_distance = open(DISTANCE_TOLERANCE_FILE, 'r')
             except FileNotFoundError:
-                print("File with tolerance distance doesn't exist, please do learning.");
+                print("File with tolerance distance doesn't exist, please do learning.")
                 _thread.interrupt_main()
-                sys.exit(1)   
-      
+                sys.exit(1)
+
             self.tolerance_distance = \
                 float(file_with_tolerance_distance.readline())
             file_with_tolerance_distance.close()
@@ -54,9 +54,9 @@ class Classifier:
         try:
             file_with_training = open(TRAINING_SET_FILE, 'rb')
         except FileNotFoundError:
-            print("File with training-set doesn't exist, please do learning.");
+            print("File with training-set doesn't exist, please do learning.")
             _thread.interrupt_main()
-            sys.exit(1) 
+            sys.exit(1)
 
         training_set = pickle.load(file_with_training)
         file_with_training.close()
@@ -65,7 +65,7 @@ class Classifier:
     def reset_training_set(self, new_training_size):
         """Start the new training set."""
         self.ultimate_training_size = new_training_size
-        self.training_size = 0     
+        self.training_size = 0
         self.training_set = []
 
     def add_to_training_set(self, signal_list):
@@ -111,7 +111,7 @@ class Classifier:
     def learn(self, load_from_file):
         """Load training symbols and learn."""
         print("learning...")
-        if load_from_file == False:
+        if not load_from_file:
             file_with_training = open(TRAINING_SET_FILE, 'wb')
             pickle.dump(self.training_set, file_with_training)
             file_with_training.close()
