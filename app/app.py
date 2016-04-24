@@ -12,6 +12,7 @@ which is based on evtest (version 1.32).
 Source code encoding: UTF-8
 """
 
+import argparse
 import queue
 import sys
 
@@ -21,26 +22,41 @@ from threads import listener
 from touchpadlib import touchpadlib
 from classifier import classifier
 
+MIN_TRAINING_SIZE = 3
+
 def main():
     """The main function."""
     # SIGINT signal handler.
     terminationhandler.setup()
 
-    training_size = 0
-    learning_mode = len(sys.argv) > 1
-    if learning_mode:
-        try:
-            training_size = int(sys.argv[1])
-        except ValueError:
-            print("wrong argument")
-            sys.exit(1)
-        if training_size == 0:
-            clsf = classifier.Classifier()
-            clsf.learn(True)
-            sys.exit(0)
-        elif training_size < 3:
-            print("argument is to little")
-            sys.exit(1)
+    description = 'Teaching your touchpad magic tricks since 2016.'
+    parser = argparse.ArgumentParser(description=description)
+    parser_group = parser.add_mutually_exclusive_group()
+    parser_group.add_argument('-s', '--system', dest='system_bitness',
+        default=None, metavar='BITS', help='set the bitness of your '
+        'operation system; this option triggers the use of the hardcoded '
+        'symbols', choices={'32', '64'})
+    parser_group.add_argument('-l', '--learning', dest='training_size',
+        default=None, metavar='SIZE', help='start the application in the '
+        'learning mode; you will be asked to draw a symbol SIZE times; '
+        'SIZE should be at least ' + str(MIN_TRAINING_SIZE), type=int)
+    parser_group.add_argument('-r', '--repeat', dest='repeat_classification',
+        default=False, action='store_true', help='repeat the classification '
+        'on the latest user-defined set of drawings')
+    args = parser.parse_args()
+
+    if args.repeat_classification:
+        print('Repeating the classification within the learning process.')
+        clsf = classifier.Classifier()
+        clsf.learn(True)
+        sys.exit(0)
+
+    training_size = args.training_size
+    learning_mode = training_size is not None
+    if learning_mode and training_size < 3:
+        print('app.py: error: the training size should be at least %d'
+            % (MIN_TRAINING_SIZE))
+        sys.exit(1)
 
     thread_queue = queue.Queue()
 
@@ -57,7 +73,9 @@ def main():
 
     # Greating.
     if learning_mode:
-        print("Welcome in learning mode. Please draw %d versions of the symbol." % (training_size))
+        print("Welcome to learning mode.\n"
+              "Think of a symbol you want the application to learn "
+              "and draw it %d times." % (training_size))
     else:
         print("Use your touchpad as usual. Have a nice day!")
 
