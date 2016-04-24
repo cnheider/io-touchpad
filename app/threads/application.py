@@ -18,7 +18,7 @@ def application_thread(queue, learning_mode=False, training_size=0,
 
     Every iteration of the while loop one signal is read from the queue.
     The signals are sent to the interpreter if there is a longer pause between
-    signals or if there is a signal meaning that the hand has been lifted.
+    signals.
 
     Args:
         queue (Queue): The inter-thread queue to pass signals between the
