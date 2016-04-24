@@ -77,10 +77,15 @@ def main():
     else:
         print("Use your touchpad as usual. Have a nice day!")
 
+    system_bitness = args.system_bitness
+    if system_bitness is not None:
+        system_bitness = int(system_bitness)
+
     thread_queue = queue.Queue()
 
     # Run both threads.
     listener.start(thread_queue)
-    application.application_thread(thread_queue, learning_mode, training_size)
+    application.application_thread(thread_queue, learning_mode, training_size,
+                                   args.system_bitness)
 
 main()
