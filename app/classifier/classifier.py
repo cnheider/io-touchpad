@@ -163,7 +163,6 @@ class Classifier:
         file_paths = []
         for path_num in range(len(files)):
             file_paths.append("")
-        print(type(system_bitness))
         Classifier._append_to_paths(file_paths, DATA_PATH)
         if system_bitness == SYSTEM_BITNESS_32:
             Classifier._append_to_paths(file_paths, HARDCODED_32BIT_DIR)
