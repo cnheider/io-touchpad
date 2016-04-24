@@ -52,7 +52,7 @@ def calculate_center_of_mass_and_length(signal_list):
        whole_mass_x += center_x*length
        whole_mass_y += center_y*length
 
-   if (len(signal_list)==1): return (minX,minY),0
+   if (curve_length==0): return (signal_list[0].get_x(),signal_list[0].get_y()),0
 
    center_of_mass = whole_mass_x/curve_length,whole_mass_y/curve_length
    return center_of_mass,curve_length
