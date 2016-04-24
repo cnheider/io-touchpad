@@ -10,7 +10,7 @@ from touchpadlib import touchpadlib
 def monkey_interrupt_and_finish(self):
     """ Function to moneky patching exiting function.
 
-        It is used to test if something fails"""
+    It is used to test if something fails"""
     self.ans = -1
 
 #change interupt and finish function for a test
@@ -22,7 +22,7 @@ tlib = touchpadlib.Touchpadlib
 def test_monkey():
     """ Test for changed function
 
-        we check if it changes the value ans"""
+    we check if it changes the value ans"""
     assert tlib.ans == 0
     tlib.interrupt_and_finish()
     
@@ -48,5 +48,14 @@ def test_conncect_to_library():
     tlib.ans = 0
     touchpadlib.TOUCHPADLIB_SHARED_LIBRARY = "../lib/touchpadlib.so"
 
-    
-    
+def test_create_touchpad_event():
+    """ test for creating touchpad event """
+    tlib.create_touchpad_event()
+    assert tlib.ans == 0
+
+def test_initialize_touchpadlib():
+    """ test for initialize touchpadlib """
+    tlib.initialize_touchpadlib()
+    assert tlib.ans == 0
+
+
