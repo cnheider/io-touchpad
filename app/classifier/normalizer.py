@@ -14,25 +14,17 @@ NUMBER_OF_POINTS = 40
 ANGLE_DOWNSCALE = 20
 
 
-def calculate_normalization_values(signal_list):
-   #calculating values necessary for normalization (center of mass, boundary and curve length for now)
-
-   curve_length = 0
-   whole_mass_x = 0
-   whole_mass_y = 0
-   for i in range(len(signal_list)-1):
-        point = signal_list[i].get_x(),signal_list[i].get_y()
-        next_point = signal_list[i+1].get_x(),signal_list[i+1].get_y()
-        if (i==0):
+def calculate_border_points(signal_list):
+    initiated_starting_values = False;
+    for signal in (signal_list):
+        point = signal.get_x(),signal.get_y()
+        if (initiated_starting_values != True ):
             minX=point[0]
             maxX=point[0]
             minY=point[1]
             maxY=point[1]
-        #curve length
-        length=length_of_line(point,next_point)
-        curve_length += length
+            initiated_starting_values = True
 
-        #max and min parameters
         if point[0]<minX:
             minX = point[0]
         if point[0]>maxX:
@@ -41,33 +33,29 @@ def calculate_normalization_values(signal_list):
             minY = point[1]
         if point[1]>maxY:
             maxY = point[1]
+    return minX,minY,maxX,maxY
 
-        #adding to center of mass parameters
-        center_x,center_y=center_of_line(point,next_point)
-        whole_mass_x += center_x*length
-        whole_mass_y += center_y*length
+def calculate_center_of_mass_and_length(signal_list):
+   curve_length = 0
+   whole_mass_x = 0
+   whole_mass_y = 0
+   for i in range(len(signal_list)-1):
+       point = signal_list[i].get_x(),signal_list[i].get_y()
+       next_point = signal_list[i+1].get_x(),signal_list[i+1].get_y()
 
+       #curve length
+       length=length_of_line(point,next_point)
+       curve_length += length
 
-   #last point was not included yet
-   point= signal_list[len(signal_list)-1].get_x(),signal_list[len(signal_list)-1].get_y() #last point can change min and max values
-   if(len(signal_list)==1):
-       minX = point[0]
-       maxX = point[0]
-       minY = point[1]
-       maxY = point[1]
-   if point[0]<minX:
-       minX = point[0]
-   if point[0]>maxX:
-       maxX = point[0]
-   if point[1]<minY:
-       minY = point[1]
-   if point[1]>maxY:
-       maxY = point[1]
+       #adding to center of mass parameters
+       center_x,center_y=center_of_line(point,next_point)
+       whole_mass_x += center_x*length
+       whole_mass_y += center_y*length
 
-   if (len(signal_list)==1): return (minX,minY),minX,minY,maxX,maxY,0
+   if (len(signal_list)==1): return (minX,minY),0
+
    center_of_mass = whole_mass_x/curve_length,whole_mass_y/curve_length
-   return center_of_mass,minX,minY,maxX,maxY,curve_length
-
+   return center_of_mass,curve_length
 
 def ratio_point_of_line(point1,point2,ratio):
     return point1[0]*(1-ratio) + point2[0]*ratio,point1[1]*(1-ratio)+ point2[1]*ratio
@@ -177,11 +165,22 @@ def join_features(list_of_points,list_of_feature1): #assumes length of points is
             feature_list.append(list_of_feature1[i])
     return feature_list
 
+def normalize_points(list_of_points):
+    #returns list of points that represents the same figure but is in our preferred standard
+    minX,minY,maxX,maxY = calculate_border_points(list_of_points)
+    center_of_mass,curve_length = calculate_center_of_mass_and_length(list_of_points)
+
+    new_points = create_normalized_list_of_points(center_of_mass,minX,minY,maxX,maxY,curve_length,list_of_points)
+    return new_points
 
 def get_features(list_of_points):
     #returns list of features for list of points taken from evtest
-    center_of_mass,minX,minY,maxX,maxY,curve_length = calculate_normalization_values(list_of_points)
-    new_points = create_normalized_list_of_points(center_of_mass,minX,minY,maxX,maxY,curve_length,list_of_points)
+    #changing format of points to preferred
+    new_points = normalize_points(list_of_points)
+
+    #getting features different then coordinates
     angles = get_angle_list(new_points)
+
+    #joining all the features together
     feature_list = join_features(new_points,angles)
     return feature_list
