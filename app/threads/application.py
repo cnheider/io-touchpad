@@ -71,6 +71,13 @@ def send_points_to_interpreter(signal_list, learning_mode, clsf):
     """
     if not signal_list:
         return
+    point_on_the_list = False
+    for one_signal in signal_list:
+        if one_signal.is_proper_signal_of_point():
+            point_on_the_list = True
+    if not point_on_the_list:
+        return
+
     print()
     print("New portion of events:")
     counter = 0
@@ -83,6 +90,7 @@ def send_points_to_interpreter(signal_list, learning_mode, clsf):
         print("Event #", counter, "\tout of", length, "in the list. x:",
               one_signal.get_x(), "y:", one_signal.get_y())
     print()
+
     if learning_mode:
         clsf.add_to_training_set(signal_list)
     else:
