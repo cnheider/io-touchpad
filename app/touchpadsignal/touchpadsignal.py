@@ -68,6 +68,10 @@ class TouchpadSignal:
         #  to end the group is a long break between signals.
         return False
 
+    def is_raising_finger_signal(self):
+        """ Check if the signal has pressure equal to 0 """
+        return self.pressure == 0
+
     def is_proper_signal_of_point(self):
         """Check if the signal has both x >= 0 and y >= 0.
 

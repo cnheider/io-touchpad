@@ -86,6 +86,7 @@ class Classifier:
         feature_vector = normalizer.get_features(signal_list)
         distances, _ = self.learning_model.kneighbors(np.array([feature_vector]))
         mean_distance = np.mean(distances[0])
+        print(mean_distance)
         if mean_distance < self.tolerance_distance:
             return 1
         else:

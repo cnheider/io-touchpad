@@ -11,7 +11,8 @@ def length_of_line(point1,point2):
 
 SCALE = 1000
 NUMBER_OF_POINTS = 40
-ANGLE_DOWNSCALE = 20
+ANGLE_DOWNSCALE = 28
+COLOR_DOWNSCALE = 2 
 
 
 def calculate_border_points(signal_list):
@@ -76,11 +77,12 @@ def scale_point(point,minX,minY,maxX,maxY,origin):
             return moved_point[0]/drawn_scale*SCALE,moved_point[1]/drawn_scale*SCALE
     return 0,0
 
-def create_normalized_list_of_points(center_of_mass, minX, minY, maxX, maxY, curve_length, signal_list): #list of signals from evtest
+def create_normalized_list_of_points(center_of_mass, minX, minY, maxX, maxY, curve_length, signal_list, colors):
     #creates list of equdistant NUMBER_OF_POINTS points that represents the same shape as signal_list list
 
     length_of_one_line = (curve_length)/NUMBER_OF_POINTS #curve_length-1 to be sure there are NUMBER_OF_POINTS points
     new_points = []
+    new_colors = []
 
     travelled_distance = 0
     for i in range(len(signal_list)-1):
@@ -99,12 +101,14 @@ def create_normalized_list_of_points(center_of_mass, minX, minY, maxX, maxY, cur
             point = ratio_point_of_line(point,next_point,ratio) #in case there should be more points added then one here
             section_length = length_of_line(point,next_point)
             new_points.append(scale_point(point,minX,minY,maxX,maxY,center_of_mass))
+            new_colors.append(colors[i])
             #new_points.append(point)
 
     while(len(new_points)!=NUMBER_OF_POINTS):
         point = signal_list[len(signal_list)-1].get_x(),signal_list[len(signal_list)-1].get_y()
         new_points.append(scale_point(point,minX,minY,maxX,maxY,center_of_mass))
-    return new_points
+        new_colors.append(colors[len(signal_list)-1])
+    return new_points, new_colors
 
 def draw_new_points(list_of_points):
     #testing function, to use with matrixanalyser
@@ -146,14 +150,14 @@ def get_angle_list(list_of_points):
          angle = get_angle_between_line_and_xaxis(point,next_point)
 
          #scaling angle
-         angle = angle/pi*(SCALE/ANGLE_DOWNSCALE)
+         angle = 2*angle/pi*(SCALE/ANGLE_DOWNSCALE)
 
          #appends absolute value of the angle
          feature_list.append(fabs(angle))
     return feature_list
 
 
-def join_features(list_of_points,list_of_feature1): #assumes length of points is the biggest here
+def join_features(list_of_points,list_of_feature1,colors): #assumes length of points is the biggest here
     #join lists of coordinates with features (one feature for now), in order x,y,feature1,x,y,feature1,....
     feature_list = []
     feature1_length = len(list_of_feature1)
@@ -161,26 +165,45 @@ def join_features(list_of_points,list_of_feature1): #assumes length of points is
         point = list_of_points[i]
         feature_list.append(point[0])
         feature_list.append(point[1])
+        feature_list.append(colors[i])
         if (i <feature1_length):
             feature_list.append(list_of_feature1[i])
     return feature_list
 
-def normalize_points(list_of_points):
+def normalize_points(list_of_points, colors):
     #returns list of points that represents the same figure but is in our preferred standard
     minX,minY,maxX,maxY = calculate_border_points(list_of_points)
     center_of_mass,curve_length = calculate_center_of_mass_and_length(list_of_points)
 
-    new_points = create_normalized_list_of_points(center_of_mass,minX,minY,maxX,maxY,curve_length,list_of_points)
+    new_points = create_normalized_list_of_points(center_of_mass,minX,minY,maxX,maxY,curve_length,list_of_points,colors)
     return new_points
 
-def get_features(list_of_points):
+def filter_points_from_signals(list_of_signals):
+    points = []
+    colors = []
+    length = len(list_of_signals)
+    color_scaled = SCALE / COLOR_DOWNSCALE
+    for i in range(length):
+        touchpad_signal = list_of_signals[i]
+        if touchpad_signal.is_proper_signal_of_point():
+            points.append(touchpad_signal)
+            j = i + 1
+            while j < length and not list_of_signals[j].is_raising_finger_signal() and not list_of_signals[j].is_proper_signal_of_point():
+                j += 1
+            if j == length or list_of_signals[j].is_proper_signal_of_point():
+                colors.append(0)
+            else: 
+                colors.append(color_scaled)
+    return points, colors
+
+def get_features(list_of_signals):
     #returns list of features for list of points taken from evtest
     #changing format of points to preferred
-    new_points = normalize_points(list_of_points)
-
+    list_of_points, colors = filter_points_from_signals(list_of_signals)
+    new_points, new_colors = normalize_points(list_of_points, colors)
     #getting features different then coordinates
     angles = get_angle_list(new_points)
 
     #joining all the features together
-    feature_list = join_features(new_points,angles)
+    feature_list = join_features(new_points,angles,new_colors)
     return feature_list

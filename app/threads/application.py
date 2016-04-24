@@ -50,7 +50,7 @@ def application_thread(queue, learning_mode=False, training_size=0):
         if signal.is_stop_signal():
             send_points_to_interpreter(collection.as_list(), learning_mode, clsf)
             collection.reset()
-        elif signal.is_proper_signal_of_point():
+        elif signal.is_proper_signal_of_point() or signal.is_raising_finger_signal():
             collection.add_and_maintain(signal)
 
 
