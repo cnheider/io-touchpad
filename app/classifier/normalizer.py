@@ -184,6 +184,4 @@ def get_features(list_of_points):
     new_points = create_normalized_list_of_points(center_of_mass,minX,minY,maxX,maxY,curve_length,list_of_points)
     angles = get_angle_list(new_points)
     feature_list = join_features(new_points,angles)
-    print(len(feature_list))
-
     return feature_list

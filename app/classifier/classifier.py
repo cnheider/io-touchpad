@@ -12,8 +12,7 @@ from classifier import normalizer
 DATA_PATH = 'classifier/data/'
 DISTANCE_TOLERANCE_FILE = DATA_PATH + 'distance-tolerance.dat'
 MODEL_FILE = DATA_PATH + 'nn-model.dat'
-DRAWINGS_SIZES_FILE = DATA_PATH + 'drawings-sizes.dat'
-DRAWINGS_SIGNALS_FILE = DATA_PATH + 'drawings-signals.dat'
+TRAINING_SET_FILE = DATA_PATH + 'training-set.dat'
 
 
 class Classifier:
@@ -23,75 +22,68 @@ class Classifier:
     def __init__(self, learning_mode=False):
         """Constructor. Loads learning model from file."""
         if not learning_mode:
-            file_with_model = open(MODEL_FILE, 'rb')
+
+            try:
+                file_with_model = open(MODEL_FILE, 'rb')
+            except FileNotFoundError:
+                print("File with learning-model doesn't exist, please do learning.");
+                _thread.interrupt_main()
+                sys.exit(1)
+
             self.learning_model = pickle.load(file_with_model)
             file_with_model.close()
-            file_with_tolerance_distance = open(DISTANCE_TOLERANCE_FILE, 'r')
+
+            try:
+                file_with_tolerance_distance = open(DISTANCE_TOLERANCE_FILE, 'r')
+            except FileNotFoundError:
+                print("File with tolerance distance doesn't exist, please do learning.");
+                _thread.interrupt_main()
+                sys.exit(1)   
+      
             self.tolerance_distance = \
                 float(file_with_tolerance_distance.readline())
             file_with_tolerance_distance.close()
+
+        # variables for learning-mode
         self.training_size = 0
         self.ultimate_training_size = 0
-        self.file_with_sizes = None
-        self.file_with_signals = None
+        self.training_set = []
 
     def load_training_set(self):
         """Load traning symbols from file."""
-        self.file_with_sizes = open(DRAWINGS_SIZES_FILE, 'r')
-        self.file_with_signals = open(DRAWINGS_SIGNALS_FILE, 'rb')
-        number_of_symbols = int(self.file_with_sizes.readline())
-        training_set = []
-        for _ in range(0, number_of_symbols):
-            symbol_size = int(self.file_with_sizes.readline())
-            signals = []
-            for _ in range(0, symbol_size):
-                touchpad_signal = pickle.load(self.file_with_signals)
-                signals.append(touchpad_signal)
-            training_set.append(signals)
-        self.file_with_sizes.close()
-        self.file_with_signals.close()
+        try:
+            file_with_training = open(TRAINING_SET_FILE, 'rb')
+        except FileNotFoundError:
+            print("File with training-set doesn't exist, please do learning.");
+            _thread.interrupt_main()
+            sys.exit(1) 
+
+        training_set = pickle.load(file_with_training)
+        file_with_training.close()
         return training_set
 
     def reset_training_set(self, new_training_size):
         """Start the new training set."""
         self.ultimate_training_size = new_training_size
-        self.training_size = 0
-        self.file_with_sizes = open(DRAWINGS_SIZES_FILE, 'w')
-        self.file_with_sizes.write("%d\n" % (new_training_size))
-        self.file_with_signals = open(DRAWINGS_SIGNALS_FILE, 'wb')
+        self.training_size = 0     
+        self.training_set = []
 
     def add_to_training_set(self, signal_list):
         """Add the symbol to training set."""
         print("training...")
-        self.file_with_sizes.write("%d\n" % (len(signal_list)))
-        for element in signal_list:
-            pickle.dump(element, self.file_with_signals)
+        self.training_set.append(signal_list)
         self.training_size += 1
         print("ok")
         if self.training_size == self.ultimate_training_size:
-            self.file_with_sizes.close()
-            self.file_with_signals.close()
-            self.learn()
+            self.learn(False)
             _thread.interrupt_main()
             sys.exit(0)
         print()
-
-    def calculate_feature_vector(self, signal_list):
-        """Calculate vector of features for given symbol."""
-        # temporal stupid features:
-        length = len(signal_list)
-        feature_vector = []
-        for i in range(0, 30):
-            index = int((length * i) / 30)
-            feature_vector.append(signal_list[index].get_x())
-            feature_vector.append(signal_list[index].get_y())
-        return feature_vector
 
     def classify(self, signal_list):
         """Classify the symbol to some item id or return None if similirity is to weak."""
         print("classifing...")
         feature_vector = normalizer.get_features(signal_list)
-        # TODO normalizing features by variance or spread
         distances, _ = self.learning_model.kneighbors(np.array([feature_vector]))
         mean_distance = np.mean(distances[0])
         if mean_distance < self.tolerance_distance:
@@ -116,13 +108,16 @@ class Classifier:
         file_with_tolerance_distance.write("%.16f\n" % (self.tolerance_distance))
         file_with_tolerance_distance.close()
 
-    def learn(self):
+    def learn(self, load_from_file):
         """Load training symbols and learn."""
         print("learning...")
+        if load_from_file == False:
+            file_with_training = open(TRAINING_SET_FILE, 'wb')
+            pickle.dump(self.training_set, file_with_training)
+            file_with_training.close()
         training_set = self.load_training_set()
         feature_vectors = []
         for training_element in training_set:
-            # TODO normalizing fetaures by variance or spread
             feature_vectors.append(normalizer.get_features(training_element))
         sample = np.array(feature_vectors)
         nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(sample)
