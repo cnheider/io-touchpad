@@ -36,7 +36,7 @@ def main():
             sys.exit(1)
         if training_size == 0:
             clsf = classifier.Classifier()
-            clsf.learn()
+            clsf.learn(True)
             sys.exit(0)
         elif training_size < 3:
             print("argument is to little")
