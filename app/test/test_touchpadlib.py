@@ -19,9 +19,10 @@ touchpadlib.Touchpadlib.ans = 0
 
 tlib = touchpadlib.Touchpadlib
 
-#--- TESTS ---
-
 def test_monkey():
+    """ Test for changed function
+
+        we check if it changes the value ans"""
     assert tlib.ans == 0
     tlib.interrupt_and_finish()
     
@@ -29,17 +30,20 @@ def test_monkey():
     tlib.ans = 0
 
 def test_conncect_to_library():
+    """ we try to connect to good and bad """
     global TOUCHPADLIB_SHARED_LIBRARY
+
+    #make it wrong
+    touchpadlib.TOUCHPADLIB_SHARED_LIBRARY = "sthstupid"
+    tlib.conncect_to_library()
+    assert tlib.ans == -1
+    tlib.ans = 0
+   
     #make it right
     touchpadlib.TOUCHPADLIB_SHARED_LIBRARY = "../../lib/touchpadlib.so"
     tlib.conncect_to_library()
     assert tlib.ans == 0
 
-    #make it wronk
-    touchpadlib.TOUCHPADLIB_SHARED_LIBRARY = "sthstupid"
-    tlib.conncect_to_library()
-    assert tlib.ans == -1
-   
     #reset
     tlib.ans = 0
     touchpadlib.TOUCHPADLIB_SHARED_LIBRARY = "../lib/touchpadlib.so"
