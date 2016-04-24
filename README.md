@@ -15,15 +15,15 @@
 
 1. Go to the `app` directory.
 
-    cd app
+        cd app
 
 2. Undertake a learning session.
 
-    sudo ./app.py 5
+        sudo ./app.py 5
 
 3. Use the app. (Hopefully, it will recognise your symbol.)
 
-    sudo ./app
+        sudo ./app
 
 ## Description
 
