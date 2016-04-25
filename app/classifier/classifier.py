@@ -21,6 +21,7 @@ DISTANCE_TOLERANCE_FILE = 'distance-tolerance.dat'
 MODEL_FILE = 'nn-model.dat'
 TRAINING_SET_FILE = 'training-set.dat'
 
+
 class Classifier:
     """Class for learning and classifying drawn symbols."""
 
@@ -54,7 +55,7 @@ class Classifier:
 
             try:
                 file_with_tolerance_distance = \
-                        open(self.distance_tolerance_file_path, 'r')
+                    open(self.distance_tolerance_file_path, 'r')
             except FileNotFoundError:
                 print("classifier.py: error: file with the tolerance distance "
                       "doesn't exist; please start the application in the "
@@ -126,7 +127,8 @@ class Classifier:
         """
         print("classifing...")
         feature_vector = featureextractor.get_features(signal_list)
-        distances, _ = self.learning_model.kneighbors(np.array([feature_vector]))
+        distances, _ = self\
+            .learning_model.kneighbors(np.array([feature_vector]))
         mean_distance = np.mean(distances[0])
         print(mean_distance)
         if mean_distance < self.tolerance_distance:
@@ -144,7 +146,8 @@ class Classifier:
             sample (list of lists of int): list of feature-vectors,
                                            on which we base on.
         """
-        nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree').fit(sample)
+        nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree')\
+            .fit(sample)
         distances, _ = nbrs.kneighbors(sample)
         print(distances)
         means = []
@@ -155,8 +158,10 @@ class Classifier:
         critical_index = math.ceil(0.8 * len(means)) - 1
         self.tolerance_distance = means[critical_index] * 1.3
         print("tolerance distance: %.16f" % (self.tolerance_distance))
-        file_with_tolerance_distance = open(self.distance_tolerance_file_path, 'w')
-        file_with_tolerance_distance.write("%.16f\n" % (self.tolerance_distance))
+        file_with_tolerance_distance = open(self.distance_tolerance_file_path,
+                                            'w')
+        file_with_tolerance_distance.write("%.16f\n"
+                                           % (self.tolerance_distance))
         file_with_tolerance_distance.close()
 
     def learn(self, load_from_file):
@@ -175,9 +180,11 @@ class Classifier:
         training_set = self.load_training_set()
         feature_vectors = []
         for training_element in training_set:
-            feature_vectors.append(featureextractor.get_features(training_element))
+            feature_vectors.append(featureextractor
+                                   .get_features(training_element))
         sample = np.array(feature_vectors)
-        nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(sample)
+        nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree')\
+            .fit(sample)
         file_with_model = open(self.model_file_path, 'wb')
         pickle.dump(nbrs, file_with_model)
         file_with_model.close()
