@@ -7,7 +7,7 @@ from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import sys
 import math
-from classifier import featureExtractor
+from classifier import featureextractor
 
 DATA_PATH = 'classifier/data/'
 
@@ -72,7 +72,7 @@ class Classifier:
         self.training_set = []
 
     def load_training_set(self):
-        """Load traning symbols from file."""
+        """Load and return traning symbols from file."""
         try:
             file_with_training = open(self.training_set_file_path, 'rb')
         except FileNotFoundError:
@@ -85,13 +85,25 @@ class Classifier:
         return training_set
 
     def reset_training_set(self, new_training_size):
-        """Start the new training set."""
+        """Start the new training set.
+
+        ARGS: 
+            new_training_size: size of new train-set which have to be
+                               given in current learning session.
+        """
         self.ultimate_training_size = new_training_size
         self.training_size = 0
         self.training_set = []
 
     def add_to_training_set(self, signal_list):
-        """Add the symbol to training set."""
+        """Add the symbol to training set. 
+           When all symbols designed for this session are given,
+           learning is called.
+
+        ARGS:
+            signal_list: list of touchpad-signal representing the drawn
+                         symbol.
+        """
         print("training...")
         self.training_set.append(signal_list)
         self.training_size += 1
@@ -103,9 +115,14 @@ class Classifier:
         print()
 
     def classify(self, signal_list):
-        """Classify the symbol to some item id or return None if similirity is to weak."""
+        """Classify the symbol to some item id or return None if similirity is too weak.
+
+        ARGS:
+            signal_list: list of touchpad-signal representing the drawn
+                         symbol.
+        """
         print("classifing...")
-        feature_vector = featureExtractor.get_features(signal_list)
+        feature_vector = featureextractor.get_features(signal_list)
         distances, _ = self.learning_model.kneighbors(np.array([feature_vector]))
         mean_distance = np.mean(distances[0])
         print(mean_distance)
@@ -132,7 +149,13 @@ class Classifier:
         file_with_tolerance_distance.close()
 
     def learn(self, load_from_file):
-        """Load training symbols and learn."""
+        """Learn basing on traing-set.
+       
+        ARGS:
+            load_from_file: True - if training-set has to be load from file,
+                            False - new training-set written in self.training_set
+                                    that has to be learned and then saved to file.
+        """
         print("learning...")
         if not load_from_file:
             file_with_training = open(self.training_set_file_path, 'wb')
@@ -141,7 +164,7 @@ class Classifier:
         training_set = self.load_training_set()
         feature_vectors = []
         for training_element in training_set:
-            feature_vectors.append(featureExtractor.get_features(training_element))
+            feature_vectors.append(featureextractor.get_features(training_element))
         sample = np.array(feature_vectors)
         nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(sample)
         file_with_model = open(self.model_file_path, 'wb')
