@@ -83,6 +83,15 @@ class MatrixAnalyser(object):
         """
         if not signal_list:
             return
+        points = []
+        point_on_the_list = False
+        for one_signal in signal_list:
+            if one_signal.is_proper_signal_of_point():
+                points.append(one_signal)
+                point_on_the_list = True
+        if not point_on_the_list:
+            return
+        signal_list = points
 
         x_coordinates = []
         y_coordinates = []
