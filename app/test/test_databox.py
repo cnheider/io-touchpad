@@ -11,14 +11,18 @@ command = databox.Command("echo","ok")
 # Test section
 
 def test_get_command_and_argument():
-    """Test for argument function, if it took good arguments when initialized"""
+    """Test for argument function, if it took good arguments when initialized
+
+    """
     comm, argument = command.get_command_and_argument()
     
     assert comm == "echo"
     assert argument == "ok"
 
 def test_is_user_defined():
-    """Test for user defined functions"""
+    """Test for user defined functions
+
+    """
     assert command.is_user_defined('not_in') == False
 
 def test_is_builtin():
@@ -30,7 +34,9 @@ def test_is_builtin():
     assert command.is_builtin('not_in') == False
 
 def test_get_command_and_arguments():
-    """Test for module function for getting commands"""
+    """Test for module function for getting commands
+
+    """
     assert databox.get_command_and_arguments('not_in') == None
 
     comm, argument = databox.get_command_and_arguments('1')
