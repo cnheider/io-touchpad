@@ -87,8 +87,8 @@ class Classifier:
     def reset_training_set(self, new_training_size):
         """Start the new training set.
 
-        Args: 
-            new_training_size: size of new train-set which have to be
+        Args:
+            new_training_size (int): size of new train-set which have to be
                                given in current learning session.
         """
         self.ultimate_training_size = new_training_size
@@ -96,13 +96,14 @@ class Classifier:
         self.training_set = []
 
     def add_to_training_set(self, signal_list):
-        """Add the symbol to training set. 
+        """Add the symbol to training set.
+
            When all symbols designed for this session are given,
            learning is called.
 
         Args:
-            signal_list: list of touchpad-signal representing the drawn
-                         symbol.
+            signal_list (TouchpadSignal list): list of touchpad-signals
+            representing the drawn symbol.
         """
         print("training...")
         self.training_set.append(signal_list)
@@ -115,11 +116,13 @@ class Classifier:
         print()
 
     def classify(self, signal_list):
-        """Classify the symbol to some item id or return None if similirity is too weak.
+        """Classify the symbol to some item.
+
+        Returns item id or None if similirity is too weak.
 
         Args:
-            signal_list: list of touchpad-signal representing the drawn
-                         symbol.
+            signal_list (TouchpadSignal list): list of touchpad-signal
+            representing the drawn symbol.
         """
         print("classifing...")
         feature_vector = featureextractor.get_features(signal_list)
@@ -132,10 +135,14 @@ class Classifier:
             return None
 
     def compute_tolerance_distance(self, sample):
-        """ Compute the distance in the feature vectors space below which we find the symbol similar.
+        """Compute the distance tolerance.
+
+        Returns distance tolerance in the feature vectors space
+        below which we find the symbol similar.
 
         Args:
-            sample: list of feature-vectors, on which we base on.
+            sample (list of lists of int): list of feature-vectors,
+                                           on which we base on.
         """
         nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree').fit(sample)
         distances, _ = nbrs.kneighbors(sample)
@@ -153,12 +160,12 @@ class Classifier:
         file_with_tolerance_distance.close()
 
     def learn(self, load_from_file):
-        """ Learn basing on traing-set.
+        """Learn basing on traing-set.
 
         Args:
-            load_from_file: True - if training-set has to be load from file,
-                            False - new training-set written in self.training_set
-                                    that has to be learned and then saved to file.
+            load_from_file (bool): True - if training has to be load from file,
+                          False - new training-set written in self.training_set
+                                 that has to be learned and then saved to file.
         """
         print("learning...")
         if not load_from_file:
