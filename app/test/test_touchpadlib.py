@@ -3,7 +3,7 @@
 """Tests for touchpadlib """
 
 import pytest
-import types 
+import types
 
 from touchpadlib import touchpadlib
 
@@ -25,23 +25,23 @@ def test_monkey():
     we check if it changes the value ans"""
     assert tlib.ans == 0
     tlib.interrupt_and_finish()
-    
+
     assert tlib.ans == -1
     tlib.ans = 0
 
-def test_conncect_to_library():
+def test_connect_to_library():
     """ we try to connect to good and bad """
     global TOUCHPADLIB_SHARED_LIBRARY
 
     #make it wrong
     touchpadlib.TOUCHPADLIB_SHARED_LIBRARY = "sthstupid"
-    tlib.conncect_to_library()
+    tlib.connect_to_library()
     assert tlib.ans == -1
     tlib.ans = 0
-   
+
     #make it right
     touchpadlib.TOUCHPADLIB_SHARED_LIBRARY = "../../lib/touchpadlib.so"
-    tlib.conncect_to_library()
+    tlib.connect_to_library()
     assert tlib.ans == 0
 
     #reset

@@ -89,7 +89,7 @@ class Touchpadlib:
     def initialize(cls):
         """Initialize the static variables."""
         if cls.touchpadlib is None:
-            cls.conncect_to_library()
+            cls.connect_to_library()
         if cls.touchpad_event is None:
             cls.create_touchpad_event()
         if cls.touchpad_file_descriptor is None:
@@ -98,8 +98,8 @@ class Touchpadlib:
             cls.create_touchpad_specification()
 
     @classmethod
-    def conncect_to_library(cls):
-        """Conncet to the touchpadlib."""
+    def connect_to_library(cls):
+        """Connect to the touchpadlib."""
         try:
             cls.touchpadlib = \
                     ctypes.cdll.LoadLibrary(TOUCHPADLIB_SHARED_LIBRARY)
