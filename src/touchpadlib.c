@@ -38,6 +38,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include <ctype.h>
+#include <regex.h>
 
 #include "touchpadlib.h"
 
@@ -134,8 +135,7 @@ static int is_event_device(const struct dirent *dir) {
 }
 
 /**
- * Scans all /dev/input/event*, display them and ask the user which one to
- * open.
+ * Scans all /dev/input/event*, detects the touchpad and opens it.
  *
  * @return The event device file name of the device file selected. This
  * string is allocated and must be freed by the caller.
@@ -144,16 +144,23 @@ static char* scan_devices(void)
 {
     struct dirent **namelist;
     int i, ndev, devnum;
+    int reti;
+    char msgbuf[100];
     char *filename;
+    regex_t regex;
+
+    devnum = -1;
+    reti = regcomp(&regex, ".*touchpad*", REG_ICASE);
+    if (reti) {
+        fprintf(stderr, "touchpadlib: error: could not compile regex\n");
+        return NULL;
+    }
 
     ndev = scandir(DEV_INPUT_EVENT, &namelist, is_event_device, versionsort);
     if (ndev <= 0)
         return NULL;
 
-    fprintf(stderr, "Available devices:\n");
-
-    for (i = 0; i < ndev; i++)
-    {
+    for (i = 0; i < ndev; i++) {
         char fname[64];
         int fd = -1;
         char name[256] = "???";
@@ -165,16 +172,20 @@ static char* scan_devices(void)
             continue;
         ioctl(fd, EVIOCGNAME(sizeof(name)), name);
 
-        // @TODO We can try to detect touchpad device here
-        // if we examine name for the 'touchpad' substring.
+        reti = regexec(&regex, name, 0, NULL, 0);
+        if (!reti) {
+            devnum = i;
+        }
+        else if (reti != REG_NOMATCH) {
+            regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+            fprintf(stderr, "touchpadlib: error: regex match failed: %s\n",
+                msgbuf);
+        }
 
-        fprintf(stderr, "%s:    %s\n", fname, name);
         close(fd);
         free(namelist[i]);
     }
 
-    fprintf(stderr, "Select the device event number [0-%d]: ", ndev - 1);
-    scanf("%d", &devnum);
 
     if (devnum >= ndev || devnum < 0)
         return NULL;
@@ -183,6 +194,7 @@ static char* scan_devices(void)
          DEV_INPUT_EVENT, EVENT_DEV_NAME,
          devnum);
 
+    regfree(&regex);
     return filename;
 }
 
