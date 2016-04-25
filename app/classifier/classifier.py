@@ -87,7 +87,7 @@ class Classifier:
     def reset_training_set(self, new_training_size):
         """Start the new training set.
 
-        ARGS: 
+        Args: 
             new_training_size: size of new train-set which have to be
                                given in current learning session.
         """
@@ -100,7 +100,7 @@ class Classifier:
            When all symbols designed for this session are given,
            learning is called.
 
-        ARGS:
+        Args:
             signal_list: list of touchpad-signal representing the drawn
                          symbol.
         """
@@ -117,7 +117,7 @@ class Classifier:
     def classify(self, signal_list):
         """Classify the symbol to some item id or return None if similirity is too weak.
 
-        ARGS:
+        Args:
             signal_list: list of touchpad-signal representing the drawn
                          symbol.
         """
@@ -132,9 +132,9 @@ class Classifier:
             return None
 
     def compute_tolerance_distance(self, sample):
-        """Compute the distance in the feature vectors space below which we find the symbol similar.
-        ,
-        ARGS:
+        """ Compute the distance in the feature vectors space below which we find the symbol similar.
+
+        Args:
             sample: list of feature-vectors, on which we base on.
         """
         nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree').fit(sample)
@@ -153,9 +153,9 @@ class Classifier:
         file_with_tolerance_distance.close()
 
     def learn(self, load_from_file):
-        """Learn basing on traing-set.
-       
-        ARGS:
+        """ Learn basing on traing-set.
+
+        Args:
             load_from_file: True - if training-set has to be load from file,
                             False - new training-set written in self.training_set
                                     that has to be learned and then saved to file.
