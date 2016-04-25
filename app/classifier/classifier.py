@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 """The Classifier class."""
 
-import _thread
-import pickle
-from sklearn.neighbors import NearestNeighbors
-import numpy as np
-import sys
 import math
+import pickle
+import sys
+import _thread
+
+import numpy as np
+from sklearn.neighbors import NearestNeighbors
+
 from classifier import featureextractor
 
 DATA_PATH = 'classifier/data/'
