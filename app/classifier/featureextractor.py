@@ -113,7 +113,7 @@ def create_normalized_list_of_points(center_of_mass, minX, minY, maxX, maxY, cur
 def draw_new_points(list_of_points):
     #testing function, to use with matrixanalyser
     center_of_mass,minX,minY,maxX,maxY,curve_length = calculate_normalization_values(list_of_points)
-    new_points = create_normalized_list_of_points(center_of_mass,minX,minY,maxX,maxY,curve_length,list_of_points)
+    new_points, _ = create_normalized_list_of_points(center_of_mass,minX,minY,maxX,maxY,curve_length,list_of_points)
 
     get_features(list_of_points)
 
@@ -175,8 +175,8 @@ def normalize_points(list_of_points, colors):
     minX,minY,maxX,maxY = calculate_border_points(list_of_points)
     center_of_mass,curve_length = calculate_center_of_mass_and_length(list_of_points)
 
-    new_points = create_normalized_list_of_points(center_of_mass,minX,minY,maxX,maxY,curve_length,list_of_points,colors)
-    return new_points
+    new_points, new_colors = create_normalized_list_of_points(center_of_mass,minX,minY,maxX,maxY,curve_length,list_of_points,colors)
+    return new_points, new_colors
 
 def filter_points_from_signals(list_of_signals):
     points = []
