@@ -71,11 +71,6 @@ def main():
             print('app.py: error: the training size should be at least %d'
                   % (MIN_TRAINING_SIZE))
             sys.exit(1)
-        print("Welcome to learning mode.\n"
-              "Think of a symbol you want the application to learn "
-              "and draw it %d times." % (training_size))
-    else:
-        print("Use your touchpad as usual. Have a nice day!")
 
     system_bitness = args.system_bitness
     if system_bitness is not None:
