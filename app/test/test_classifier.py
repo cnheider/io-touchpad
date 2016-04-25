@@ -3,10 +3,11 @@
 """Tests for classifier"""
 
 import pytest
+from math import fabs
 
 from classifier import classifier as classifier_module
 
-
+epsilon = 0.00001
 
 def test_reset_training_set():
     """Test for load training set."""
@@ -32,14 +33,14 @@ def test_compute_tolerance_distance():
     AL = [L1, L2, L3, L4, L5]
     classifier.compute_tolerance_distance(AL)
 
-    assert classifier.tolerance_distance == 0.5506099238118276
+    assert fabs(classifier.tolerance_distance - 0.5506099238118276) < epsilon
 
 def test_learn():
     """Test learn with existing resource."""
     classifier = classifier_module.Classifier(True,None)
     classifier.training_set_file_path = "learn_dat/training-set.dat"
     classifier.learn(True)
-    assert classifier.tolerance_distance == 1271.9887310656133650
+    assert fabs(classifier.tolerance_distance-1271.9887310656133650) < epsilon
 
 def test_classify():
     """Test classify."""
