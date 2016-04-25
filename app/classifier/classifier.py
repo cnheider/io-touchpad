@@ -132,7 +132,11 @@ class Classifier:
             return None
 
     def compute_tolerance_distance(self, sample):
-        """Compute the distance in the feature vectors space below which we find the symbol similar."""
+        """Compute the distance in the feature vectors space below which we find the symbol similar.
+        ,
+        ARGS:
+            sample: list of feature-vectors, on which we base on.
+        """
         nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree').fit(sample)
         distances, _ = nbrs.kneighbors(sample)
         print(distances)
