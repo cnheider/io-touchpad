@@ -4,25 +4,23 @@
 
 import pytest
 
-from classifier import classifier
+from classifier import classifier as classifier_module
 
-cifier = classifier.Classifier(True, None)
+classifier = classifier_module.Classifier(True, None)
 
 def test_reset_training_set():
-    """Test for load training set 
-
-    """
-    cifier.reset_training_set(117)
-    assert cifier.training_set == []
-    assert cifier.training_size == 0
-    assert cifier.ultimate_training_size == 117
+    """Test for load training set."""
+    classifier.reset_training_set(117)
+    assert classifier.training_set == []
+    assert classifier.training_size == 0
+    assert classifier.ultimate_training_size == 117
 
 
 def test_compute_tolerance_distance():
-    """Test for computing distance
+    """Test for computing distance.
 
-    we put some list of list of features to calculate 
-    fixed distance, and check if it's same
+    We put some list of list of features to calculate 
+    fixed distance, and check if it's same.
     """
     L1 = [11.2, 41.43, 1.33]
     L2 = [10.9, 41.45, 1.34]
@@ -30,6 +28,6 @@ def test_compute_tolerance_distance():
     L4 = [11.3, 41.15, 1.12]
     L5 = [11.223, 41.0, 1.31]
     AL = [L1, L2, L3, L4, L5]
-    cifier.compute_tolerance_distance(AL)
+    classifier.compute_tolerance_distance(AL)
 
-    assert cifier.tolerance_distance == 0.5506099238118276
+    assert classifier.tolerance_distance == 0.5506099238118276
