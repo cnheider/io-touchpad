@@ -11,12 +11,14 @@ addons:
 before_install:
     - pip install -U pip setuptools wheel
 install:
+    - pip install --user codecov
     - travis_wait travis_retry pip install -r requirements.txt
     - make
 script:
     - cd app/test
     - py.test
 after_success:
+    - codecov
     - bash <(curl -s https://codecov.io/bash) # codecov.io
 notifications:
     slack: io-touchpad:Fv8xkXiL4PSbXN8GN9hDAlxp
