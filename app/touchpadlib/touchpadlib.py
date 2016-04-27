@@ -102,7 +102,7 @@ class Touchpadlib:
         """Connect to the touchpadlib."""
         try:
             cls.touchpadlib = \
-                    ctypes.cdll.LoadLibrary(TOUCHPADLIB_SHARED_LIBRARY)
+                ctypes.cdll.LoadLibrary(TOUCHPADLIB_SHARED_LIBRARY)
         except OSError:
             print("touchpadlib.py: error: no such library as touchpadlib.so",
                   file=sys.stderr)
