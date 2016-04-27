@@ -4,6 +4,7 @@
 [![Code Health](https://landscape.io/github/0mp/io-touchpad/master/landscape.svg?style=flat)](https://landscape.io/github/0mp/io-touchpad/master)
 [![Code Issues](https://www.quantifiedcode.com/api/v1/project/538d6bb306774bd7ae52b8c4dbdd0854/badge.svg)](https://www.quantifiedcode.com/app/project/538d6bb306774bd7ae52b8c4dbdd0854)
 [![codecov](https://codecov.io/gh/0mp/io-touchpad/branch/master/graph/badge.svg)](https://codecov.io/gh/0mp/io-touchpad)
+[![Codacy Badge](https://api.codacy.com/project/badge/grade/dc3f6a8c83dc4acbab2a195fdfd70008)](https://www.codacy.com/app/mpp302/io-touchpad)
 
 
 ## Application
