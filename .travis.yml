@@ -11,7 +11,7 @@ addons:
 before_install:
     - pip install -U pip setuptools wheel
 install:
-    - pip install --user codecov
+    - pip install codecov
     - travis_wait travis_retry pip install -r requirements.txt
     - make
 script:
