@@ -3,6 +3,7 @@
 """Tests for classifier"""
 
 import pytest
+import operator
 from math import fabs
 
 from classifier import classifier as classifier_module
@@ -21,7 +22,7 @@ def test_reset_training_set():
 def test_compute_tolerance_distance():
     """Test for computing distance.
 
-    We put some list of list of features to calculate 
+    We put some list of list of features to calculate
     fixed distance, and check if it's same.
     """
     classifier = classifier_module.Classifier(True,None)
@@ -38,13 +39,47 @@ def test_compute_tolerance_distance():
 def test_learn():
     """Test learn with existing resource."""
     classifier = classifier_module.Classifier(True,None)
-    classifier.training_set_file_path = "learn_dat/training-set.dat"
+    classifier.files[classifier_module.TRAINING_SET_FILE] = \
+        "learn_dat/training-set.dat"
     classifier.learn(True)
     assert fabs(classifier.tolerance_distance-1271.9887310656133650) < epsilon
 
 def test_classify():
     """Test classify."""
     classifier = classifier_module.Classifier()
-    classifier.training_set_file_path = "learn_dat/training-set.dat"
+    classifier.files[classifier_module.TRAINING_SET_FILE] = \
+        "learn_dat/training-set.dat"
     classifier.training_set = classifier.load_training_set()
     assert classifier.classify(classifier.training_set[0]) == 1
+
+def test__build_paths():
+    """Test of the method which build file paths."""
+    files1 = ["file1", "file2"]
+    userdefined_path = classifier_module.DATA_PATH + classifier_module.USER_DIR
+
+    expected_out_files1 = [operator.add(userdefined_path, file)
+                           for file in files1]
+    out_files1 = classifier_module.Classifier._build_paths(files=files1,
+                                                           system_bitness=None)
+
+    assert len(out_files1) == len(expected_out_files1)
+
+    for file_num in range(len(out_files1)):
+        assert out_files1[file_num] == expected_out_files1[file_num]
+
+def test__extend_paths():
+    """Test of the tiny helper function which expands a list of strings with a string."""
+    file_paths = ["docs/abcd/", "docs/123/"]
+
+    extend_paths = classifier_module.Classifier._extend_paths
+    path_element = "u/"
+    extended_paths = extend_paths(file_paths, path_element)
+
+    assert len(file_paths) == len(extended_paths)
+    for path_num in range(len(file_paths)):
+        assert file_paths[path_num] + path_element == extended_paths[path_num]
+
+
+
+
+
