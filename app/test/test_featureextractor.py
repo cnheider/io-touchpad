@@ -145,7 +145,8 @@ def test_calculate_border_points():
     expected2 = featureextractor.Point(2.0, 2.0)
 
     point1, point2 = featureextractor.calculate_border_points(SIGNAL_LIST_TEST)
-    assert point1.equals(expected1) and point2.equals(expected2)
+    assert point1.equals(expected1) 
+    assert point2.equals(expected2)
 
 
 def test_angle_between_line_and_xaxis():
@@ -183,6 +184,7 @@ def test_feature_extractor():
     minimum = 0
     maximum = 0
     for feature in features:
+        print(feature)
         if feature < minimum:
             minimum = feature
         if feature > maximum:
