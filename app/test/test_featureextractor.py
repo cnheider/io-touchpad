@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Tests for signal collection"""
+"""Tests for signal collection."""
 
 import pytest
 
@@ -10,32 +10,35 @@ from math import pi
 # Basic points
 POINTA = featureextractor.Point(2.0, 4.0)
 POINTB = featureextractor.Point(1.0, 2.0)
-#POINTA = [2.0, 4.0]
-#POINTB = [1.0, 2.0]
+
+
+
 
 def test_flip_horizontally():
-    """Simple flip vertically test
+    """Simple flip vertically test.
 
     """
-    point = featureextractor.Point(5, 3);
-    expected = featureextractor.Point(-5, 3);
+    point = featureextractor.Point(5, 3)
+    expected = featureextractor.Point(-5, 3)
     point.flip_horizontally()
 
     assert point.equals(expected)
 
-def test_flip_horizontally():
-    """Simple flip vertically test
+
+def test_flip_vertically():
+    """Simple flip vertically test.
 
     """
-    point = featureextractor.Point(5, 3);
-    expected = featureextractor.Point(5, -3);
+    point = featureextractor.Point(5, 3)
+    expected = featureextractor.Point(5, -3)
     point.flip_vertically()
 
     assert point.equals(expected)
 
+
 def test_center_of_line():
-    """Simple center of line test
-    
+    """Simple center of line test.
+
     """
     line = featureextractor.Line(POINTA, POINTB)
     expected = featureextractor.Point(1.5, 3)
@@ -43,7 +46,7 @@ def test_center_of_line():
 
 
 def test_ratio_point():
-    """Test for ratio point of line function
+    """Test for ratio point of line function.
 
     """
     line = featureextractor.Line(POINTA, POINTB)
@@ -52,7 +55,7 @@ def test_ratio_point():
 
 
 def test_length_of_line():
-    """Simple length of line test
+    """Simple length of line test.
 
     """
     line = featureextractor.Line(POINTA, POINTB)
@@ -63,7 +66,7 @@ def test_length_of_line():
 
 # Tests for Scaler
 def test_move_point():
-    """Test move point function
+    """Test move point function.
 
     """
 
@@ -76,7 +79,7 @@ def test_move_point():
 
 
 def test_scale_point():
-    """Test scaling point function
+    """Test scaling point function.
 
     """
     min_point = featureextractor.Point(0.0, 0.0)
@@ -103,7 +106,7 @@ def test_actualise_center_of_mass():
 
 
 def test_add_point():
-    """Test adding point to the curve
+    """Test adding point to the curve.
 
     """
     curve = featureextractor.Curve(featureextractor.Point(0.0, 0.0))
@@ -114,16 +117,17 @@ def test_add_point():
         assert curve.center_of_mass.equals(featureextractor.Point(1.5*x, 2*x))
         assert curve.length == length
 
+
 # Class for mocking signal
 class Signal_test:
     
     def __init__(self, x, y):
         self.x = x
         self.y = y
-    
+
     def get_x(self): 
         return self.x
-    
+
     def get_y(self):
         return self.y
 
@@ -137,8 +141,9 @@ SIGNALA = Signal_test(1.0, 1.0)
 SIGNALB = Signal_test(2.0, 2.0)
 SIGNAL_LIST_TEST = [SIGNALA, SIGNALB]
 
+
 def test_calculate_border_points():
-    """Test the border point of signal test list
+    """Test the border point of signal test list.
 
     """
     expected1 = featureextractor.Point(1.0, 1.0)
@@ -150,7 +155,7 @@ def test_calculate_border_points():
 
 
 def test_angle_between_line_and_xaxis():
-    """Test for angle between line and xaxis
+    """Test for angle between line and xaxis.
 
     """
     PA = featureextractor.Point(2, 2)
@@ -159,7 +164,7 @@ def test_angle_between_line_and_xaxis():
 
 
 def test_join_features():
-    """Test for joining features
+    """Test for joining features.
 
     """
     P1 = featureextractor.Point(3, 4)
@@ -173,7 +178,7 @@ def test_join_features():
 
 
 def test_feature_extractor():
-    """Test for  extracted features
+    """Test for  extracted features.
 
     """
     signal_list = []
