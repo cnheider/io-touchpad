@@ -19,7 +19,7 @@ class Point:
         self.x_cord = -self.x_cord
 
     def equals(self, point2):
-        """Compares itself to point2."""
+        """Compare itself to point2."""
         if self.x_cord != point2.x_cord or self.y_cord != point2.y_cord:
             return False
         return True
