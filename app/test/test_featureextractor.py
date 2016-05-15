@@ -12,8 +12,6 @@ POINTA = featureextractor.Point(2.0, 4.0)
 POINTB = featureextractor.Point(1.0, 2.0)
 
 
-
-
 def test_flip_horizontally():
     """Simple flip vertically test.
 
@@ -150,7 +148,7 @@ def test_calculate_border_points():
     expected2 = featureextractor.Point(2.0, 2.0)
 
     point1, point2 = featureextractor.calculate_border_points(SIGNAL_LIST_TEST)
-    assert point1.equals(expected1) 
+    assert point1.equals(expected1)
     assert point2.equals(expected2)
 
 
@@ -160,7 +158,7 @@ def test_angle_between_line_and_xaxis():
     """
     PA = featureextractor.Point(2, 2)
     PB = featureextractor.Point(-6, -6)
-    assert featureextractor.angle_between_line_and_xaxis(PA,PB) == pi/4
+    assert featureextractor.angle_between_line_and_xaxis(PA, PB) == pi/4
 
 
 def test_join_features():
@@ -199,5 +197,3 @@ def test_feature_extractor():
     assert minimum < -500.0 + 0.000001
     assert maximum < 500.0 + 0.000001
     assert maximum > 500.0 - 0.000001
-
-
