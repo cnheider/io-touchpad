@@ -2,6 +2,9 @@
 
 [![Build Status](https://travis-ci.org/0mp/io-touchpad.svg?branch=master)](https://travis-ci.org/0mp/io-touchpad)
 [![Code Health](https://landscape.io/github/0mp/io-touchpad/master/landscape.svg?style=flat)](https://landscape.io/github/0mp/io-touchpad/master)
+[![Code Issues](https://www.quantifiedcode.com/api/v1/project/538d6bb306774bd7ae52b8c4dbdd0854/badge.svg)](https://www.quantifiedcode.com/app/project/538d6bb306774bd7ae52b8c4dbdd0854)
+[![codecov](https://codecov.io/gh/0mp/io-touchpad/branch/master/graph/badge.svg)](https://codecov.io/gh/0mp/io-touchpad)
+
 
 ## Application
 
