@@ -2,6 +2,7 @@
 """The Classifier class."""
 
 import math
+import operator
 import pickle
 import sys
 import _thread
@@ -37,14 +38,16 @@ class Classifier:
                 (with respect to the provided bitness) will be recogniezed
                 instead of the user defined symbols.
         """
-        files = [DISTANCE_TOLERANCE_FILE, MODEL_FILE, TRAINING_SET_FILE]
-        file_paths = Classifier._build_paths(files, system_bitness)
-        (self.distance_tolerance_file_path, self.model_file_path,
-         self.training_set_file_path) = file_paths
+        file_names = [DISTANCE_TOLERANCE_FILE, MODEL_FILE, TRAINING_SET_FILE]
+        file_paths = Classifier._build_paths(file_names, system_bitness)
+        #  (self.distance_tolerance_file_path, self.model_file_path,
+        #   self.training_set_file_path) = file_paths
+
+        self.files = {name: path for name, path in zip(file_names, file_paths)}
 
         if not learning_mode:
             try:
-                file_with_model = open(self.model_file_path, 'rb')
+                file_with_model = open(self.files[MODEL_FILE], 'rb')
             except FileNotFoundError:
                 print("classifier.py: error: file with the learning model "
                       "doesn't exist; please start the application in the "
@@ -57,7 +60,7 @@ class Classifier:
 
             try:
                 file_with_tolerance_distance = \
-                    open(self.distance_tolerance_file_path, 'r')
+                    open(self.files[DISTANCE_TOLERANCE_FILE], 'r')
             except FileNotFoundError:
                 print("classifier.py: error: file with the tolerance distance "
                       "doesn't exist; please start the application in the "
@@ -77,10 +80,10 @@ class Classifier:
     def load_training_set(self):
         """Load and return traning symbols from file."""
         try:
-            file_with_training = open(self.training_set_file_path, 'rb')
+            file_with_training = open(self.files[TRAINING_SET_FILE], 'rb')
         except FileNotFoundError:
-            print("classifier.py: error: file with training set doesn't exist; "
-                  "please start the application in the learning mode",
+            print("classifier.py: error: file with training set doesn't "
+                  "exist; please start the application in the learning mode",
                   file=sys.stderr)
             _thread.interrupt_main()
             sys.exit(1)
@@ -162,8 +165,8 @@ class Classifier:
         critical_index = math.ceil(0.8 * len(means)) - 1
         self.tolerance_distance = means[critical_index] * 1.3
         print("tolerance distance: %.16f" % (self.tolerance_distance))
-        file_with_tolerance_distance = open(self.distance_tolerance_file_path,
-                                            'w')
+        file_with_tolerance_distance = \
+            open(self.files[DISTANCE_TOLERANCE_FILE], 'w')
         file_with_tolerance_distance.write("%.16f\n"
                                            % (self.tolerance_distance))
         file_with_tolerance_distance.close()
@@ -178,7 +181,7 @@ class Classifier:
         """
         print("learning...")
         if not load_from_file:
-            file_with_training = open(self.training_set_file_path, 'wb')
+            file_with_training = open(self.files[TRAINING_SET_FILE], 'wb')
             pickle.dump(self.training_set, file_with_training)
             file_with_training.close()
         training_set = self.load_training_set()
@@ -189,7 +192,7 @@ class Classifier:
         sample = np.array(feature_vectors)
         nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree')\
             .fit(sample)
-        file_with_model = open(self.model_file_path, 'wb')
+        file_with_model = open(self.files[MODEL_FILE], 'wb')
         pickle.dump(nbrs, file_with_model)
         file_with_model.close()
         self.compute_tolerance_distance(sample)
@@ -199,36 +202,41 @@ class Classifier:
         """Build paths of the files based on the system bitness.
 
         Chooses different directories depending on the value of the
-        system_bitness.
+        system_bitness. If the bitness is neither 32 nor 64 then the
+        USER_DIR directory will be used.
 
         Args:
             files (list): The names of the files themselves.
             system_bitness (int): The system bitness.
         """
-        file_paths = []
-        for path_num in range(len(files)):
-            file_paths.append("")
-        Classifier._append_to_paths(file_paths, DATA_PATH)
-        if system_bitness == SYSTEM_BITNESS_32:
-            Classifier._append_to_paths(file_paths, HARDCODED_32BIT_DIR)
-        elif system_bitness == SYSTEM_BITNESS_64:
-            Classifier._append_to_paths(file_paths, HARDCODED_64BIT_DIR)
-        else:
-            Classifier._append_to_paths(file_paths, USER_DIR)
+        file_paths = ["" for file in files]
 
-        for path_num in range(len(file_paths)):
-            file_paths[path_num] += files[path_num]
+        file_paths = Classifier._extend_paths(file_paths, DATA_PATH)
+        if system_bitness == SYSTEM_BITNESS_32:
+            file_paths = Classifier._extend_paths(file_paths,
+                                                  HARDCODED_32BIT_DIR)
+        elif system_bitness == SYSTEM_BITNESS_64:
+            file_paths = Classifier._extend_paths(file_paths,
+                                                  HARDCODED_64BIT_DIR)
+        else:
+            file_paths = Classifier._extend_paths(file_paths, USER_DIR)
+
+        file_paths = [operator.add(l, r) for l, r in zip(file_paths, files)]
 
         return file_paths
 
     @staticmethod
-    def _append_to_paths(file_paths, path_element):
-        """Append the path_element to the provided file paths.
+    def _extend_paths(file_paths, path_element):
+        """Extend the file paths with path_element.
+
+        The file paths should end with '/'. Same applies to the path element.
 
         Args:
             file_paths (list): List of file paths which are going to be
                 extended with the path_element.
             path_element (str): The string to be appended to the file_paths.
+
+        Returns:
+            file_paths extended with path_element.
         """
-        for path_num in range(len(file_paths)):
-            file_paths[path_num] += path_element
+        return [operator.add(path, path_element) for path in file_paths]
