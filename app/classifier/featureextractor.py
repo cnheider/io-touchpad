@@ -272,7 +272,7 @@ def angle_between_line_and_xaxis(point1, point2):
     if point2.x_cord != point1.x_cord:
         return atan((point2.y_cord - point1.y_cord) /
                     (point2.x_cord - point1.x_cord))
-    if point2.y != point1.y:
+    if point2.y_cord != point1.y_cord:
         return (pi / 2) * (point2.y_cord - point1.y_cord) / \
             abs(point2.y_cord - point1.y_cord)
     return 0
