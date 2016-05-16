@@ -12,7 +12,6 @@ addons:
 before_install:
     - pip install -U pip setuptools wheel
 install:
-    # - pip install codacy-coverage
     # - pip install coveralls
     - pip install codecov
     - travis_wait travis_retry pip install -r requirements.txt
@@ -21,15 +20,7 @@ script:
     - cd app/test
     - py.test
 after_success:
-    # coveralls
-    # - codecov
     - bash <(curl -s https://codecov.io/bash) # codecov.io
-      # - coverage xml
-      # - python-codacy-coverage -r coverage.xml
-# --source specifies what packages to cover, you probably want to use that option
-script:
-    - cd app/
-    - coverage run ./app.py
 notifications:
     slack: io-touchpad:Fv8xkXiL4PSbXN8GN9hDAlxp
     email: false
