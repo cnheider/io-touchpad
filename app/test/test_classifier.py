@@ -12,16 +12,14 @@ epsilon = 0.00001
 
 def test_reset_training_set():
     """Test for load training set."""
-    classifier = classifier_module.Classifier(True,None)
-    classifier.reset_training_set(117)
+    classifier = classifier_module.Classifier(True, None)
+    classifier.reset_training_set(117, "a")
     assert classifier.training_set == []
     assert classifier.training_size == 0
     assert classifier.ultimate_training_size == 117
 
-
 def test_compute_tolerance_distance():
     """Test for computing distance.
-
     We put some list of list of features to calculate
     fixed distance, and check if it's same.
     """
@@ -32,25 +30,16 @@ def test_compute_tolerance_distance():
     L4 = [11.3, 41.15, 1.12]
     L5 = [11.223, 41.0, 1.31]
     AL = [L1, L2, L3, L4, L5]
-    classifier.compute_tolerance_distance(AL)
-
-    assert fabs(classifier.tolerance_distance - 0.5506099238118276) < epsilon
-
-def test_learn():
-    """Test learn with existing resource."""
-    classifier = classifier_module.Classifier(True,None)
-    classifier.files[classifier_module.TRAINING_SET_FILE] = \
-        "learn_dat/training-set.dat"
-    classifier.learn(True)
-    assert fabs(classifier.tolerance_distance-1292.524372765934) < epsilon
-
-def test_classify():
-    """Test classify."""
-    classifier = classifier_module.Classifier()
-    classifier.files[classifier_module.TRAINING_SET_FILE] = \
-        "learn_dat/training-set.dat"
-    classifier.training_set = classifier.load_training_set()
-    assert classifier.classify(classifier.training_set[0]) == 1
+    symbol = "a"
+    classifier.compute_tolerance_distance(AL, symbol)
+    tolerance_distance_path = \
+        classifier_module.Classifier._get_file_path( \
+            classifier.files[classifier_module.DISTANCE_TOLERANCE_FILE], symbol)
+    file_with_tolerance_distance = \
+        open(tolerance_distance_path, 'r')
+    tolerance_distance = float(file_with_tolerance_distance.readline())
+    file_with_tolerance_distance.close()
+    assert fabs(tolerance_distance - 0.5506099238118276) < epsilon
 
 def test__build_paths():
     """Test of the method which build file paths."""
