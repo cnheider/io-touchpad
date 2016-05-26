@@ -183,10 +183,7 @@ def _activate(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    print('app.py: warning: the command line argument "activate" '
-          'has not been implemented yet', file=sys.stderr)
-    print('app.py: notice: the list of selected symbols: '
-          '{0}'.format(args.symbols), file=sys.stderr)
+    databox.activate(args.symbols)
     sys.exit(0)
 
 
@@ -212,10 +209,7 @@ def _deactivate(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    print('app.py: warning: the command line argument "deactivate" '
-          'has not been implemented yet', file=sys.stderr)
-    print('app.py: notice: the list of selected symbols: '
-          '{0}'.format(args.symbols), file=sys.stderr)
+    databox.deactivate(args.symbols)
     sys.exit(0)
 
 
