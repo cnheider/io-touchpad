@@ -47,7 +47,7 @@ def application_thread(queue, learning_mode=False, training_size=0,
     if learning_mode:
         print("Welcome to learning mode.\n"
               "Think of a symbol you want the application to learn "
-              "and draw it %d times." % (training_size))
+              "and draw it {0} times.".format(training_size))
     else:
         print("Use your touchpad as usual. Have a nice day!")
 
