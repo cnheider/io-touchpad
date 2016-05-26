@@ -27,7 +27,7 @@ RUN_SUBCOMMAND = 'run'
 RUN_USER_MODE = 'user'
 RUN_32_MODE = '32'
 RUN_64_MODE = '64'
-LEARN_SUBCOMMAND = 'learn'
+ADD_SUBCOMMAND = 'add'
 REPEAT_SUBCOMMAND = 'repeat'
 
 
@@ -52,16 +52,18 @@ def _get_configured_parser():
                             '64-bit machines and <user> to use user-defined '
                             'symbols')
 
-    parser_learn = subparsers.add_parser(LEARN_SUBCOMMAND, help='a subcommand '
-                                         'to undertake a learning session')
-    parser_learn.add_argument(dest='training_size', default=None,
-                              metavar='SIZE', help='you will be asked to draw '
-                              'a symbol SIZE times; SIZE should be at '
-                              'least ' + str(MIN_TRAINING_SIZE), type=int)
-    parser_learn.add_argument(dest='symbol_name', default=None,
-                              metavar='SYMBOL', help='the name of the symbol '
-                              'you want the app to learn during the learning '
-                              'session')
+    # add.
+    parser_add = subparsers.add_parser(ADD_SUBCOMMAND, help='undertake a '
+                                       'learning session in order to add '
+                                       'a new symbol')
+    parser_add.add_argument(dest='training_size', default=None,
+                            metavar='SIZE', help='you will be asked to draw '
+                            'a symbol SIZE times; SIZE should be at '
+                            'least ' + str(MIN_TRAINING_SIZE), type=int)
+    parser_add.add_argument(dest='symbol_name', default=None,
+                            metavar='SYMBOL', help='the name of the symbol '
+                            'you want the app to learn during the learning '
+                            'session')
 
     parser_repeat = subparsers.add_parser(REPEAT_SUBCOMMAND, help='a '
                                           'subcommand to repeat the '
@@ -96,7 +98,7 @@ def main():
         classifier.learn(True, args.symbol_name)
         sys.exit(0)
 
-    if args.subcommand == LEARN_SUBCOMMAND:
+    if args.subcommand == ADD_SUBCOMMAND:
         print('The symbol name is ' + args.symbol_name + '.')
         training_size = args.training_size
         if training_size < MIN_TRAINING_SIZE:
