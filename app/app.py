@@ -28,6 +28,7 @@ RUN_USER_MODE = 'user'
 RUN_32_MODE = '32'
 RUN_64_MODE = '64'
 ADD_SUBCOMMAND = 'add'
+ACTIVATE_SUBCOMMAND = 'activate'
 DELETE_SUBCOMMAND = 'delete'
 REPEAT_SUBCOMMAND = 'repeat'
 
@@ -54,6 +55,15 @@ def _get_configured_parser():
                             '64-bit machines and <user> to use user-defined '
                             'symbols')
 
+    # activate.
+    parser_activate = subparsers.add_parser(ACTIVATE_SUBCOMMAND,
+                                            help='activate an existing '
+                                            'symbol; the app will detect this '
+                                            'symbol if the user draws it')
+    parser_activate.add_argument(dest='symbol_name', default=None,
+                                 metavar='SYMBOL', help='the name of the '
+                                 'symbol the user wants to activate')
+
     # add.
     parser_add = subparsers.add_parser(ADD_SUBCOMMAND, help='undertake a '
                                        'learning session in order to add '
@@ -66,7 +76,6 @@ def _get_configured_parser():
                             metavar='SYMBOL', help='the name of the symbol '
                             'you want the app to learn during the learning '
                             'session')
-
 
     # delete.
     parser_delete = subparsers.add_parser(DELETE_SUBCOMMAND, help='delete an '
@@ -107,6 +116,11 @@ def main():
         print('Repeating the classification within the learning process.')
         classifier = classifier_module.Classifier(True)
         classifier.learn(True, args.symbol_name)
+        sys.exit(0)
+
+    if args.subcommand == ACTIVATE_SUBCOMMAND:
+        print('app.py: warning: The command line argument "activate SYMBOL" '
+              'has not been implemented yet.', file=sys.stderr)
         sys.exit(0)
 
     if args.subcommand == ADD_SUBCOMMAND:
