@@ -23,17 +23,17 @@ from classifier import classifier as classifier_module
 
 MIN_TRAINING_SIZE = 5
 
+ACTIVATE_SUBCOMMAND = 'activate'
+ADD_SUBCOMMAND = 'add'
+DEACTIVATE_SUBCOMMAND = 'deactivate'
+DELETE_SUBCOMMAND = 'delete'
+LIST_SUBCOMMAND = 'list'
+MODIFY_SUBCOMMAND = 'modify'
+REPEAT_SUBCOMMAND = 'repeat'
 RUN_SUBCOMMAND = 'run'
 RUN_USER_MODE = 'user'
 RUN_32_MODE = '32'
 RUN_64_MODE = '64'
-ADD_SUBCOMMAND = 'add'
-ACTIVATE_SUBCOMMAND = 'activate'
-DELETE_SUBCOMMAND = 'delete'
-DEACTIVATE_SUBCOMMAND = 'deactivate'
-LIST_SUBCOMMAND = 'list'
-MODIFY_SUBCOMMAND = 'modify'
-REPEAT_SUBCOMMAND = 'repeat'
 
 
 def _get_configured_parser():
@@ -46,17 +46,6 @@ def _get_configured_parser():
                                        'SUBCOMMAND -h to show help for '
                                        'the SUBCOMMAND you are interested in')
     subparsers.required = True  # Require SUBCOMMAND to be specified.
-
-    # run.
-    parser_run = subparsers.add_parser(RUN_SUBCOMMAND, help='run the app '
-                                       'using hardcoded or user-defined '
-                                       'symbols')
-    parser_run.add_argument(dest='run_mode', metavar='MODE',
-                            choices={RUN_32_MODE, RUN_64_MODE, RUN_USER_MODE},
-                            help='set the mode you would like to run the '
-                            'app in; use <32> for 32-bit machines, <64> for '
-                            '64-bit machines and <user> to use user-defined '
-                            'symbols')
 
     # activate.
     parser_activate = subparsers.add_parser(ACTIVATE_SUBCOMMAND,
@@ -88,8 +77,8 @@ def _get_configured_parser():
                                               'be possible to activate the '
                                               'symbol back later')
     parser_deactivate.add_argument(dest='symbol_name', default=None,
-                            metavar='SYMBOL', help='the name of the symbol '
-                            'the user wants to deactivate')
+                                   metavar='SYMBOL', help='the name of the '
+                                   'symbol the user wants to deactivate')
 
     # delete.
     parser_delete = subparsers.add_parser(DELETE_SUBCOMMAND, help='delete an '
@@ -99,11 +88,11 @@ def _get_configured_parser():
                                'you want to delete from the app')
 
     # list.
-    parser_list = subparsers.add_parser(LIST_SUBCOMMAND, help='list all the '
-                                        'available symbols (both activated '
-                                        'and deactivated)')
+    subparsers.add_parser(LIST_SUBCOMMAND, help='list all the '
+                          'available symbols (both activated '
+                          'and deactivated)')
 
-    # delete.
+    # modify.
     parser_modify = subparsers.add_parser(MODIFY_SUBCOMMAND, help='modify the '
                                           'command assigned to a symbol')
     parser_modify.add_argument(dest='symbol_name', default=None,
@@ -124,72 +113,90 @@ def _get_configured_parser():
                                'of the symbol on which you want to repeat the '
                                'classification process')
 
+    # run.
+    parser_run = subparsers.add_parser(RUN_SUBCOMMAND, help='run the app '
+                                       'using hardcoded or user-defined '
+                                       'symbols')
+    parser_run.add_argument(dest='run_mode', metavar='MODE',
+                            choices={RUN_32_MODE, RUN_64_MODE, RUN_USER_MODE},
+                            help='set the mode you would like to run the '
+                            'app in; use <32> for 32-bit machines, <64> for '
+                            '64-bit machines and <user> to use user-defined '
+                            'symbols')
+
     return parser
 
 
-def main():
-    """The main function."""
-    # SIGINT signal handler.
-    terminationhandler.setup()
+def _start_threads(learning_mode=None, training_size=None, system_bitness=None,
+                   symbol_name=None):
+    """Wrap the threads launching.
 
-    parser = _get_configured_parser()
-    args = parser.parse_args()
-
-    training_size = None
-    system_bitness = None
-    learning_mode = None
-    symbol_name = None
-
-    if args.subcommand == REPEAT_SUBCOMMAND:
-        print('Repeating the classification within the learning process.')
-        classifier = classifier_module.Classifier(True)
-        classifier.learn(True, args.symbol_name)
-        sys.exit(0)
-
-    if args.subcommand == ACTIVATE_SUBCOMMAND:
-        print('app.py: warning: the command line argument "activate SYMBOL" '
-              'has not been implemented yet', file=sys.stderr)
-        sys.exit(0)
-
-    if args.subcommand == ADD_SUBCOMMAND:
-        print('The symbol name is ' + args.symbol_name + '.')
-        training_size = args.training_size
-        if training_size < MIN_TRAINING_SIZE:
-            print('app.py: error: the training size should be at least %d'
-                  % (MIN_TRAINING_SIZE), file=sys.stderr)
-            sys.exit(1)
-        symbol_name = args.symbol_name
-        learning_mode = True
-
-    if args.subcommand == DEACTIVATE_SUBCOMMAND:
-        print('app.py: warning: the command line argument "deactivate SYMBOL" '
-              'has not been implemented yet', file=sys.stderr)
-        sys.exit(0)
-
-    if args.subcommand == DELETE_SUBCOMMAND:
-        print('app.py: warning: the command line argument "delete SYMBOL" '
-              'has not been implemented yet', file=sys.stderr)
-        sys.exit(0)
-
-    if args.subcommand == LIST_SUBCOMMAND:
-        print('app.py: warning: the command line argument "list" '
-              'has not been implemented yet', file=sys.stderr)
-        sys.exit(0)
-
-    if args.subcommand == MODIFY_SUBCOMMAND:
-        print('app.py: warning: the command line argument "modify SYMBOL '
-              'COMMAND" has not been implemented yet', file=sys.stderr)
-        sys.exit(0)
-
-    if args.subcommand == RUN_SUBCOMMAND:
-        if args.run_mode != RUN_USER_MODE:
-            system_bitness = int(args.run_mode)
-
+    Args:
+        learning_mode (bool): The variable which stores the information if
+            the app would like to enter the learning mode or not.
+        training_size (int): The number of the learning samples of the symbol
+            that the user is asked to draw.
+        system_bitness (int): The bitness of the system. The only legal values
+            are {None, 32, 64}. If the value is 32 or 64 then set of hardcoded
+            symbols (with respect to the provided bitness) will be
+            recogniezed instead of the user defined symbols.
+        symbol_name (str): The name of the symbol provided by the user with
+            a command line option.
+    """
     thread_queue = queue.Queue()
 
     # Run both threads.
     listener.start(thread_queue)
     application.application_thread(thread_queue, learning_mode, training_size,
                                    system_bitness, symbol_name)
+
+
+def main():
+    """The main function."""
+    terminationhandler.setup()
+
+    parser = _get_configured_parser()
+    args = parser.parse_args()
+
+    if args.subcommand == ACTIVATE_SUBCOMMAND:
+        print('app.py: warning: the command line argument "activate SYMBOL" '
+              'has not been implemented yet', file=sys.stderr)
+        sys.exit(0)
+    elif args.subcommand == ADD_SUBCOMMAND:
+        print('The symbol name is ' + args.symbol_name + '.')
+        if args.training_size < MIN_TRAINING_SIZE:
+            print('app.py: error: the training size should be at least %d'
+                  % (MIN_TRAINING_SIZE), file=sys.stderr)
+            sys.exit(1)
+        _start_threads(learning_mode=True, symbol_name=args.symbol_name,
+                       training_size=args.training_size)
+    elif args.subcommand == DEACTIVATE_SUBCOMMAND:
+        print('app.py: warning: the command line argument "deactivate SYMBOL" '
+              'has not been implemented yet', file=sys.stderr)
+        sys.exit(0)
+    elif args.subcommand == DELETE_SUBCOMMAND:
+        print('app.py: warning: the command line argument "delete SYMBOL" '
+              'has not been implemented yet', file=sys.stderr)
+        sys.exit(0)
+    elif args.subcommand == LIST_SUBCOMMAND:
+        print('app.py: warning: the command line argument "list" '
+              'has not been implemented yet', file=sys.stderr)
+        sys.exit(0)
+    elif args.subcommand == MODIFY_SUBCOMMAND:
+        print('app.py: warning: the command line argument "modify SYMBOL '
+              'COMMAND" has not been implemented yet', file=sys.stderr)
+        sys.exit(0)
+    elif args.subcommand == REPEAT_SUBCOMMAND:
+        print('Repeating the classification within the learning process.')
+        classifier = classifier_module.Classifier(True)
+        classifier.learn(True, args.symbol_name)
+        sys.exit(0)
+    elif args.subcommand == RUN_SUBCOMMAND:
+        try:
+            system_bitness = int(args.run_mode)
+        except ValueError:
+            system_bitness = None
+        finally:
+            _start_threads(system_bitness=system_bitness)
 
 main()
