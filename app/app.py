@@ -76,15 +76,15 @@ def _get_configured_parser():
 
     # The deactivate subcommand section.
     subparser = subparsers.add_parser(DEACTIVATE_SUBCOMMAND, help='deactivate '
-                                      'existing symbols; the selected symbols '
-                                      'will be not be recognised by the app; '
-                                      'it is be possible to rectivate any of '
+                                      'selected symbols; the app will not '
+                                      'recognise those symbols; '
+                                      'it is be possible to reactivate any of '
                                       'those symbols in the future')
     group = subparser.add_mutually_exclusive_group(required=True)
     group.add_argument('-a', '--all', dest='symbols', action='store_const',
-                       const=[], help='deactivate all symbols')
+                       const=[], help='deactivate all the existing symbols')
     group.add_argument('-s', '--select', dest='symbols', nargs="+",
-                       help='deactivate all the symbols from the list')
+                       help='deactivate all the selected symbols')
 
     # The delete subcommand section.
     subparser = subparsers.add_parser(DELETE_SUBCOMMAND, help='delete '
