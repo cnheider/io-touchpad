@@ -47,82 +47,87 @@ def _get_configured_parser():
                                        'the SUBCOMMAND you are interested in')
     subparsers.required = True  # Require SUBCOMMAND to be specified.
 
-    # activate.
-    parser_activate = subparsers.add_parser(ACTIVATE_SUBCOMMAND,
-                                            help='activate an existing '
-                                            'symbol; the app will detect this '
-                                            'symbol if the user draws it')
-    parser_activate.add_argument(dest='symbol_name', default=None,
-                                 metavar='SYMBOL', help='the name of the '
-                                 'symbol the user wants to activate')
+    # The activate subcommand section.
+    subparser = subparsers.add_parser(ACTIVATE_SUBCOMMAND,
+                                      help='activate selected symbols; '
+                                      'the selected symbols will be '
+                                      'added to the list of the symbols '
+                                      'recognisable by the app')
+    group = subparser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-a', '--all', dest='symbols', action='store_const',
+                       const=[], help='activate all symbols')
+    group.add_argument('-s', '--select', dest='symbols', nargs="+",
+                       help='activate all the symbols from the list')
 
-    # add.
-    parser_add = subparsers.add_parser(ADD_SUBCOMMAND, help='undertake a '
-                                       'learning session in order to add '
-                                       'a new symbol')
-    parser_add.add_argument(dest='training_size', default=None,
-                            metavar='SIZE', help='you will be asked to draw '
-                            'a symbol SIZE times; SIZE should be at '
-                            'least ' + str(MIN_TRAINING_SIZE), type=int)
-    parser_add.add_argument(dest='symbol_name', default=None,
-                            metavar='SYMBOL', help='the name of the symbol '
-                            'you want the app to learn during the learning '
-                            'session')
-    parser_add.add_argument(dest='shell_command', default=None,
-                            metavar='COMMAND', help='the shell command '
-                            'to be triggered when the symbol is drawn')
+    # The add subcommand section.
+    subparser = subparsers.add_parser(ADD_SUBCOMMAND, help='undertake a '
+                                      'learning session in order to add '
+                                      'a new symbol')
+    subparser.add_argument(dest='training_size', metavar='SIZE',
+                           help='you will be asked to draw '
+                           'a symbol SIZE times; SIZE should be at '
+                           'least {0}'.format(MIN_TRAINING_SIZE), type=int)
+    subparser.add_argument(dest='symbol_name', metavar='SYMBOL',
+                           help='the name of the symbol you want the app to '
+                           'learn during the learning session')
+    subparser.add_argument(dest='shell_command', metavar='COMMAND',
+                           help='the shell command to be triggered when the '
+                           'symbol is drawn')
 
-    # deactivate.
-    parser_deactivate = subparsers.add_parser(DEACTIVATE_SUBCOMMAND,
-                                              help='deactivate an existing '
-                                              'symbol; the app will not '
-                                              'recognise this symbol; it will '
-                                              'be possible to activate the '
-                                              'symbol back later')
-    parser_deactivate.add_argument(dest='symbol_name', default=None,
-                                   metavar='SYMBOL', help='the name of the '
-                                   'symbol the user wants to deactivate')
+    # The deactivate subcommand section.
+    subparser = subparsers.add_parser(DEACTIVATE_SUBCOMMAND, help='deactivate '
+                                      'existing symbols; the selected symbols '
+                                      'will be not be recognised by the app; '
+                                      'it is be possible to rectivate any of '
+                                      'those symbols in the future')
+    group = subparser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-a', '--all', dest='symbols', action='store_const',
+                       const=[], help='deactivate all symbols')
+    group.add_argument('-s', '--select', dest='symbols', nargs="+",
+                       help='deactivate all the symbols from the list')
 
-    # delete.
-    parser_delete = subparsers.add_parser(DELETE_SUBCOMMAND, help='delete an '
-                                          'existing symbol')
-    parser_delete.add_argument(dest='symbol_name', default=None,
-                               metavar='SYMBOL', help='the name of the symbol '
-                               'you want to delete from the app')
+    # The delete subcommand section.
+    subparser = subparsers.add_parser(DELETE_SUBCOMMAND, help='delete '
+                                      'selected symbols; the selected symbols '
+                                      'will be removed and lost forever')
+    group = subparser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-a', '--all', dest='symbols', action='store_const',
+                       const=[], help='delete all the existing symbols')
+    group.add_argument('-s', '--select', dest='symbols', nargs="+",
+                       help='delete all the symbols from the list')
 
-    # list.
-    subparsers.add_parser(LIST_SUBCOMMAND, help='list all the '
-                          'available symbols (both activated '
-                          'and deactivated)')
+    # The list subcommand section.
+    subparsers.add_parser(LIST_SUBCOMMAND, help='list all the available '
+                          'symbols (both activated ' 'and deactivated)')
 
-    # modify.
-    parser_modify = subparsers.add_parser(MODIFY_SUBCOMMAND, help='modify the '
+    # The modify subcommand section.
+    subparser = subparsers.add_parser(MODIFY_SUBCOMMAND, help='modify the '
                                           'command assigned to a symbol')
-    parser_modify.add_argument(dest='symbol_name', default=None,
-                               metavar='SYMBOL', help='the name of the symbol '
-                               'the user wants to modify')
-    parser_modify.add_argument(dest='new_shell_command', default=None,
-                               metavar='COMMAND', help='the new shell command '
-                               'to be triggered when the symbol is drawn')
+    subparser.add_argument(dest='symbol_name', default=None,
+                           metavar='SYMBOL', help='the name of the symbol '
+                           'the user wants to modify')
+    subparser.add_argument(dest='new_shell_command', default=None,
+                           metavar='COMMAND', help='the new shell command '
+                           'to be triggered when the symbol is drawn')
 
-    # repeat.
-    parser_repeat = subparsers.add_parser(REPEAT_SUBCOMMAND, help='repeat the '
-                                          'learning process of all the'
-                                          'symbols; use the --symbol option '
-                                          'to repeat the process for only one '
-                                          'symbol')
-    parser_repeat.add_argument('-s', '--symbol', dest='symbol_name',
+    # The repeat subcommand section.
+    subparser = subparsers.add_parser(REPEAT_SUBCOMMAND, help='repeat the '
+                                     'learning process of all the'
+                                     'symbols; use the --symbol option '
+                                     'to repeat the process for only one '
+                                     'symbol')
+    subparser.add_argument('-s', '--symbol', dest='symbol_name',
                                default=None, metavar='SYMBOL', help='repeat '
                                'the learning process for the SYMBOL only; '
                                'if this option is not provided then '
                                'the learning process will be '
                                'repeated for each symbol known to the app')
 
-    # run.
-    parser_run = subparsers.add_parser(RUN_SUBCOMMAND, help='run the app '
+    # The run subcommand section.
+    subparser = subparsers.add_parser(RUN_SUBCOMMAND, help='run the app '
                                        'using hardcoded or user-defined '
                                        'symbols')
-    parser_run.add_argument(dest='run_mode', metavar='MODE',
+    subparser.add_argument(dest='run_mode', metavar='MODE',
                             choices={RUN_32_MODE, RUN_64_MODE, RUN_USER_MODE},
                             help='set the mode you would like to run the '
                             'app in; use <32> for 32-bit machines, <64> for '
@@ -164,8 +169,10 @@ def main():
     args = parser.parse_args()
 
     if args.subcommand == ACTIVATE_SUBCOMMAND:
-        print('app.py: warning: the command line argument "activate SYMBOL" '
+        print('app.py: warning: the command line argument "activate" '
               'has not been implemented yet', file=sys.stderr)
+        print('app.py: notice: the list of selected symbols: '
+              '{0}'.format(args.symbols), file=sys.stderr)
         sys.exit(0)
     elif args.subcommand == ADD_SUBCOMMAND:
         print('The symbol name is ' + args.symbol_name + '.')
@@ -176,12 +183,16 @@ def main():
         _start_threads(learning_mode=True, symbol_name=args.symbol_name,
                        training_size=args.training_size)
     elif args.subcommand == DEACTIVATE_SUBCOMMAND:
-        print('app.py: warning: the command line argument "deactivate SYMBOL" '
+        print('app.py: warning: the command line argument "deactivate" '
               'has not been implemented yet', file=sys.stderr)
+        print('app.py: notice: the list of selected symbols: '
+              '{0}'.format(args.symbols), file=sys.stderr)
         sys.exit(0)
     elif args.subcommand == DELETE_SUBCOMMAND:
-        print('app.py: warning: the command line argument "delete SYMBOL" '
+        print('app.py: warning: the command line argument "delete" '
               'has not been implemented yet', file=sys.stderr)
+        print('app.py: notice: the list of selected symbols: '
+              '{0}'.format(args.symbols), file=sys.stderr)
         sys.exit(0)
     elif args.subcommand == LIST_SUBCOMMAND:
         print('app.py: warning: the command line argument "list" '
