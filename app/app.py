@@ -94,7 +94,7 @@ def _get_configured_parser():
     group.add_argument('-a', '--all', dest='symbols', action='store_const',
                        const=[], help='delete all the existing symbols')
     group.add_argument('-s', '--select', dest='symbols', nargs="+",
-                       help='delete all the symbols from the list')
+                       help='delete all the selected symbols')
 
     # The list subcommand section.
     subparsers.add_parser(LIST_SUBCOMMAND, help='list all the available '
