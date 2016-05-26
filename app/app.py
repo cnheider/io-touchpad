@@ -42,6 +42,7 @@ def _get_configured_parser():
                                        'the SUBCOMMAND you are interested in')
     subparsers.required = True  # Require SUBCOMMAND to be specified.
 
+    # run.
     parser_run = subparsers.add_parser(RUN_SUBCOMMAND, help='a subcommand to '
                                        'run the app using hardcoded or '
                                        'user-defined symbols')
@@ -70,7 +71,7 @@ def _get_configured_parser():
                                           'classification process of all '
                                           'symbols; use the --symbol option '
                                           'to repeat the process for only one '
-                                          'symbol.')
+                                          'symbol')
     parser_repeat.add_argument('-s', '--symbol', dest='symbol_name',
                                default=None, metavar='SYMBOL', help='the name '
                                'of the symbol on which you want to repeat the '
