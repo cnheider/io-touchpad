@@ -30,6 +30,7 @@ RUN_64_MODE = '64'
 ADD_SUBCOMMAND = 'add'
 ACTIVATE_SUBCOMMAND = 'activate'
 DELETE_SUBCOMMAND = 'delete'
+DEACTIVATE_SUBCOMMAND = 'deactivate'
 REPEAT_SUBCOMMAND = 'repeat'
 
 
@@ -76,6 +77,17 @@ def _get_configured_parser():
                             metavar='SYMBOL', help='the name of the symbol '
                             'you want the app to learn during the learning '
                             'session')
+
+    # deactivate.
+    parser_deactivate = subparsers.add_parser(DEACTIVATE_SUBCOMMAND,
+                                              help='deactivate an existing '
+                                              'symbol; the app will not '
+                                              'recognise this symbol; it will '
+                                              'be possible to activate the '
+                                              'symbol back later')
+    parser_deactivate.add_argument(dest='symbol_name', default=None,
+                            metavar='SYMBOL', help='the name of the symbol '
+                            'the user wants to deactivate')
 
     # delete.
     parser_delete = subparsers.add_parser(DELETE_SUBCOMMAND, help='delete an '
@@ -132,6 +144,11 @@ def main():
             sys.exit(1)
         symbol_name = args.symbol_name
         learning_mode = True
+
+    if args.subcommand == DEACTIVATE_SUBCOMMAND:
+        print('app.py: warning: The command line argument "deactivate SYMBOL" '
+              'has not been implemented yet.', file=sys.stderr)
+        sys.exit(0)
 
     if args.subcommand == DELETE_SUBCOMMAND:
         print('app.py: warning: The command line argument "delete SYMBOL" '
