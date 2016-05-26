@@ -197,9 +197,10 @@ def _add(args):
     """
     print('The symbol name is ' + args.symbol_name + '.')
     if args.training_size < MIN_TRAINING_SIZE:
-        print('app.py: error: the training size should be at least '
-              '{0}'.format(MIN_TRAINING_SIZE), file=sys.stderr)
+        print('app.py: error: the training size should be at least %d'
+              % (MIN_TRAINING_SIZE), file=sys.stderr)
         sys.exit(1)
+    databox.bind_symbol_with_command(symbol, args.shell_command)
     _start_threads(learning_mode=True, symbol_name=args.symbol_name,
                    training_size=args.training_size)
 
@@ -223,17 +224,15 @@ def _delete(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    print('app.py: warning: the command line argument "delete" '
-          'has not been implemented yet', file=sys.stderr)
-    print('app.py: notice: the list of selected symbols: '
-          '{0}'.format(args.symbols), file=sys.stderr)
+    classifier = classifier_module.Classifier(True)
+    classifier.delete_symbols([args.symbol_name])
+    databox.delete_symbols([args.symbol_name])
     sys.exit(0)
 
 
 def _list():
     """Wrap up the list subcommand to make main() less complex."""
-    print('app.py: warning: the command line argument "list" '
-          'has not been implemented yet', file=sys.stderr)
+    databox.print_commands()
     sys.exit(0)
 
 
