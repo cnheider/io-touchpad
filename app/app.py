@@ -128,14 +128,14 @@ def _get_configured_parser():
 
     # The run subcommand section.
     subparser = subparsers.add_parser(RUN_SUBCOMMAND, help='run the app '
-                                       'using hardcoded or user-defined '
-                                       'symbols')
+                                      'using either hardcoded or user-defined '
+                                      'symbols')
     subparser.add_argument(dest='run_mode', metavar='MODE',
-                            choices={RUN_32_MODE, RUN_64_MODE, RUN_USER_MODE},
-                            help='set the mode you would like to run the '
-                            'app in; use <32> for 32-bit machines, <64> for '
-                            '64-bit machines and <user> to use user-defined '
-                            'symbols')
+                           choices={RUN_32_MODE, RUN_64_MODE, RUN_USER_MODE},
+                           help='set the mode you would like to run the '
+                           'app in; use <32> for 32-bit machines, <64> for '
+                           '64-bit machines and <user> to use user-defined '
+                           'symbols')
 
     return parser
 
