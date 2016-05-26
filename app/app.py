@@ -27,6 +27,7 @@ DEACTIVATE_SUBCOMMAND = 'deactivate'
 DELETE_SUBCOMMAND = 'delete'
 LIST_SUBCOMMAND = 'list'
 MODIFY_SUBCOMMAND = 'modify'
+REDRAW_SUBCOMMAND = 'redraw'
 REPEAT_SUBCOMMAND = 'repeat'
 RUN_SUBCOMMAND = 'run'
 RUN_USER_MODE = 'user'
@@ -112,6 +113,17 @@ def _get_configured_parser():
                            help='the arguments for the shell command to be '
                            'triggered when the symbol is drawn; for '
                            'e.g. "/tmp/touched_file"')
+
+    # The redraw subcommand section.
+    subparser = subparsers.add_parser(REDRAW_SUBCOMMAND, help='redraw a '
+                                      'symbol while retaining the command '
+                                      'related to that symbol')
+    subparser.add_argument(dest='symbol_name', metavar='SYMBOL', help='the '
+                           'name of the symbol you want to draw again')
+    subparser.add_argument(dest='training_size', metavar='SIZE',
+                           help='you will be asked to redraw '
+                           'the selected symbol SIZE times; SIZE should be at '
+                           'least {0}'.format(MIN_TRAINING_SIZE), type=int)
 
     # The repeat subcommand section.
     subparser = subparsers.add_parser(REPEAT_SUBCOMMAND, help='repeat the '
@@ -241,6 +253,20 @@ def _modify(args):
     sys.exit(0)
 
 
+def _redraw(args):
+    """Wrap up the redraw subcommand to make main() less complex.
+
+    Args:
+        args (dict): Parsed command line arguments.
+    """
+    print('app.py: warning: the command line argument "redraw" has not '
+          'been implemented yet', file=sys.stderr)
+    print('app.py: notice: parsed command line arguments: symbol name: '
+          '"{0}", training size: "{1}"'
+          ''.format(args.symbol_name, args.training_size), file=sys.stderr)
+    sys.exit(0)
+
+
 def _repeat(args):
     """Wrap up the repeate subcommand to make main() less complex.
 
@@ -286,6 +312,8 @@ def main():
         _list()
     elif args.subcommand == MODIFY_SUBCOMMAND:
         _modify(args)
+    elif args.subcommand == REDRAW_SUBCOMMAND:
+        _redraw(args)
     elif args.subcommand == REPEAT_SUBCOMMAND:
         _repeat(args)
     elif args.subcommand == RUN_SUBCOMMAND:
