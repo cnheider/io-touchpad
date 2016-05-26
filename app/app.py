@@ -32,6 +32,7 @@ ACTIVATE_SUBCOMMAND = 'activate'
 DELETE_SUBCOMMAND = 'delete'
 DEACTIVATE_SUBCOMMAND = 'deactivate'
 LIST_SUBCOMMAND = 'list'
+MODIFY_SUBCOMMAND = 'modify'
 REPEAT_SUBCOMMAND = 'repeat'
 
 
@@ -102,6 +103,16 @@ def _get_configured_parser():
                                         'available symbols (both activated '
                                         'and deactivated)')
 
+    # delete.
+    parser_modify = subparsers.add_parser(MODIFY_SUBCOMMAND, help='modify the '
+                                          'command assigned to a symbol')
+    parser_modify.add_argument(dest='symbol_name', default=None,
+                               metavar='SYMBOL', help='the name of the symbol '
+                               'the user wants to modify')
+    parser_modify.add_argument(dest='new_command', default=None,
+                               metavar='COMMAND', help='the new shell command '
+                               'to be triggered when the symbol is drawn')
+
     # repeat.
     parser_repeat = subparsers.add_parser(REPEAT_SUBCOMMAND, help='repeat the '
                                           'classification process of all '
@@ -163,6 +174,9 @@ def main():
     if args.subcommand == LIST_SUBCOMMAND:
         print('app.py: warning: The command line argument "list" '
               'has not been implemented yet.', file=sys.stderr)
+    if args.subcommand == MODIFY_SUBCOMMAND:
+        print('app.py: warning: the command line argument "modify SYMBOL '
+              'COMMAND" has not been implemented yet', file=sys.stderr)
         sys.exit(0)
 
     if args.subcommand == RUN_SUBCOMMAND:
