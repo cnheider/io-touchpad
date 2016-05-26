@@ -142,7 +142,7 @@ def _get_configured_parser():
 
 def _start_threads(learning_mode=None, training_size=None, system_bitness=None,
                    symbol_name=None):
-    """Wrap the threads launching.
+    """Wrap up the threads launching.
 
     Args:
         learning_mode (bool): The variable which stores the information if
@@ -164,6 +164,109 @@ def _start_threads(learning_mode=None, training_size=None, system_bitness=None,
                                    system_bitness, symbol_name)
 
 
+def _activate(args):
+    """Wrap up the activate subcommand to make main() less complex.
+
+    Args:
+        args (dict): Parsed command line arguments.
+    """
+    print('app.py: warning: the command line argument "activate" '
+          'has not been implemented yet', file=sys.stderr)
+    print('app.py: notice: the list of selected symbols: '
+          '{0}'.format(args.symbols), file=sys.stderr)
+    sys.exit(0)
+
+
+def _add(args):
+    """Wrap up the add subcommand to make main() less complex.
+
+    Args:
+        args (dict): Parsed command line arguments.
+    """
+    print('The symbol name is ' + args.symbol_name + '.')
+    if args.training_size < MIN_TRAINING_SIZE:
+        print('app.py: error: the training size should be at least '
+              '{0}'.format(MIN_TRAINING_SIZE), file=sys.stderr)
+        sys.exit(1)
+    _start_threads(learning_mode=True, symbol_name=args.symbol_name,
+                   training_size=args.training_size)
+
+
+def _deactivate(args):
+    """Wrap up the deactivate subcommand to make main() less complex.
+
+    Args:
+        args (dict): Parsed command line arguments.
+    """
+    print('app.py: warning: the command line argument "deactivate" '
+          'has not been implemented yet', file=sys.stderr)
+    print('app.py: notice: the list of selected symbols: '
+          '{0}'.format(args.symbols), file=sys.stderr)
+    sys.exit(0)
+
+
+def _delete(args):
+    """Wrap up the delete subcommand to make main() less complex.
+
+    Args:
+        args (dict): Parsed command line arguments.
+    """
+    print('app.py: warning: the command line argument "delete" '
+          'has not been implemented yet', file=sys.stderr)
+    print('app.py: notice: the list of selected symbols: '
+          '{0}'.format(args.symbols), file=sys.stderr)
+    sys.exit(0)
+
+
+def _list():
+    """Wrap up the list subcommand to make main() less complex."""
+    print('app.py: warning: the command line argument "list" '
+          'has not been implemented yet', file=sys.stderr)
+    sys.exit(0)
+
+
+def _modify(args):
+    """Wrap up the modify subcommand to make main() less complex.
+
+    Args:
+        args (dict): Parsed command line arguments.
+    """
+    print('app.py: warning: the command line argument "modify" has not '
+          'been implemented yet', file=sys.stderr)
+    print('app.py: notice: parsed command line arguments: symbol name: '
+          '"{0}", command: "{1}", arguments: "{2}"'
+          ''.format(args.symbol_name, args.shell_command,
+                    args.shell_command_arguments),
+          file=sys.stderr)
+    sys.exit(0)
+
+
+def _repeat(args):
+    """Wrap up the repeate subcommand to make main() less complex.
+
+    Args:
+        args (dict): Parsed command line arguments.
+    """
+    print('Repeating the classification within the learning process.')
+    classifier = classifier_module.Classifier(True)
+    classifier.learn(True, args.symbol_name)
+    sys.exit(0)
+
+
+def _run(args):
+    """Wrap up the run subcommand to make main() less complex.
+
+    Args:
+        args (dict): Parsed command line arguments.
+    """
+    try:
+        system_bitness = int(args.run_mode)
+    except ValueError:
+        system_bitness = None
+    finally:
+        _start_threads(system_bitness=system_bitness)
+
+
 def main():
     """The main function."""
     terminationhandler.setup()
@@ -172,50 +275,20 @@ def main():
     args = parser.parse_args()
 
     if args.subcommand == ACTIVATE_SUBCOMMAND:
-        print('app.py: warning: the command line argument "activate" '
-              'has not been implemented yet', file=sys.stderr)
-        print('app.py: notice: the list of selected symbols: '
-              '{0}'.format(args.symbols), file=sys.stderr)
-        sys.exit(0)
+        _activate(args)
     elif args.subcommand == ADD_SUBCOMMAND:
-        print('The symbol name is ' + args.symbol_name + '.')
-        if args.training_size < MIN_TRAINING_SIZE:
-            print('app.py: error: the training size should be at least %d'
-                  % (MIN_TRAINING_SIZE), file=sys.stderr)
-            sys.exit(1)
-        _start_threads(learning_mode=True, symbol_name=args.symbol_name,
-                       training_size=args.training_size)
+        _add(args)
     elif args.subcommand == DEACTIVATE_SUBCOMMAND:
-        print('app.py: warning: the command line argument "deactivate" '
-              'has not been implemented yet', file=sys.stderr)
-        print('app.py: notice: the list of selected symbols: '
-              '{0}'.format(args.symbols), file=sys.stderr)
-        sys.exit(0)
+        _deactivate(args)
     elif args.subcommand == DELETE_SUBCOMMAND:
-        print('app.py: warning: the command line argument "delete" '
-              'has not been implemented yet', file=sys.stderr)
-        print('app.py: notice: the list of selected symbols: '
-              '{0}'.format(args.symbols), file=sys.stderr)
-        sys.exit(0)
+        _delete(args)
     elif args.subcommand == LIST_SUBCOMMAND:
-        print('app.py: warning: the command line argument "list" '
-              'has not been implemented yet', file=sys.stderr)
-        sys.exit(0)
+        _list()
     elif args.subcommand == MODIFY_SUBCOMMAND:
-        print('app.py: warning: the command line argument "modify SYMBOL '
-              'COMMAND" has not been implemented yet', file=sys.stderr)
-        sys.exit(0)
+        _modify(args)
     elif args.subcommand == REPEAT_SUBCOMMAND:
-        print('Repeating the classification within the learning process.')
-        classifier = classifier_module.Classifier(True)
-        classifier.learn(True, args.symbol_name)
-        sys.exit(0)
+        _repeat(args)
     elif args.subcommand == RUN_SUBCOMMAND:
-        try:
-            system_bitness = int(args.run_mode)
-        except ValueError:
-            system_bitness = None
-        finally:
-            _start_threads(system_bitness=system_bitness)
+        _run(args)
 
 main()
