@@ -68,6 +68,9 @@ def _get_configured_parser():
                             metavar='SYMBOL', help='the name of the symbol '
                             'you want the app to learn during the learning '
                             'session')
+    parser_add.add_argument(dest='shell_command', default=None,
+                            metavar='COMMAND', help='the shell command '
+                            'to be triggered when the symbol is drawn')
 
     # deactivate.
     parser_deactivate = subparsers.add_parser(DEACTIVATE_SUBCOMMAND,
@@ -98,7 +101,7 @@ def _get_configured_parser():
     parser_modify.add_argument(dest='symbol_name', default=None,
                                metavar='SYMBOL', help='the name of the symbol '
                                'the user wants to modify')
-    parser_modify.add_argument(dest='new_command', default=None,
+    parser_modify.add_argument(dest='new_shell_command', default=None,
                                metavar='COMMAND', help='the new shell command '
                                'to be triggered when the symbol is drawn')
 
