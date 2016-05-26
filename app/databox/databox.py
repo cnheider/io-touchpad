@@ -162,7 +162,7 @@ def get_command_and_arguments(command_id):
         command = _USER_DEFINED_COMMANDS[command_id]
     else:
         command = None
-    if command.is_active():
+    if command is not None and command.is_active():
         return command.get_command_and_argument()
     else:
         return None
