@@ -102,13 +102,16 @@ def _get_configured_parser():
 
     # The modify subcommand section.
     subparser = subparsers.add_parser(MODIFY_SUBCOMMAND, help='modify the '
-                                          'command assigned to a symbol')
-    subparser.add_argument(dest='symbol_name', default=None,
-                           metavar='SYMBOL', help='the name of the symbol '
-                           'the user wants to modify')
-    subparser.add_argument(dest='new_shell_command', default=None,
-                           metavar='COMMAND', help='the new shell command '
-                           'to be triggered when the symbol is drawn')
+                                      'command assigned to a symbol')
+    subparser.add_argument(dest='symbol_name', metavar='SYMBOL', help='the '
+                           'name of the symbol the user wants to modify')
+    subparser.add_argument(dest='shell_command', metavar='COMMAND', help='the '
+                           'new shell command to be triggered when the symbol '
+                           'is drawn; for e.g. "touch"')
+    subparser.add_argument(dest='shell_command_arguments', metavar='ARGUMENTS',
+                           help='the arguments for the shell command to be '
+                           'triggered when the symbol is drawn; for '
+                           'e.g. "/tmp/touched_file"')
 
     # The repeat subcommand section.
     subparser = subparsers.add_parser(REPEAT_SUBCOMMAND, help='repeat the '
