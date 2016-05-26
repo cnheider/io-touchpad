@@ -28,6 +28,7 @@ RUN_USER_MODE = 'user'
 RUN_32_MODE = '32'
 RUN_64_MODE = '64'
 ADD_SUBCOMMAND = 'add'
+DELETE_SUBCOMMAND = 'delete'
 REPEAT_SUBCOMMAND = 'repeat'
 
 
@@ -65,6 +66,14 @@ def _get_configured_parser():
                             metavar='SYMBOL', help='the name of the symbol '
                             'you want the app to learn during the learning '
                             'session')
+
+
+    # delete.
+    parser_delete = subparsers.add_parser(DELETE_SUBCOMMAND, help='delete an '
+                                          'existing symbol')
+    parser_delete.add_argument(dest='symbol_name', default=None,
+                               metavar='SYMBOL', help='the name of the symbol '
+                               'you want to delete from the app')
 
 
     parser_repeat = subparsers.add_parser(REPEAT_SUBCOMMAND, help='a '
@@ -109,6 +118,11 @@ def main():
             sys.exit(1)
         symbol_name = args.symbol_name
         learning_mode = True
+
+    if args.subcommand == DELETE_SUBCOMMAND:
+        print('app.py: warning: The command line argument "delete SYMBOL" '
+              'has not been implemented yet.', file=sys.stderr)
+        sys.exit(0)
 
     if args.subcommand == RUN_SUBCOMMAND:
         if args.run_mode != RUN_USER_MODE:
