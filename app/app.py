@@ -104,14 +104,16 @@ def _get_configured_parser():
 
     # repeat.
     parser_repeat = subparsers.add_parser(REPEAT_SUBCOMMAND, help='repeat the '
-                                          'classification process of all '
+                                          'learning process of all the'
                                           'symbols; use the --symbol option '
                                           'to repeat the process for only one '
                                           'symbol')
     parser_repeat.add_argument('-s', '--symbol', dest='symbol_name',
-                               default=None, metavar='SYMBOL', help='the name '
-                               'of the symbol on which you want to repeat the '
-                               'classification process')
+                               default=None, metavar='SYMBOL', help= 'repeat '
+                               'the learning process for the SYMBOL only; '
+                               'if this option is not provided then '
+                               'the learning process will be '
+                               'repeated for each symbol known to the app')
 
     # run.
     parser_run = subparsers.add_parser(RUN_SUBCOMMAND, help='run the app '
