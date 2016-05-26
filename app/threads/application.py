@@ -26,7 +26,7 @@ def application_thread(queue, learning_mode=False, training_size=0,
         learning_mode (bool): The variable which stores the information if
             the app is in the learning mode or not.
         training_size (int): The number of the learning samples of the symbol
-            that the user is asked for to draw.
+            that the user is asked to draw.
         system_bitness (int): The bitness of the system. The only legal values
             are {None, 32, 64}. If the value is 32 or 64 then set of hardcoded
             symbols (with respect to the provided bitness) will be
