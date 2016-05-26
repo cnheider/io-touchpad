@@ -76,8 +76,8 @@ def _get_configured_parser():
                                'you want to delete from the app')
 
 
-    parser_repeat = subparsers.add_parser(REPEAT_SUBCOMMAND, help='a '
-                                          'subcommand to repeat the '
+    # repeat.
+    parser_repeat = subparsers.add_parser(REPEAT_SUBCOMMAND, help='repeat the '
                                           'classification process of all '
                                           'symbols; use the --symbol option '
                                           'to repeat the process for only one '
