@@ -43,9 +43,9 @@ def _get_configured_parser():
     subparsers.required = True  # Require SUBCOMMAND to be specified.
 
     # run.
-    parser_run = subparsers.add_parser(RUN_SUBCOMMAND, help='a subcommand to '
-                                       'run the app using hardcoded or '
-                                       'user-defined symbols')
+    parser_run = subparsers.add_parser(RUN_SUBCOMMAND, help='run the app '
+                                       'using hardcoded or user-defined '
+                                       'symbols')
     parser_run.add_argument(dest='run_mode', metavar='MODE',
                             choices={RUN_32_MODE, RUN_64_MODE, RUN_USER_MODE},
                             help='set the mode you would like to run the '
@@ -65,6 +65,7 @@ def _get_configured_parser():
                             metavar='SYMBOL', help='the name of the symbol '
                             'you want the app to learn during the learning '
                             'session')
+
 
     parser_repeat = subparsers.add_parser(REPEAT_SUBCOMMAND, help='a '
                                           'subcommand to repeat the '
