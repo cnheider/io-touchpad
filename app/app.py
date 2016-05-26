@@ -147,8 +147,8 @@ def main():
         sys.exit(0)
 
     if args.subcommand == ACTIVATE_SUBCOMMAND:
-        print('app.py: warning: The command line argument "activate SYMBOL" '
-              'has not been implemented yet.', file=sys.stderr)
+        print('app.py: warning: the command line argument "activate SYMBOL" '
+              'has not been implemented yet', file=sys.stderr)
         sys.exit(0)
 
     if args.subcommand == ADD_SUBCOMMAND:
@@ -162,18 +162,20 @@ def main():
         learning_mode = True
 
     if args.subcommand == DEACTIVATE_SUBCOMMAND:
-        print('app.py: warning: The command line argument "deactivate SYMBOL" '
-              'has not been implemented yet.', file=sys.stderr)
+        print('app.py: warning: the command line argument "deactivate SYMBOL" '
+              'has not been implemented yet', file=sys.stderr)
         sys.exit(0)
 
     if args.subcommand == DELETE_SUBCOMMAND:
-        print('app.py: warning: The command line argument "delete SYMBOL" '
-              'has not been implemented yet.', file=sys.stderr)
+        print('app.py: warning: the command line argument "delete SYMBOL" '
+              'has not been implemented yet', file=sys.stderr)
         sys.exit(0)
 
     if args.subcommand == LIST_SUBCOMMAND:
-        print('app.py: warning: The command line argument "list" '
-              'has not been implemented yet.', file=sys.stderr)
+        print('app.py: warning: the command line argument "list" '
+              'has not been implemented yet', file=sys.stderr)
+        sys.exit(0)
+
     if args.subcommand == MODIFY_SUBCOMMAND:
         print('app.py: warning: the command line argument "modify SYMBOL '
               'COMMAND" has not been implemented yet', file=sys.stderr)
