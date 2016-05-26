@@ -201,7 +201,7 @@ def _add(args):
         print('app.py: error: the training size should be at least %d'
               % (MIN_TRAINING_SIZE), file=sys.stderr)
         sys.exit(1)
-    databox.bind_symbol_with_command(symbol, args.shell_command)
+    databox.bind_symbol_with_command(args.symbol_name, args.shell_command, args.shell_command_arguments)
     _start_threads(learning_mode=True, symbol_name=args.symbol_name,
                    training_size=args.training_size)
 
@@ -226,8 +226,8 @@ def _delete(args):
         args (dict): Parsed command line arguments.
     """
     classifier = classifier_module.Classifier(True)
-    classifier.delete_symbols([args.symbol_name])
-    databox.delete_symbols([args.symbol_name])
+    classifier.delete_symbols(args.symbols)
+    databox.delete_symbols(args.symbols)
     sys.exit(0)
 
 
@@ -243,13 +243,7 @@ def _modify(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    print('app.py: warning: the command line argument "modify" has not '
-          'been implemented yet', file=sys.stderr)
-    print('app.py: notice: parsed command line arguments: symbol name: '
-          '"{0}", command: "{1}", arguments: "{2}"'
-          ''.format(args.symbol_name, args.shell_command,
-                    args.shell_command_arguments),
-          file=sys.stderr)
+    databox.bind_symbol_with_command(args.symbol_name, args.shell_command, args.shell_command_arguments)
     sys.exit(0)
 
 

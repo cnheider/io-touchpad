@@ -107,6 +107,7 @@ def bind_symbol_with_command(symbol, command='touch', command_arguments=None):
         command (str): The shell command to be bound with the symbol.
         command_arguments (str): The arguments for the command.
     """
+    global _USER_DEFINED_COMMANDS
     _check_and_load_commands()
     if command == 'touch' and command_arguments is None:
         command_arguments = '/tmp/created_by_' + symbol

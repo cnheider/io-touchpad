@@ -339,6 +339,7 @@ class Classifier:
             symbols (list of str): Symbols to delete names.
         """
         if not symbols_to_delete:
+            print('removing all symbols from classifier')
             symbols_to_delete = self.symbol_list
         
         if symbols_to_delete:
