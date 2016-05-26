@@ -31,6 +31,7 @@ ADD_SUBCOMMAND = 'add'
 ACTIVATE_SUBCOMMAND = 'activate'
 DELETE_SUBCOMMAND = 'delete'
 DEACTIVATE_SUBCOMMAND = 'deactivate'
+LIST_SUBCOMMAND = 'list'
 REPEAT_SUBCOMMAND = 'repeat'
 
 
@@ -96,6 +97,10 @@ def _get_configured_parser():
                                metavar='SYMBOL', help='the name of the symbol '
                                'you want to delete from the app')
 
+    # list.
+    parser_list = subparsers.add_parser(LIST_SUBCOMMAND, help='list all the '
+                                        'available symbols (both activated '
+                                        'and deactivated)')
 
     # repeat.
     parser_repeat = subparsers.add_parser(REPEAT_SUBCOMMAND, help='repeat the '
@@ -152,6 +157,11 @@ def main():
 
     if args.subcommand == DELETE_SUBCOMMAND:
         print('app.py: warning: The command line argument "delete SYMBOL" '
+              'has not been implemented yet.', file=sys.stderr)
+        sys.exit(0)
+
+    if args.subcommand == LIST_SUBCOMMAND:
+        print('app.py: warning: The command line argument "list" '
               'has not been implemented yet.', file=sys.stderr)
         sys.exit(0)
 
