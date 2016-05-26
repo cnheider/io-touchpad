@@ -49,15 +49,13 @@ def _get_configured_parser():
 
     # The activate subcommand section.
     subparser = subparsers.add_parser(ACTIVATE_SUBCOMMAND,
-                                      help='activate selected symbols; '
-                                      'the selected symbols will be '
-                                      'added to the list of the symbols '
+                                      help='activate selected symbols to be '
                                       'recognisable by the app')
     group = subparser.add_mutually_exclusive_group(required=True)
     group.add_argument('-a', '--all', dest='symbols', action='store_const',
-                       const=[], help='activate all symbols')
+                       const=[], help='activate all the existing symbols')
     group.add_argument('-s', '--select', dest='symbols', nargs="+",
-                       help='activate all the symbols from the list')
+                       help='activate all the selected symbols')
 
     # The add subcommand section.
     subparser = subparsers.add_parser(ADD_SUBCOMMAND, help='undertake a '
