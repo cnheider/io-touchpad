@@ -31,6 +31,8 @@ def application_thread(queue, learning_mode=False, training_size=0,
             are {None, 32, 64}. If the value is 32 or 64 then set of hardcoded
             symbols (with respect to the provided bitness) will be
             recogniezed instead of the user defined symbols.
+        symbol_name (str): The name of the symbol provided by the user with
+            a command line option.
 
     Variables:
         collection (SignalCollection): A collection of signals sent by
