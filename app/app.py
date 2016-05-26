@@ -8,8 +8,6 @@ with certain actions you bound to those symbols.
 
 Your finger's absolute position is fetched using a library called touchpadlib
 which is based on evtest (version 1.32).
-
-Source code encoding: UTF-8
 """
 
 import argparse
