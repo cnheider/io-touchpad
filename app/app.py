@@ -18,6 +18,7 @@ from terminationhandler import terminationhandler
 from threads import application
 from threads import listener
 from classifier import classifier as classifier_module
+from databox import databox
 
 MIN_TRAINING_SIZE = 5
 
@@ -313,6 +314,12 @@ def main():
         _modify(args)
     elif args.subcommand == REDRAW_SUBCOMMAND:
         _redraw(args)
+    elif args.subcommand == LIST_SUBCOMMAND:
+        databox.print_commands()
+        sys.exit(0)
+    elif args.subcommand == MODIFY_SUBCOMMAND:
+        
+        sys.exit(0)
     elif args.subcommand == REPEAT_SUBCOMMAND:
         _repeat(args)
     elif args.subcommand == RUN_SUBCOMMAND:
