@@ -247,11 +247,12 @@ def _redraw(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    print('app.py: warning: the command line argument "redraw" has not '
-          'been implemented yet', file=sys.stderr)
-    print('app.py: notice: parsed command line arguments: symbol name: '
-          '"{0}", training size: "{1}"'
-          ''.format(args.symbol_name, args.training_size), file=sys.stderr)
+    if args.training_size < MIN_TRAINING_SIZE:
+        print('app.py: error: the training size should be at least %d'
+              % (MIN_TRAINING_SIZE), file=sys.stderr)
+        sys.exit(1)
+    _start_threads(learning_mode=True, symbol_name=args.symbol_name,
+                   training_size=args.training_size)
     sys.exit(0)
 
 
@@ -304,9 +305,6 @@ def main():
         _redraw(args)
     elif args.subcommand == LIST_SUBCOMMAND:
         databox.print_commands()
-        sys.exit(0)
-    elif args.subcommand == MODIFY_SUBCOMMAND:
-        
         sys.exit(0)
     elif args.subcommand == REPEAT_SUBCOMMAND:
         _repeat(args)
