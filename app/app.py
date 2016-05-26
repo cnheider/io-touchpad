@@ -72,7 +72,11 @@ def _get_configured_parser():
                            'learn during the learning session')
     subparser.add_argument(dest='shell_command', metavar='COMMAND',
                            help='the shell command to be triggered when the '
-                           'symbol is drawn')
+                           'symbol is drawn; for e.g. "touch"')
+    subparser.add_argument(dest='shell_command_arguments', metavar='ARGUMENTS',
+                           help='the arguments for the shell command to be '
+                           'triggered when the symbol is drawn; for '
+                           'e.g. "/tmp/touched_file"')
 
     # The deactivate subcommand section.
     subparser = subparsers.add_parser(DEACTIVATE_SUBCOMMAND, help='deactivate '
