@@ -38,8 +38,8 @@ def _get_configured_parser():
 
     subparsers = parser.add_subparsers(metavar='SUBCOMMAND', dest='subcommand',
                                        help='available subcommands; run '
-                                       '<subcommand> -h to show help for '
-                                       'the <subcommand>')
+                                       'SUBCOMMAND -h to show help for '
+                                       'the SUBCOMMAND you are interested in')
     subparsers.required = True  # Require SUBCOMMAND to be specified.
 
     parser_run = subparsers.add_parser(RUN_SUBCOMMAND, help='a subcommand to '
