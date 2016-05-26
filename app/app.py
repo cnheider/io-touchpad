@@ -109,7 +109,7 @@ def _get_configured_parser():
                                           'to repeat the process for only one '
                                           'symbol')
     parser_repeat.add_argument('-s', '--symbol', dest='symbol_name',
-                               default=None, metavar='SYMBOL', help= 'repeat '
+                               default=None, metavar='SYMBOL', help='repeat '
                                'the learning process for the SYMBOL only; '
                                'if this option is not provided then '
                                'the learning process will be '
