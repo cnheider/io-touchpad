@@ -195,10 +195,11 @@ def _add(args):
     """
     print('The symbol name is ' + args.symbol_name + '.')
     if args.training_size < MIN_TRAINING_SIZE:
-        print('app.py: error: the training size should be at least %d'
-              % (MIN_TRAINING_SIZE), file=sys.stderr)
+        print('app.py: error: the training size should be at least '
+              '{0}'.format(MIN_TRAINING_SIZE), file=sys.stderr)
         sys.exit(1)
-    databox.bind_symbol_with_command(args.symbol_name, args.shell_command, args.shell_command_arguments)
+    databox.bind_symbol_with_command(args.symbol_name, args.shell_command,
+                                     args.shell_command_arguments)
     _start_threads(learning_mode=True, symbol_name=args.symbol_name,
                    training_size=args.training_size)
 
@@ -219,7 +220,7 @@ def _delete(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    classifier = classifier_module.Classifier(True)
+    classifier = classifier_module.Classifier(learning_mode=True)
     classifier.delete_symbols(args.symbols)
     databox.delete_symbols(args.symbols)
     sys.exit(0)
@@ -237,7 +238,8 @@ def _modify(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    databox.bind_symbol_with_command(args.symbol_name, args.shell_command, args.shell_command_arguments)
+    databox.bind_symbol_with_command(args.symbol_name, args.shell_command,
+                                     args.shell_command_arguments)
     sys.exit(0)
 
 
@@ -248,8 +250,8 @@ def _redraw(args):
         args (dict): Parsed command line arguments.
     """
     if args.training_size < MIN_TRAINING_SIZE:
-        print('app.py: error: the training size should be at least %d'
-              % (MIN_TRAINING_SIZE), file=sys.stderr)
+        print('app.py: error: the training size should be at least '
+              '{0}'.format(MIN_TRAINING_SIZE), file=sys.stderr)
         sys.exit(1)
     _start_threads(learning_mode=True, symbol_name=args.symbol_name,
                    training_size=args.training_size)
@@ -263,7 +265,7 @@ def _repeat(args):
         args (dict): Parsed command line arguments.
     """
     print('Repeating the classification within the learning process.')
-    classifier = classifier_module.Classifier(True)
+    classifier = classifier_module.Classifier(learning_mode=True)
     classifier.learn(True, args.symbol_name)
     sys.exit(0)
 
@@ -303,9 +305,6 @@ def main():
         _modify(args)
     elif args.subcommand == REDRAW_SUBCOMMAND:
         _redraw(args)
-    elif args.subcommand == LIST_SUBCOMMAND:
-        databox.print_commands()
-        sys.exit(0)
     elif args.subcommand == REPEAT_SUBCOMMAND:
         _repeat(args)
     elif args.subcommand == RUN_SUBCOMMAND:
