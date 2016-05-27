@@ -210,8 +210,8 @@ def test_get_angle_list():
     curve = featureextractor.Curve(featureextractor.Point(0, 0))
 
     colors = [0]
-    SCALING = 2 / pi * \
-              (featureextractor.SCALE / featureextractor.ANGLE_DOWNSCALE)
+    SCALING = 2 / pi * (featureextractor.SCALE /
+                        featureextractor.ANGLE_DOWNSCALE)
     for x in range(1, 42):
         point = featureextractor.Point(x, x*x)
         curve.add_point(point)
