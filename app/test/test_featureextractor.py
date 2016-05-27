@@ -192,8 +192,8 @@ def test_create_normalized_curve():
         colors.append(0)
         last_point = point
     start_point = featureextractor.Point(0, 0)
-    normalized = featureextractor.create_normalized_curve(curve,
-                                                          start_point, last_point, colors)
+    normalized = featureextractor.\
+        create_normalized_curve(curve, start_point, last_point, colors)
     expected_x = -500.0
     for point in normalized.list_of_points:
 
@@ -210,7 +210,8 @@ def test_get_angle_list():
     curve = featureextractor.Curve(featureextractor.Point(0, 0))
 
     colors = [0]
-    SCALING = 2 / pi * (featureextractor.SCALE / featureextractor.ANGLE_DOWNSCALE)
+    SCALING = 2 / pi * \
+              (featureextractor.SCALE / featureextractor.ANGLE_DOWNSCALE)
     for x in range(1, 42):
         point = featureextractor.Point(x, x*x)
         curve.add_point(point)
@@ -221,7 +222,8 @@ def test_get_angle_list():
         angle = angles[i]
         point1 = curve.list_of_points[i]
         point2 = curve.list_of_points[i + 1]
-        expected_angle = featureextractor.angle_between_line_and_xaxis(point1, point2)
+        expected_angle = featureextractor.\
+            angle_between_line_and_xaxis(point1, point2)
         expected_angle *= SCALING
 
         assert angle < expected_angle + 0.000001
@@ -244,7 +246,7 @@ def test_filter_points_from_signal_and_normalize_curve():
 
     curve = featureextractor.normalize_points(points, colors)
 
-    for i in range(0, featureextractor.NUMBER_OF_POINTS -1):
+    for i in range(0, featureextractor.NUMBER_OF_POINTS - 1):
         point = curve.list_of_points[i]
         x_jump = 2.5 + 0.705128205128055
         x = -62.5 + i * x_jump
