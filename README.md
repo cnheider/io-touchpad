@@ -16,21 +16,21 @@
     pip3 install scikit-learn
     make
 
-### Usage
+### Quick start
 
 1. Go to the `app` directory.
 
         cd app
 
-2. Undertake a learning session with a trainig size of SIZE for a symbol named SYMBOL:
+2. Undertake a learning session with a trainig size of **5** for a symbol named **your-secret-symbol** which will create a **yss.txt** file in the **/tmp** directory.:
 
-        sudo ./app.py add SIZE SYMBOL
+        sudo ./app.py add 5 your-secret-symbol touch /tmp/yss.txt
 
 3. Use the app. (Hopefully, it will recognise your symbol.)
 
         sudo ./app run user
 
-If you want to use predefined, hardcoded symbols run `./app --help` for more information.
+If you want to learn more then run `./app --help` for more information.
 
 
 
