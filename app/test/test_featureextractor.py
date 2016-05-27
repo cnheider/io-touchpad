@@ -48,8 +48,8 @@ def test_ratio_point():
 
     """
     line = featureextractor.Line(POINTA, POINTB)
-    expected = featureextractor.Point(1.5, 3)
-    assert line.ratio_point(0.5).equals(expected)
+    expected = featureextractor.Point(1.25, 2.50)
+    assert line.ratio_point(0.75).equals(expected)
 
 
 def test_length_of_line():
@@ -173,6 +173,87 @@ def test_join_features():
     C1 = [5.6, 45, 12]
 
     assert len(featureextractor.join_features(PLIST, F1, C1)) == 11
+
+
+def test_create_normalized_curve():
+    """Test for creating 40 equidistant points
+
+    """
+    curve = featureextractor.Curve(featureextractor.Point(0, 0))
+    x = 0
+
+    colors = [0]
+
+    last_point = featureextractor.Point(0, 0)
+    for i in range(1, 42):
+        x += i
+        point = featureextractor.Point(x*x, 0)
+        curve.add_point(point)
+        colors.append(0)
+        last_point = point
+    start_point = featureextractor.Point(0, 0)
+    normalized = featureextractor.create_normalized_curve(curve,
+                                                          start_point, last_point, colors)
+    expected_x = -500.0
+    for point in normalized.list_of_points:
+
+        assert point.x_cord < expected_x + 0.000001
+        assert point.x_cord > expected_x - 0.000001
+        expected_x += 1000.0/39.0
+
+
+def test_get_angle_list():
+    """Test for checking angles in Curve
+
+    """
+
+    curve = featureextractor.Curve(featureextractor.Point(0, 0))
+
+    colors = [0]
+    SCALING = 2 / pi * (featureextractor.SCALE / featureextractor.ANGLE_DOWNSCALE)
+    for x in range(1, 42):
+        point = featureextractor.Point(x, x*x)
+        curve.add_point(point)
+        colors.append(0)
+
+    angles = featureextractor.get_angle_list(curve)
+    for i in range(0, featureextractor.NUMBER_OF_POINTS - 2):
+        angle = angles[i]
+        point1 = curve.list_of_points[i]
+        point2 = curve.list_of_points[i + 1]
+        expected_angle = featureextractor.angle_between_line_and_xaxis(point1, point2)
+        expected_angle *= SCALING
+
+        assert angle < expected_angle + 0.000001
+        assert angle > expected_angle - 0.000001
+
+
+def test_filter_points_from_signal_and_normalize_curve():
+    signals = []
+    exp_points = []
+    for i in range(0, 100):
+        signals.append(Signal_test(i, 8*i + 2))
+        exp_points.append(featureextractor.Point(i, 8*i + 2))
+
+    points, colors = featureextractor.filter_points_from_signals(signals)
+
+    for i in range(0, 100):
+        assert points[i].x == exp_points[i].x_cord
+        assert points[i].y == exp_points[i].y_cord
+        assert colors[i] == 0
+
+    curve = featureextractor.normalize_points(points, colors)
+
+    for i in range(0, featureextractor.NUMBER_OF_POINTS -1):
+        point = curve.list_of_points[i]
+        x_jump = 2.5 + 0.705128205128055
+        x = -62.5 + i * x_jump
+        y = i * 1000.0 / (featureextractor.NUMBER_OF_POINTS - 1)
+        assert point.x_cord < x + 0.00001
+        assert point.x_cord > x - 0.00001
+
+        assert point.y_cord < -500 + y + 0.00001
+        assert point.y_cord > -500 + y - 0.00001
 
 
 def test_feature_extractor():
