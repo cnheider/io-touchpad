@@ -176,7 +176,7 @@ def test_classify():
         signal_list_test = [signal_a, signal_b]
 
         symbol = classifier.classify(signal_list_test)
-        assert symbol == 'dupa'
+        assert symbol == 'test'
 
 
 def test_delete_symbol():
