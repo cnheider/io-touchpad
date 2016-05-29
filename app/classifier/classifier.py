@@ -18,7 +18,7 @@ from classifier import featureextractor
 from string import Template
 
 DATA_PATH = 'classifier/data/'
-TEST_LOCATION = '../classifier/data/test/'
+TEST_LOCATION = 'classifier/data/'
 
 USER_DIR = 'user-defined/'
 SYSTEM_BITNESS_32 = 32
@@ -59,6 +59,9 @@ class Classifier:
             else:
                 file_with_symbols = \
                     open(TEST_LOCATION + 'test_symbol_list.dat', 'rb')
+            print(self.files[SYMBOL_LIST_FILE])
+            print("abcdefg")
+
             self.symbol_list = pickle.load(file_with_symbols)
             file_with_symbols.close()
         except FileNotFoundError:
@@ -120,14 +123,12 @@ class Classifier:
         self.training_set = []
         self.symbol_name = None
 
-    def load_training_set(self, symbol,test=False):
+    def load_training_set(self, symbol):
         """Load and return traning symbols from file."""
         try:
-            if not test:
-                training_path = Classifier.\
-                    _get_file_path(self.files[TRAINING_SET_FILE], symbol)
-            else:
-                training_path = TEST_LOCATION + 'test_training_set.dat'
+            training_path = Classifier.\
+                _get_file_path(self.files[TRAINING_SET_FILE], symbol)
+
             file_with_training = open(training_path, 'rb')
         except FileNotFoundError:
             print("classifier.py: error: file with training set doesn't "
@@ -220,11 +221,10 @@ class Classifier:
         critical_index = math.ceil(0.8 * len(means)) - 1
         tolerance_distance = means[critical_index] * 1.3
         print("tolerance distance: %.16f" % (tolerance_distance))
-        if not test:
-            tolerance_distance_path = \
-                Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol)
-        else:
-            tolerance_distance_path = TEST_LOCATION + 'tolerance_distance.dat'
+
+        tolerance_distance_path = \
+            Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol)
+
         file_with_tolerance_distance = \
             open(tolerance_distance_path, 'w')
         file_with_tolerance_distance.write("%.16f\n"
@@ -239,44 +239,35 @@ class Classifier:
         Args:
             str (str): Name of the symbol.
         """
-        if test == 0:
-            file_with_training_path = \
-                Classifier._get_file_path(self.files[TRAINING_SET_FILE], symbol)
-        else:
-            file_with_training_path = \
-                TEST_LOCATION + 'test_training_set.dat'
+        file_with_training_path = \
+            Classifier._get_file_path(self.files[TRAINING_SET_FILE], symbol)
+
         if test != 2:
             file_with_training = \
                 open(file_with_training_path, 'wb')
-            file_with_training.truncate()
-
-            training_set_copy = self.training_set
-            self.training_set = []
-
-            for train in training_set_copy:
-                self.training_set.append(train)
+            #file_with_training.truncate()
+            print(file_with_training_path)
+            print("siurkumurku")
             pickle.dump(self.training_set, file_with_training)
             file_with_training.close()
 
         if symbol not in self.symbol_list:
             self.symbol_list.append(symbol)
-            if not test:
-                file_with_symbols = \
-                    open(self.files[SYMBOL_LIST_FILE], 'wb')
-            else:
-                file_with_symbols = \
-                    open(TEST_LOCATION + 'test_symbol_list.dat', 'wb')
+            file_with_symbols = \
+                open(self.files[SYMBOL_LIST_FILE], 'wb')
+
             pickle.dump(self.symbol_list, file_with_symbols)
             file_with_symbols.close()
 
-    def learn_one_symbol(self, symbol, test=False):
+
+    def learn_one_symbol(self, symbol):
         """Learn given symbol basing on training set from file.
 
         Args:
             symbol (str): Name of the symbol.
             test (bool): says if it is a test
         """
-        training_set = self.load_training_set(symbol, test)
+        training_set = self.load_training_set(symbol)
         feature_vectors = []
         for training_element in training_set:
             feature_vectors.append(featureextractor
@@ -284,11 +275,10 @@ class Classifier:
         sample = np.array(feature_vectors)
         nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree')\
             .fit(sample)
-        if not test:
-            model_path = Classifier.\
-                _get_file_path(self.files[MODEL_FILE], symbol)
-        else:
-            model_path = TEST_LOCATION + 'test_nn_model.dat'
+
+        model_path = Classifier.\
+            _get_file_path(self.files[MODEL_FILE], symbol)
+
         file_with_model = open(model_path, 'wb')
         pickle.dump(nbrs, file_with_model)
         file_with_model.close()
@@ -346,16 +336,13 @@ class Classifier:
         print("learning all together...")
         self.learn_all_symbols_together()
 
-    def delete_symbol(self, symbol, test=False):
+    def delete_symbol(self, symbol):
         print('removing symbol', symbol, 'from classifier...')
         if symbol in self.symbol_list:
             self.symbol_list.remove(symbol)
-            if test:
-                file_with_symbols = \
-                    open(self.files[SYMBOL_LIST_FILE], 'wb')
-            else:
-                file_with_symbols = \
-                    open(TEST_LOCATION + 'test_symbol_list.dat', 'wb')
+            file_with_symbols = \
+                open(self.files[SYMBOL_LIST_FILE], 'wb')
+
             file_with_symbols.truncate()
             pickle.dump(self.symbol_list, file_with_symbols)
             file_with_symbols.close()

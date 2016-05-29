@@ -7,6 +7,7 @@ import operator
 import filecmp
 import difflib
 import pickle
+import sys
 from math import fabs
 
 from classifier import classifier as classifier_module
@@ -38,7 +39,7 @@ SIGNAL_LIST_TEST = [SIGNALA, SIGNALB]
 
 epsilon = 0.00001
 
-TEST_LOCATION = '../classifier/data/test/'
+TEST_LOCATION = 'classifier/data/'
 
 
 
@@ -119,7 +120,9 @@ def test_add_to_training_set():
 
 def test_save_training_set():
     """Test learning symbol given the specific training set"""
+
     classifier = classifier_module.Classifier(True, None)
+    classifier.delete_symbol('test')
     classifier.reset_training_set(7, 'test')
     for i in range(0, 5):
         signal_a = Signal_test(1.0 + i * 0.028, 1.00 - i * i * 0.20 * 0.30)
@@ -129,16 +132,16 @@ def test_save_training_set():
         classifier.add_to_training_set(signal_list_test)
 
     classifier.save_training_set("test", 1)
-    assert filecmp.cmp(TEST_LOCATION + 'test_symbol_list.dat',
-                       TEST_LOCATION + 'expected_test_symbol_list.dat')
-    assert filecmp.cmp(TEST_LOCATION + 'test_training_set.dat',
-                       TEST_LOCATION + 'expected_test_training_set.dat')
+    assert filecmp.cmp(TEST_LOCATION + 'user-defined/symbol-list.dat',
+                       TEST_LOCATION + 'user-defined/expected_symbol-list.dat')
+    assert filecmp.cmp(TEST_LOCATION + 'user-defined/training-set_test.dat',
+                       TEST_LOCATION + 'user-defined/expected_training-set_test.dat')
 
 
 def test_load_training_set():
     """Test loading training set from file"""
     classifier = classifier_module.Classifier(True, None)
-    set = classifier.load_training_set('test', True)
+    set = classifier.load_training_set('test')
     for i in range(0, 5):
         signal_list = set[i]
         assert signal_list[0].get_x() == 1.0 + i * 0.028
@@ -151,7 +154,7 @@ def test_load_training_set():
 def test_learn_one_symbol():
     """Test learning specific symbol"""
     classifier = classifier_module.Classifier(True, None)
-    tolerance = classifier.learn_one_symbol('test', True)
+    tolerance = classifier.learn_one_symbol('test')
 
     file_with_model = open(TEST_LOCATION + 'test_nn_model.dat', 'rb')
     nbrs_from_file = pickle.load(file_with_model)
@@ -182,11 +185,13 @@ def test_classify():
 def test_delete_symbol():
     """Test deleting one symbol"""
     classifier = classifier_module.Classifier(True, None)
-    classifier.delete_symbol('test', True)
     classifier.save_training_set("test2", 2)
+    classifier.delete_symbol('test2')
+    classifier.save_training_set("test3", 2)
 
-    assert filecmp.cmp(TEST_LOCATION + 'test_symbol_list.dat',
-                       TEST_LOCATION + 'expected_test_delete_symbol.dat')
+
+    assert filecmp.cmp(TEST_LOCATION + 'user-defined/symbol-list.dat',
+                       TEST_LOCATION + 'user-defined/expected_test_delete_symbol.dat')
 
 
 def test_delete_symbols():
@@ -201,5 +206,5 @@ def test_delete_symbols():
 
     classifier.save_training_set("test2", 2)
 
-    assert filecmp.cmp(TEST_LOCATION + 'test_symbol_list.dat',
-                       TEST_LOCATION + 'expected_test_delete_symbol.dat')
+    assert filecmp.cmp(TEST_LOCATION + 'user-defined/symbol-list.dat',
+                       TEST_LOCATION + 'user-defined/expected_test_delete_symbols.dat')
