@@ -35,7 +35,7 @@ SYMBOL_LIST_FILE = 'symbol-list.dat'
 class Classifier:
     """Class for learning and classifying drawn symbols."""
 
-    def __init__(self, learning_mode=False, system_bitness=None, test=False):
+    def __init__(self, learning_mode=False, system_bitness=None):
         """Constructor. Loads the learning model from files.
 
         Args:
@@ -53,14 +53,10 @@ class Classifier:
 
         # Symbol list loading.
         try:
-            if not test:
-                file_with_symbols = \
-                    open(self.files[SYMBOL_LIST_FILE], 'rb')
-            else:
-                file_with_symbols = \
-                    open(TEST_LOCATION + 'test_symbol_list.dat', 'rb')
-            print(self.files[SYMBOL_LIST_FILE])
-            print("abcdefg")
+
+            file_with_symbols = \
+                open(self.files[SYMBOL_LIST_FILE], 'rb')
+
 
             self.symbol_list = pickle.load(file_with_symbols)
             file_with_symbols.close()
@@ -74,11 +70,10 @@ class Classifier:
             self.symbol_list.append("")
             for symbol in self.symbol_list:
                 try:
-                    if not test:
-                        model_path = Classifier.\
-                            _get_file_path(self.files[MODEL_FILE], symbol)
-                    else:
-                        model_path = TEST_LOCATION + 'test_nn_model.dat'
+
+                    model_path = Classifier.\
+                        get_file_path(self.files[MODEL_FILE], symbol)
+
                     file_with_model = open(model_path, 'rb')
                 except FileNotFoundError:
                     print("classifier.py: error: file with the learning model "
@@ -92,12 +87,10 @@ class Classifier:
 
                 if symbol != "":
                     try:
-                        if not test:
-                            tolerance_distance_path = \
-                                Classifier._get_file_path( \
-                                    self.files[DISTANCE_TOLERANCE_FILE], symbol)
-                        else:
-                            tolerance_distance_path = TEST_LOCATION + 'tolerance_distance.dat'
+
+                        tolerance_distance_path = \
+                            Classifier._get_file_path( \
+                                self.files[DISTANCE_TOLERANCE_FILE], symbol)
                         file_with_tolerance_distance = \
                             open(tolerance_distance_path, 'r')
                     except FileNotFoundError:
