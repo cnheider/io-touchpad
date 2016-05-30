@@ -272,15 +272,17 @@ class Classifier:
             knn_model = KNeighborsClassifier(n_neighbors=5).\
                 fit(feature_vectors, results)
             file_with_model = \
-                open(Classifier._get_file_path(self.files[MODEL_FILE], ""), 'wb')
+                open(Classifier._get_file_path(self.files[MODEL_FILE], ""),
+                     'wb')
             pickle.dump(knn_model, file_with_model)
             file_with_model.close()
         else:
             try:
-                os.remove(Classifier._get_file_path(self.files[MODEL_FILE], ""))
+                os.remove(Classifier.\
+                    _get_file_path(self.files[MODEL_FILE], ""))
             except OSError:
                 pass
-            
+
 
     def learn(self, load_from_file, symbol=""):
         """Learn basing on traing-set.
@@ -321,19 +323,23 @@ class Classifier:
             pickle.dump(self.symbol_list, file_with_symbols)
             file_with_symbols.close()
         else:
-            print('warning: symbol', symbol, 'is not present in classifier database')
+            print('warning: symbol', symbol,
+                  'is not present in classifier database')
 
         print("removing related files...")
         try:
-            os.remove(Classifier._get_file_path(self.files[TRAINING_SET_FILE], symbol))
+            os.remove(Classifier.\
+                _get_file_path(self.files[TRAINING_SET_FILE], symbol))
         except OSError:
             pass
         try:
-            os.remove(Classifier._get_file_path(self.files[MODEL_FILE], symbol))
+            os.remove(Classifier.\
+                _get_file_path(self.files[MODEL_FILE], symbol))
         except OSError:
             pass
         try:
-            os.remove(Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol))
+            os.remove(Classifier.\
+                _get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol))
         except OSError:
             pass
 
