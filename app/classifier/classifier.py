@@ -109,7 +109,7 @@ class Classifier:
         self.training_set = []
         self.symbol_name = None
 
-    def load_training_set(self, symbol):
+    def _load_training_set(self, symbol):
         """Load and return traning symbols from file."""
         try:
             training_path = Classifier.\
@@ -183,7 +183,7 @@ class Classifier:
         else:
             return None
 
-    def compute_tolerance_distance(self, sample, symbol):
+    def _compute_tolerance_distance(self, sample, symbol):
         """Compute the distance tolerance.
 
         Computes distance tolerance in the feature vectors space
@@ -214,7 +214,7 @@ class Classifier:
                                            % (tolerance_distance))
         file_with_tolerance_distance.close()
 
-    def save_training_set(self, symbol):
+    def _save_training_set(self, symbol):
         """Save the drawn training set to file.
 
         Args:
@@ -233,13 +233,13 @@ class Classifier:
             pickle.dump(self.symbol_list, file_with_symbols)
             file_with_symbols.close()
 
-    def learn_one_symbol(self, symbol):
+    def _learn_one_symbol(self, symbol):
         """Learn given symbol basing on training set from file.
 
         Args:
             symbol (str): Name of the symbol.
         """
-        training_set = self.load_training_set(symbol)
+        training_set = self._load_training_set(symbol)
         feature_vectors = []
         for training_element in training_set:
             feature_vectors.append(featureextractor
@@ -252,9 +252,9 @@ class Classifier:
         file_with_model = open(model_path, 'wb')
         pickle.dump(nbrs, file_with_model)
         file_with_model.close()
-        self.compute_tolerance_distance(sample, symbol)
+        self._compute_tolerance_distance(sample, symbol)
 
-    def learn_all_symbols_together(self):
+    def _learn_all_symbols_together(self):
         """Build file of knn-classifier model of all training elements."""
         feature_vectors = []
         results = []
@@ -298,17 +298,17 @@ class Classifier:
         if symbol != "":
             print("learning", symbol, "symbol...")
             if not load_from_file:
-                self.save_training_set(symbol)
-            self.learn_one_symbol(symbol)
+                self._save_training_set(symbol)
+            self._learn_one_symbol(symbol)
         else:
             for sym in self.symbol_list:
                 print("learning", sym, "symbol...")
-                self.learn_one_symbol(sym)
+                self._learn_one_symbol(sym)
 
         print("learning all together...")
-        self.learn_all_symbols_together()
+        self._learn_all_symbols_together()
 
-    def delete_symbol(self, symbol):
+    def _delete_symbol(self, symbol):
         """Delete symbol from classifier.
 
         Args:
@@ -354,10 +354,10 @@ class Classifier:
 
         if symbols_to_delete:
             for symbol in symbols_to_delete:
-                self.delete_symbol(symbol)
+                self._delete_symbol(symbol)
 
         print("learning all together...")
-        self.learn_all_symbols_together()
+        self._learn_all_symbols_together()
 
 
     @staticmethod
