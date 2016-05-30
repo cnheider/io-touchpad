@@ -31,7 +31,7 @@ def test_compute_tolerance_distance():
     L5 = [11.223, 41.0, 1.31]
     AL = [L1, L2, L3, L4, L5]
     symbol = "a"
-    classifier.compute_tolerance_distance(AL, symbol)
+    classifier._compute_tolerance_distance(AL, symbol)
     tolerance_distance_path = \
         classifier_module.Classifier._get_file_path( \
             classifier.files[classifier_module.DISTANCE_TOLERANCE_FILE], symbol)
