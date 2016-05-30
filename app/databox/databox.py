@@ -84,7 +84,8 @@ def is_active(symbol):
 
     Args:
         symbol (str): name of the symbol which we check to be active
-    if there is no such symbol in database, returns false"""
+    if there is no such symbol in database, returns false.
+    """
     _check_and_load_commands()
 
     if Command.is_builtin(symbol):
@@ -108,9 +109,11 @@ def print_commands():
 
 def _set_status(symbols, status):
     """Set status of command on active or inactive.
+
     Args:
         symbols (list of str): Symbols to set status.
-        status ('active'/'inactive'): New status."""
+        status ('active'/'inactive'): New status.
+    """
     global _USER_DEFINED_COMMANDS
     _check_and_load_commands()
     if not symbols:
@@ -126,15 +129,19 @@ def _set_status(symbols, status):
 
 def activate(symbols):
     """Change the status of given symbols on active.
+
     Args:
-        symbols (list of str): Symbols to set status."""
+        symbols (list of str): Symbols to set status.
+    """
     _set_status(symbols, 'active')
 
 
 def deactivate(symbols):
     """Change the status of given symbols on inactive.
+
     Args:
-        symbols (list of str): Symbols to set status."""
+        symbols (list of str): Symbols to set status.
+    """
     _set_status(symbols, 'inactive')
 
 
