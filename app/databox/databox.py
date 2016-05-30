@@ -79,6 +79,23 @@ _BUILTIN_COMMANDS = {
 }
 
 
+def is_active(symbol):
+    """Check if given symbol is active
+
+    if there is no such symbol in database, returns false"""
+    global _USER_DEFINED_COMMANDS
+    _check_and_load_commands()
+
+    if Command.is_builtin(symbol):
+        command = _BUILTIN_COMMANDS[symbol]
+    elif Command.is_user_defined(symbol):
+        command = _USER_DEFINED_COMMANDS[symbol]
+    else:
+        return None
+
+    return command.is_active()
+
+
 def print_commands():
     """Print command list for user."""
     global _USER_DEFINED_COMMANDS
