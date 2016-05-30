@@ -80,7 +80,7 @@ _BUILTIN_COMMANDS = {
 
 
 def is_active(symbol):
-    """Check if given symbol is active
+    """Check if given symbol is active.
 
     if there is no such symbol in database, returns false"""
     global _USER_DEFINED_COMMANDS
