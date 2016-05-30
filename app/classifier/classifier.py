@@ -8,14 +8,14 @@ import sys
 import _thread
 import os
 
+from string import Template
+
 import numpy as np
+
 from sklearn.neighbors import NearestNeighbors
-
 from sklearn.neighbors import KNeighborsClassifier
-
 from classifier import featureextractor
 
-from string import Template
 
 DATA_PATH = 'classifier/data/'
 
@@ -44,7 +44,8 @@ class Classifier:
                 (with respect to the provided bitness) will be recogniezed
                 instead of the user defined symbols.
         """
-        file_names = [DISTANCE_TOLERANCE_FILE, MODEL_FILE, TRAINING_SET_FILE, SYMBOL_LIST_FILE]
+        file_names = [DISTANCE_TOLERANCE_FILE, MODEL_FILE,
+                      TRAINING_SET_FILE, SYMBOL_LIST_FILE]
         file_paths = Classifier._build_paths(file_names, system_bitness)
         #  (self.distance_tolerance_file_path, self.model_file_path,
         #   self.training_set_file_path) = file_paths
@@ -81,26 +82,29 @@ class Classifier:
 
                 if symbol != "":
                     try:
-                        tolerance_distance_path = \
-                            Classifier._get_file_path( \
-                                self.files[DISTANCE_TOLERANCE_FILE], symbol)
-                        file_with_tolerance_distance = \
-                            open(tolerance_distance_path, 'r')
+                        tolerance_distance_path = Classifier._get_file_path(
+                            self.files[DISTANCE_TOLERANCE_FILE],
+                            symbol)
+                        file_with_tolerance_distance = open(
+                            tolerance_distance_path, 'r')
                     except FileNotFoundError:
                         print("classifier.py: error: file with the tolerance "
                               "distance doesn't exist; please start the "
-                              "application in the learning mode", file=sys.stderr)
+                              "application in the learning mode",
+                              file=sys.stderr)
                         _thread.interrupt_main()
                         sys.exit(1)
 
-                    self.tolerance_distances.append( \
+                    self.tolerance_distances.append(
                         float(file_with_tolerance_distance.readline()))
                     file_with_tolerance_distance.close()
 
-            self.learning_models = \
-                {sym: mod for sym, mod in zip(self.symbol_list, self.learning_models)}
-            self.tolerance_distances = \
-                {sym: dist for sym, dist in zip(self.symbol_list, self.tolerance_distances)}
+            self.learning_models = {sym: mod for sym, mod
+                                    in zip(self.symbol_list,
+                                           self.learning_models)}
+            self.tolerance_distances = {sym: dist for sym, dist
+                                        in zip(self.symbol_list,
+                                               self.tolerance_distances)}
             self.symbol_list.pop()
 
         # Variables for learning-mode.
@@ -206,8 +210,8 @@ class Classifier:
         critical_index = math.ceil(0.8 * len(means)) - 1
         tolerance_distance = means[critical_index] * 1.3
         print("tolerance distance: %.16f" % (tolerance_distance))
-        tolerance_distance_path = \
-            Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol)
+        tolerance_distance_path = Classifier._get_file_path(
+            self.files[DISTANCE_TOLERANCE_FILE], symbol)
         file_with_tolerance_distance = \
             open(tolerance_distance_path, 'w')
         file_with_tolerance_distance.write("%.16f\n"
@@ -265,7 +269,8 @@ class Classifier:
                 open(file_with_training_path, 'rb')
             training_set = pickle.load(file_with_training)
             for training_element in training_set:
-                feature_vector = featureextractor.get_features(training_element)
+                feature_vector = featureextractor.get_features(
+                    training_element)
                 feature_vectors.append(feature_vector)
                 results.append(sym)
         if self.symbol_list:
@@ -278,8 +283,8 @@ class Classifier:
             file_with_model.close()
         else:
             try:
-                os.remove(Classifier.
-                    _get_file_path(self.files[MODEL_FILE], ""))
+                os.remove(Classifier._get_file_path(self.files[MODEL_FILE],
+                                                    ""))
             except OSError:
                 pass
 
@@ -327,18 +332,18 @@ class Classifier:
 
         print("removing related files...")
         try:
-            os.remove(Classifier.
-                _get_file_path(self.files[TRAINING_SET_FILE], symbol))
+            os.remove(Classifier._get_file_path(self.files[TRAINING_SET_FILE],
+                                                symbol))
         except OSError:
             pass
         try:
-            os.remove(Classifier.
-                _get_file_path(self.files[MODEL_FILE], symbol))
+            os.remove(Classifier._get_file_path(self.files[MODEL_FILE],
+                                                symbol))
         except OSError:
             pass
         try:
-            os.remove(Classifier.
-                _get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol))
+            os.remove(Classifier._get_file_path(
+                self.files[DISTANCE_TOLERANCE_FILE], symbol))
         except OSError:
             pass
 
@@ -359,14 +364,14 @@ class Classifier:
         print("learning all together...")
         self._learn_all_symbols_together()
 
-
     @staticmethod
     def _get_file_path(template_string, symbol_name):
         """Transform the file path template to real path.
 
         Args:
             template_string (str): Template of file path.
-            symbol_name (str): Name of symbol or empty string for general files.
+            symbol_name (str): Name of symbol or empty string
+                for general files.
 
         Returns:
             Actual file path.
