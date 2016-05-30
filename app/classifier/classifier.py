@@ -198,7 +198,7 @@ class Classifier:
         else:
             return None
 
-    def compute_tolerance_distance(self, sample, symbol, test=False):
+    def compute_tolerance_distance(self, sample, symbol):
         """Compute the distance tolerance.
 
         Computes distance tolerance in the feature vectors space
@@ -245,7 +245,6 @@ class Classifier:
         if test != 2:
             file_with_training = \
                 open(file_with_training_path, 'wb')
-            #file_with_training.truncate()
             print(file_with_training_path)
             print("siurkumurku")
             pickle.dump(self.training_set, file_with_training)
@@ -282,7 +281,7 @@ class Classifier:
         file_with_model = open(model_path, 'wb')
         pickle.dump(nbrs, file_with_model)
         file_with_model.close()
-        return self.compute_tolerance_distance(sample, symbol, True)
+        return self.compute_tolerance_distance(sample, symbol)
 
     def learn_all_symbols_together(self):
         """Build file of knn-classifier model of all training elements."""
