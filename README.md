@@ -62,7 +62,7 @@ If you want to use predefined, hardcoded symbols run `./app --help` for more inf
     cd app
     sudo ./tools/matrixanalyser.py [--help] [--tolerance TOLERANCE] [--show]
 
-More information on the usege is avaialabe if you run `./tools/matrixanalyser.py --help`.
+More information on the usage is avaialabe if you run `./tools/matrixanalyser.py --help`.
 
 
 All generated figures of the drawn symbols are stored inside
