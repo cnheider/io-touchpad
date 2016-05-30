@@ -259,12 +259,12 @@ def _redraw(args):
 
 
 def _repeat(args):
-    """Wrap up the repeate subcommand to make main() less complex.
+    """Wrap up the repeat subcommand to make main() less complex.
 
     Args:
         args (dict): Parsed command line arguments.
     """
-    print('Repeating the classification within the learning process.')
+    print('Repeating the learning process from traning-set file.')
     classifier = classifier_module.Classifier(learning_mode=True)
     classifier.learn(True, args.symbol_name)
     sys.exit(0)

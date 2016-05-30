@@ -1,4 +1,4 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Data of the application.
 This module stores information about symbols and related commands.
 Global variables:
@@ -34,7 +34,7 @@ class Command(object):
         return self.command + ' ' + self.arguments + ' ' + self.status
 
     def is_active(self):
-        """Return True if the command is active. False othervise"""
+        """Return True if the command is active. False othervise."""
         return self.status == 'active'
 
     def get_command_and_argument(self):
@@ -78,14 +78,21 @@ _BUILTIN_COMMANDS = {
     'large_sigma': Command('touch', '/tmp/created-by-large_sigma'),
 }
 
+
 def print_commands():
+    """Print command list for user."""
     global _USER_DEFINED_COMMANDS
     _check_and_load_commands()
     for sym in _USER_DEFINED_COMMANDS:
         command = _USER_DEFINED_COMMANDS[sym]
         print(sym, command.to_str())
 
+
 def _set_status(symbols, status):
+    """Set status of command on active or inactive.
+    Args:
+        symbols (list of str): Symbols to set status.
+        status ('active'/'inactive'): New status."""
     global _USER_DEFINED_COMMANDS
     _check_and_load_commands()
     if not symbols:
@@ -98,14 +105,21 @@ def _set_status(symbols, status):
     with open(DATA_PATH + USER_DEFINED_COMMANDS_FILE, 'wb') as handle:
         pickle.dump(_USER_DEFINED_COMMANDS, handle)
 
+
 def activate(symbols):
-    """Change the status of given symbols on active."""
+    """Change the status of given symbols on active.
+    Args:
+        symbols (list of str): Symbols to set status."""
     _set_status(symbols, 'active')
 
+
 def deactivate(symbols):
-    """Change the status of given symbols on inactive."""
+    """Change the status of given symbols on inactive.
+    Args:
+        symbols (list of str): Symbols to set status."""
     _set_status(symbols, 'inactive')
-    
+
+
 def delete_symbols(symbols):
     """Delete commands related to given symbols.
     if symbols is empty list, then remove all symbols.
@@ -116,7 +130,7 @@ def delete_symbols(symbols):
     if not symbols:
         print('removing all symbols from databox...')
         _USER_DEFINED_COMMANDS = {}
-    elif symbols: 
+    elif symbols:
         _check_and_load_commands()
         for symbol in symbols:
             print('removing symbol', symbol, 'from databox')
@@ -126,7 +140,7 @@ def delete_symbols(symbols):
                 print('warning: symbol', symbol, 'is not present in databox')
     with open(DATA_PATH + USER_DEFINED_COMMANDS_FILE, 'wb') as handle:
         pickle.dump(_USER_DEFINED_COMMANDS, handle)
-         
+
 
 def bind_symbol_with_command(symbol, command='touch', command_arguments=None):
     """Bind the symbol's name with the provided command.

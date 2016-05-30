@@ -302,12 +302,17 @@ class Classifier:
         else:
             for sym in self.symbol_list:
                 print("learning", sym, "symbol...")
-                self.learn_one_symbol(sym) 
+                self.learn_one_symbol(sym)
 
         print("learning all together...")
         self.learn_all_symbols_together()
 
     def delete_symbol(self, symbol):
+        """Delete symbol from classifier.
+
+        Args:
+            symbol (str): Name of the symbol.
+        """
         print('removing symbol', symbol, 'from classifier...')
         if symbol in self.symbol_list:
             self.symbol_list.remove(symbol)
@@ -336,12 +341,12 @@ class Classifier:
         """Delete symbols from classifier with all files related.
 
         Args:
-            symbols (list of str): Symbols to delete names.
+            symbols (list of str): Names of symbols to delete.
         """
         if not symbols_to_delete:
             print('removing all symbols from classifier')
             symbols_to_delete = self.symbol_list
-        
+
         if symbols_to_delete:
             for symbol in symbols_to_delete:
                 self.delete_symbol(symbol)
