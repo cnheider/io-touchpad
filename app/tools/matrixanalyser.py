@@ -22,6 +22,7 @@ package manager.
 import argparse
 import queue
 import time
+import threading
 import sys
 import matplotlib.pyplot as plt
 
@@ -116,7 +117,7 @@ class MatrixAnalyser(object):
         if show_figure:
             plt.show()
 
-    def run_application(self, thread_queue, show_figure=False):
+    def run_application(self, thread_queue, condition, show_figure=False):
         """Run the modified version of the application.
 
         The MatrixAnalyser version of thread/application.py main function.
@@ -124,6 +125,8 @@ class MatrixAnalyser(object):
         Args:
             thread_queue (Queue): The inter-thread queue to pass signals
                 between the listener and the application.
+            condition (Condition): A condition which allows the threads to notify
+                each other and wait if there is nothing to do.
             show_figure (bool): The indicator whether the figure should be
                 opened just after saving it or not.
         """
@@ -132,9 +135,9 @@ class MatrixAnalyser(object):
         print("Now you can draw symbols on the touchpad. "
               "(Interrupt to exit.)")
         while 1:
-            while thread_queue.empty() \
-                    and collection.is_recent_enough(time.time()):
-                pass
+            condition.acquire()
+            condition.wait(collection.get_time_when_old_enough(time.time()))
+            condition.release()
 
             if not collection.is_recent_enough(time.time()):
                 self.save_symbols(collection.as_list(), show_figure)
@@ -197,9 +200,10 @@ def main():
     touchpad_specification = touchpadlib.Touchpadlib.get_specification()
 
     thread_queue = queue.Queue()
+    condition = threading.Condition()
     matrix_analyser = MatrixAnalyser(touchpad_specification, args.tolerance)
 
-    listener.start(thread_queue)
-    matrix_analyser.run_application(thread_queue, args.show_figure)
+    listener.start(thread_queue, condition)
+    matrix_analyser.run_application(thread_queue, condition, args.show_figure)
 
 main()
