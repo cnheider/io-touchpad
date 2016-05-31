@@ -125,8 +125,8 @@ class MatrixAnalyser(object):
         Args:
             thread_queue (Queue): The inter-thread queue to pass signals
                 between the listener and the application.
-            condition (Condition): A condition which allows the threads to notify
-                each other and wait if there is nothing to do.
+            condition (Condition): A condition which allows the threads to
+                notify each other and wait if there is nothing to do.
             show_figure (bool): The indicator whether the figure should be
                 opened just after saving it or not.
         """
