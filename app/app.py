@@ -118,7 +118,11 @@ def _get_configured_parser():
     # The redraw subcommand section.
     subparser = subparsers.add_parser(REDRAW_SUBCOMMAND, help='redraw a '
                                       'symbol while retaining the command '
-                                      'related to that symbol')
+                                      'related to that symbol; simply '
+                                      'undertake a learning session once '
+                                      'again for a specified symbol; the '
+                                      'related command, arguments and name '
+                                      'will be preserved')
     subparser.add_argument(dest='symbol_name', metavar='SYMBOL', help='the '
                            'name of the symbol you want to draw again')
     subparser.add_argument(dest='training_size', metavar='SIZE',
