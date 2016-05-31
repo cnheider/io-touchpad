@@ -53,7 +53,7 @@ def application_thread(queue, learning_mode=False, training_size=0,
 
     collection = signalcollection.SignalCollection()
 
-    while 1:
+    while True:
         while queue.empty() and collection.is_recent_enough(time.time()):
             pass
 

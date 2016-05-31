@@ -30,6 +30,6 @@ def listener_thread(queue):
     Args:
         queue, (Queue): An inter-thread communication queue for threads.
     """
-    while 1:
+    while True:
         touchpad_signal = touchpadsignal.TouchpadSignal()
         queue.put(touchpad_signal, True)
