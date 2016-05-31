@@ -30,7 +30,7 @@
 
         sudo ./app run user
 
-If you want to learn more then run `./app --help` for more information.
+Run `./app --help` if you want to learn other features of this app.
 
 
 
