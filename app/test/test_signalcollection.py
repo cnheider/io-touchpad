@@ -2,8 +2,6 @@
 
 """Tests for signal collection """
 
-#  import pytest
-
 from signalcollection import signalcollection
 
 COLLECTION = signalcollection.SignalCollection()
