@@ -224,7 +224,8 @@ class Classifier:
         print("tolerance distance: %.16f" % tolerance_distance)
 
         tolerance_distance_path = \
-            Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol)
+            Classifier._get_file_path(
+                self.files[DISTANCE_TOLERANCE_FILE], symbol)
 
         with open(tolerance_distance_path, 'w') as handle:
             handle.write("%.16f\n" % tolerance_distance)
