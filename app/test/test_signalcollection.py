@@ -2,108 +2,114 @@
 
 """Tests for signal collection """
 
-import pytest
-
 from signalcollection import signalcollection
 
-collection = signalcollection.SignalCollection()
-
-def test_init():
-    """Test for initial function"""
-    assert collection.signal_list == []
+COLLECTION = signalcollection.SignalCollection()
 
 
-def test_reset():
-    """Test for reseting signal list"""
-    collection.signal_list = [5]
-    assert collection.signal_list == [5]
-
-    collection.reset()
-    assert collection.signal_list == []
-
-def test_is_to_big():
-    """Test is_too_big function"""
-    maxi = signalcollection.MAX_NUMBER_OF_SIGNALS_IN_GROUP
-
-    for i in range(0,maxi-1):
-        collection.signal_list.append(i)
-    
-    assert collection.is_too_big() == False
-
-    collection.signal_list.append(-1)
-
-    assert collection.is_too_big() == True
-
-
-def test_is_empty():
-    """Test is_empty function"""
-    collection.signal_list = [5]
-    assert collection.is_empty() == False
-
-    collection.reset()
-    assert collection.is_empty() == True
-
-def test_as_list():
-    """Test as_empty function"""
-    assert collection.as_list() == collection.signal_list
-
-class signal_for_test():
+class TestSignal():
 
     def __init__(self):
         self.time = 0
 
     def set_time(self, time):
-        self.time = time 
+        self.time = time
 
     def get_time(self):
         return self.time
 
+
+def test_init():
+    """Test for initial function"""
+    assert COLLECTION.signal_list == []
+
+
+def test_reset():
+    """Test for reseting signal list"""
+    COLLECTION.signal_list = [5]
+    assert COLLECTION.signal_list == [5]
+
+    COLLECTION.reset()
+    assert COLLECTION.signal_list == []
+
+
+def test__is_to_big():
+    """Test _is_too_big function"""
+    maxi = signalcollection.MAX_NUMBER_OF_SIGNALS_IN_GROUP
+
+    for i in range(0, maxi - 1):
+        COLLECTION.signal_list.append(i)
+
+    assert COLLECTION._is_too_big() is False
+
+    COLLECTION.signal_list.append(-1)
+
+    assert COLLECTION._is_too_big() is True
+
+
+def test__is_empty():
+    """Test _is_empty function"""
+    COLLECTION.signal_list = [5]
+    assert COLLECTION._is_empty() is False
+
+    COLLECTION.reset()
+    assert COLLECTION._is_empty() is True
+
+
+def test_as_list():
+    """Test as_empty function"""
+    assert COLLECTION.as_list() == COLLECTION.signal_list
+
+
 def test_is_head_too_old():
     """Test is_head_too_old function"""
-   
-    #we put signal with time 0
-    signal_zero = signal_for_test()
-   
-    collection.signal_list.append(signal_zero)
-   
-    signal_maxi = signal_for_test()
+
+    # We put signal with time 0.
+    signal_zero = TestSignal()
+
+    COLLECTION.signal_list.append(signal_zero)
+
+    signal_maxi = TestSignal()
     signal_maxi.set_time(signalcollection.MAX_DURATION_OF_GROUP)
 
-    assert collection.is_head_too_old(signal_maxi) == False
+    assert COLLECTION._is_head_too_old(signal_maxi) is False
 
     signal_maxi.set_time(signalcollection.MAX_DURATION_OF_GROUP+0.1)
 
-    assert collection.is_head_too_old(signal_maxi) == True
+    assert COLLECTION._is_head_too_old(signal_maxi) is True
 
-    collection.reset()
+    COLLECTION.reset()
+
 
 def test_is_recent_enough():
-    """Test is_recent_enough function"""
-   
-    #we put signal with time 0
-    signal_zero = signal_for_test()
-   
-    collection.signal_list.append(signal_zero)
+    """Test is_recent_enough function."""
 
-    assert collection.is_recent_enough(signalcollection.MAX_BREAK_BETWEEN_TWO_SIGNALS) == True
-    assert collection.is_recent_enough(signalcollection.MAX_BREAK_BETWEEN_TWO_SIGNALS+0.1) == False
+    # We put signal with time 0.
+    signal_zero = TestSignal()
 
-    collection.reset()
+    COLLECTION.signal_list.append(signal_zero)
 
-def test_need_to_remove_head():
+    assert COLLECTION.is_recent_enough(signalcollection
+                                       .MAX_BREAK_BETWEEN_TWO_SIGNALS) is True
+    assert COLLECTION.is_recent_enough(signalcollection
+                                       .MAX_BREAK_BETWEEN_TWO_SIGNALS +
+                                       0.1) is False
+
+    COLLECTION.reset()
+
+
+def test__need_to_remove_head():
     """Test need_to_remove_head function"""
 
-    #we put signal with time 0
-    signal_zero = signal_for_test()
-   
-    #assert on Empty
-    assert collection.need_to_remove_head(signal_zero) == False
+    # We put signal with time 0.
+    signal_zero = TestSignal()
 
-    collection.signal_list.append(signal_zero)
+    # assert on Empty
+    assert COLLECTION._need_to_remove_head(signal_zero) is False
 
-    #assert not too big and not too old
-    assert collection.need_to_remove_head(signal_zero) == False
+    COLLECTION.signal_list.append(signal_zero)
 
-    collection.reset()
- 
-    
+    # Assert not too big and not too old.
+    assert COLLECTION._need_to_remove_head(signal_zero) is False
+
+    COLLECTION.reset()

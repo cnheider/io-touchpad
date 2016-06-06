@@ -12,7 +12,7 @@ from executor import executor
 from signalcollection import signalcollection
 
 
-def application_thread(queue, learning_mode=False, training_size=0,
+def application_thread(queue, condition, learning_mode=False, training_size=0,
                        system_bitness=None, symbol_name=None):
     """The application thread function.
 
@@ -21,17 +21,19 @@ def application_thread(queue, learning_mode=False, training_size=0,
     signals.
 
     Args:
-        queue (Queue): The inter-thread queue to pass signals between the
+        queue (Queue): An inter-thread queue to pass signals between the
             listener and the application.
-        learning_mode (bool): The variable which stores the information if
+        condition (Condition): A condition which allows the threads to notify
+            each other and wait if there is nothing to do.
+        learning_mode (bool): A variable which stores the information if
             the app is in the learning mode or not.
-        training_size (int): The number of the learning samples of the symbol
+        training_size (int): A number of the learning samples of the symbol
             that the user is asked to draw.
-        system_bitness (int): The bitness of the system. The only legal values
+        system_bitness (int): A bitness of the system. The only legal values
             are {None, 32, 64}. If the value is 32 or 64 then set of hardcoded
             symbols (with respect to the provided bitness) will be
             recogniezed instead of the user defined symbols.
-        symbol_name (str): The name of the symbol provided by the user with
+        symbol_name (str): A name of the symbol provided by the user with
             a command line option.
 
     Variables:
@@ -54,8 +56,9 @@ def application_thread(queue, learning_mode=False, training_size=0,
     collection = signalcollection.SignalCollection()
 
     while True:
-        while queue.empty() and collection.is_recent_enough(time.time()):
-            pass
+        condition.acquire()
+        condition.wait(collection.get_time_when_old_enough(time.time()))
+        condition.release()
 
         if not collection.is_recent_enough(time.time()):
             send_points_to_interpreter(collection.as_list(), learning_mode,

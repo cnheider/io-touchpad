@@ -12,13 +12,14 @@ which is based on evtest (version 1.32).
 
 import argparse
 import queue
+import threading
 import sys
 
+from classifier import classifier as classifier_module
+from databox import databox
 from terminationhandler import terminationhandler
 from threads import application
 from threads import listener
-from classifier import classifier as classifier_module
-from databox import databox
 
 MIN_TRAINING_SIZE = 5
 
@@ -174,11 +175,12 @@ def _start_threads(learning_mode=None, training_size=None, system_bitness=None,
             a command line option.
     """
     thread_queue = queue.Queue()
+    condition = threading.Condition()
 
     # Run both threads.
-    listener.start(thread_queue)
-    application.application_thread(thread_queue, learning_mode, training_size,
-                                   system_bitness, symbol_name)
+    listener.start(thread_queue, condition)
+    application.application_thread(thread_queue, condition, learning_mode,
+                                   training_size, system_bitness, symbol_name)
 
 
 def _activate(args):
