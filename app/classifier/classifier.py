@@ -33,6 +33,7 @@ SYMBOL_LIST_FILE = 'symbol-list.dat'
 EXPORT_SAVING_FILE = 'exports/$sym'
 EXPORT_DIRECTORY = 'exports'
 
+
 class Classifier:
     """Class for learning and classifying drawn symbols."""
 
@@ -123,8 +124,6 @@ class Classifier:
         self.symbol_name = None
 
 
-
-
     def _load_training_set(self, symbol, file_not_found_ignore=False):
         """Load and return traning symbols from file."""
         try:
@@ -148,6 +147,7 @@ class Classifier:
 
     def export_files(self, settings_name):
         """Export saved settings to file.
+
         Args:
             settings_name (str): The id of the saved settings.
         """
@@ -168,8 +168,10 @@ class Classifier:
         pickle.dump(box, file_with_export)
         file_with_export.close()
 
+
     def import_files(self, settings_name):
         """Import saved settings from file.
+
         Args:
             settings_name (str): The id of the saved settings.
         """
@@ -220,7 +222,6 @@ class Classifier:
             pickle.dump(training_set, file_with_training)
             file_with_training.close()
 
-
     def reset_training_set(self, new_training_size, symbol_name):
         """Start the new training set.
 
@@ -234,6 +235,7 @@ class Classifier:
         self.training_size = 0
         self.training_set = []
         self.symbol_name = symbol_name
+
 
     def add_to_training_set(self, signal_list):
         """Add the symbol to training set.
