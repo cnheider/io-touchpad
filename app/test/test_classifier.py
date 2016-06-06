@@ -8,6 +8,7 @@ import filecmp
 import difflib
 import pickle
 import sys
+import shutil
 from math import fabs
 
 from classifier import classifier as classifier_module
@@ -39,8 +40,28 @@ SIGNAL_LIST_TEST = [SIGNALA, SIGNALB]
 
 epsilon = 0.00001
 
-TEST_LOCATION = 'classifier/data/'
+TEST_LOCATION = 'classifier/data/user-defined/'
+PRE_TEST_FOLDER = 'pre_test/'
 
+
+def setup_function(test_function):
+    """Copy file with prepared data for test."""
+    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'symbol-list.dat',
+                 TEST_LOCATION + 'symbol-list.dat')
+    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'nn-model.dat',
+                 TEST_LOCATION + 'nn-model.dat')
+    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'nn-model_test.dat',
+                 TEST_LOCATION + 'nn-model_test.dat')
+    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'nn-model_test2.dat',
+                 TEST_LOCATION + 'nn-model_test2.dat')
+    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'distance-tolerance_test.dat',
+                 TEST_LOCATION + 'distance-tolerance_test.dat')
+    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'distance-tolerance_test2.dat',
+                 TEST_LOCATION + 'distance-tolerance_test2.dat')
+    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'training-set_test.dat',
+                 TEST_LOCATION + 'training-set_test.dat')
+    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'training-set_test2.dat',
+                 TEST_LOCATION + 'training-set_test2.dat')
 
 
 def test_reset_training_set():
@@ -131,11 +152,14 @@ def test_save_training_set():
 
         classifier.add_to_training_set(signal_list_test)
 
-    classifier.save_training_set("test", 1)
-    assert filecmp.cmp(TEST_LOCATION + 'user-defined/symbol-list.dat',
-                       TEST_LOCATION + 'user-defined/expected_symbol-list.dat')
-    assert filecmp.cmp(TEST_LOCATION + 'user-defined/training-set_test.dat',
-                       TEST_LOCATION + 'user-defined/expected_training-set_test.dat')
+    classifier.save_training_set("test")
+    assert filecmp.cmp(TEST_LOCATION + 'symbol-list.dat',
+                       TEST_LOCATION + 'expected_symbol-list.dat')
+    assert filecmp.cmp(TEST_LOCATION + 'training-set_test.dat',
+                       TEST_LOCATION + 'expected_training-set_test.dat') or \
+           filecmp.cmp(TEST_LOCATION + 'training-set_test.dat',
+                       TEST_LOCATION + 'expected2_training-set_test.dat')
+
 
 
 def test_load_training_set():
@@ -149,6 +173,7 @@ def test_load_training_set():
 
         assert signal_list[1].get_x() == 2.0 - i * 0.011
         assert signal_list[1].get_y() == 2.00 - i * 0.020
+
 
 
 def test_learn_one_symbol():
@@ -192,19 +217,17 @@ def test_delete_symbol():
     classifier.save_symbol_list()
 
 
-    assert filecmp.cmp(TEST_LOCATION + 'user-defined/symbol-list.dat',
-                       TEST_LOCATION + 'user-defined/expected_test_delete_symbol.dat')
+    assert filecmp.cmp(TEST_LOCATION + 'symbol-list.dat',
+                       TEST_LOCATION + 'expected_test_delete_symbol.dat')
 
 
 def test_delete_symbols():
     """Test deleting all symbols"""
     classifier = classifier_module.Classifier(True, None)
-    classifier.symbol_list.append("test2")
-    classifier.save_symbol_list()
-    classifier.symbol_list.append("test3")
-    classifier.save_symbol_list()
-    classifier.symbol_list.append("test4")
-    classifier.save_symbol_list()
+
+    classifier.save_training_set("test2")
+    classifier.save_training_set("test3")
+    classifier.save_training_set("test4")
 
     symbols_list = ['test2', 'test3', 'test4']
     classifier.delete_symbols(symbols_list)
@@ -212,5 +235,5 @@ def test_delete_symbols():
     classifier.symbol_list.append("test2")
     classifier.save_symbol_list()
 
-    assert filecmp.cmp(TEST_LOCATION + 'user-defined/symbol-list.dat',
-                       TEST_LOCATION + 'user-defined/expected_test_delete_symbols.dat')
+    assert filecmp.cmp(TEST_LOCATION + 'symbol-list.dat',
+                       TEST_LOCATION + 'expected_test_delete_symbols.dat')

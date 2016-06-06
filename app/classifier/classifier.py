@@ -98,7 +98,9 @@ class Classifier:
                         print("classifier.py: error: file with the tolerance "
                               "distance doesn't exist; please start the "
                               "application in the learning mode", file=sys.stderr)
+                        print(tolerance_distance_path)
                         _thread.interrupt_main()
+
                         sys.exit(1)
 
 
@@ -128,6 +130,7 @@ class Classifier:
             print("classifier.py: error: file with training set doesn't "
                   "exist; please start the application in the learning mode",
                   file=sys.stderr)
+            print(training_path)
             _thread.interrupt_main()
             sys.exit(1)
 
@@ -334,6 +337,7 @@ class Classifier:
     def delete_symbol(self, symbol):
         print('removing symbol', symbol, 'from classifier...')
         if symbol in self.symbol_list:
+            print(symbol)
             self.symbol_list.remove(symbol)
             with open(self.files[SYMBOL_LIST_FILE], 'wb') as handle:
                 handle.truncate()
@@ -370,8 +374,11 @@ class Classifier:
 
         if symbols_to_delete:
             for symbol in symbols_to_delete:
+                print(symbol)
                 self.delete_symbol(symbol)
 
+        for symbol in self.symbol_list:
+            print(symbol)
         print("learning all together...")
         self.learn_all_symbols_together()
 
