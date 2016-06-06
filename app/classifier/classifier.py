@@ -45,7 +45,10 @@ class Classifier:
                 (with respect to the provided bitness) will be recogniezed
                 instead of the user defined symbols.
         """
-        file_names = [DISTANCE_TOLERANCE_FILE, MODEL_FILE, TRAINING_SET_FILE, SYMBOL_LIST_FILE]
+        file_names = [DISTANCE_TOLERANCE_FILE,
+                      MODEL_FILE,
+                      TRAINING_SET_FILE,
+                      SYMBOL_LIST_FILE]
         file_paths = Classifier._build_paths(file_names, system_bitness)
         #  (self.distance_tolerance_file_path, self.model_file_path,
         #   self.training_set_file_path) = file_paths
@@ -82,13 +85,11 @@ class Classifier:
                     _thread.interrupt_main()
                     sys.exit(1)
 
-
-
                 if symbol != "":
                     try:
 
                         tolerance_distance_path = \
-                            Classifier._get_file_path( \
+                            Classifier._get_file_path(
                                 self.files[DISTANCE_TOLERANCE_FILE], symbol)
 
                         with open(tolerance_distance_path, 'r') as handle:
@@ -102,8 +103,6 @@ class Classifier:
                         _thread.interrupt_main()
 
                         sys.exit(1)
-
-
 
             self.learning_models = \
                 {sym: mod for sym, mod in zip(self.symbol_list, self.learning_models)}
@@ -134,7 +133,6 @@ class Classifier:
             _thread.interrupt_main()
             sys.exit(1)
 
-
         return training_set
 
     def reset_training_set(self, new_training_size, symbol_name):
@@ -143,6 +141,8 @@ class Classifier:
         Args:
             new_training_size (int): size of new train-set which have to be
                                given in current learning session.
+            symbol_name    (String): name of the symbol which training set
+                               is being resetted.
         """
         self.ultimate_training_size = new_training_size
         self.training_size = 0
@@ -180,7 +180,7 @@ class Classifier:
             The name of the symbol (such as "small_a" for a or "large_k for K
             if similarity has been found. None otherwise.
         """
-        print("classifing...")
+        print("classifying...")
         feature_vector = featureextractor.get_features(signal_list)
         models = self.learning_models
         symbol_candidate = models[""].predict([feature_vector])[0]
@@ -204,6 +204,7 @@ class Classifier:
         Args:
             sample (list of lists of int): list of feature-vectors,
                                            on which we base on.
+            symbol (String): name of symbol to compute tolerance
         """
         nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree')\
             .fit(sample)
@@ -216,11 +217,10 @@ class Classifier:
         means.sort()
         critical_index = math.ceil(0.8 * len(means)) - 1
         tolerance_distance = means[critical_index] * 1.3
-        print("tolerance distance: %.16f" % (tolerance_distance))
+        print("tolerance distance: %.16f" % tolerance_distance)
 
         tolerance_distance_path = \
             Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol)
-
 
         with open(tolerance_distance_path, 'w') as handle:
             handle.write("%.16f\n" % tolerance_distance)
@@ -232,7 +232,6 @@ class Classifier:
 
         file_with_training_path = \
             Classifier._get_file_path(self.files[TRAINING_SET_FILE], symbol)
-
 
         with open(file_with_training_path, 'wb') as handle:
             pickle.dump(self.training_set, handle)
@@ -246,9 +245,8 @@ class Classifier:
     def save_training_set(self, symbol):
         """Save the drawn training set to file.
 
-        test = 2 oznacza niezapisywanie training_seta do pliku
         Args:
-            str (str): Name of the symbol.
+            symbol (str): Name of the symbol.
         """
 
         self.write_training_set_to_file(symbol)
@@ -262,7 +260,6 @@ class Classifier:
 
         Args:
             symbol (str): Name of the symbol.
-            test (bool): says if it is a test
         """
         training_set = self.load_training_set(symbol)
         feature_vectors = []
@@ -286,11 +283,6 @@ class Classifier:
         feature_vectors = []
         results = []
         for sym in self.symbol_list:
-            #file_with_training_path = \
-            #   Classifier._get_file_path(self.files[TRAINING_SET_FILE], sym)
-            #file_with_training = \
-            #    open(file_with_training_path, 'rb')
-            #training_set = pickle.load(file_with_training)
 
             training_set = self.load_training_set(sym)
             for training_element in training_set:
@@ -366,7 +358,7 @@ class Classifier:
         """Delete symbols from classifier with all files related.
 
         Args:
-            symbols (list of str): Symbols to delete names.
+            symbols_to_delete (list of str): Symbols to delete names.
         """
         if not symbols_to_delete:
             print('removing all symbols from classifier')
@@ -381,7 +373,6 @@ class Classifier:
             print(symbol)
         print("learning all together...")
         self.learn_all_symbols_together()
-
 
     @staticmethod
     def _get_file_path(template_string, symbol_name):

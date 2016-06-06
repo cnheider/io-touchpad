@@ -5,9 +5,7 @@
 import pytest
 import operator
 import filecmp
-import difflib
 import pickle
-import sys
 import shutil
 from math import fabs
 
@@ -54,9 +52,11 @@ def setup_function(test_function):
                  TEST_LOCATION + 'nn-model_test.dat')
     shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'nn-model_test2.dat',
                  TEST_LOCATION + 'nn-model_test2.dat')
-    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'distance-tolerance_test.dat',
+    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER +
+                 'distance-tolerance_test.dat',
                  TEST_LOCATION + 'distance-tolerance_test.dat')
-    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'distance-tolerance_test2.dat',
+    shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER +
+                 'distance-tolerance_test2.dat',
                  TEST_LOCATION + 'distance-tolerance_test2.dat')
     shutil.copy2(TEST_LOCATION + PRE_TEST_FOLDER + 'training-set_test.dat',
                  TEST_LOCATION + 'training-set_test.dat')
@@ -157,9 +157,8 @@ def test_save_training_set():
                        TEST_LOCATION + 'expected_symbol-list.dat')
     assert filecmp.cmp(TEST_LOCATION + 'training-set_test.dat',
                        TEST_LOCATION + 'expected_training-set_test.dat') or \
-           filecmp.cmp(TEST_LOCATION + 'training-set_test.dat',
-                       TEST_LOCATION + 'expected2_training-set_test.dat')
-
+        filecmp.cmp(TEST_LOCATION + 'training-set_test.dat',
+                    TEST_LOCATION + 'expected2_training-set_test.dat')
 
 
 def test_load_training_set():
@@ -173,7 +172,6 @@ def test_load_training_set():
 
         assert signal_list[1].get_x() == 2.0 - i * 0.011
         assert signal_list[1].get_y() == 2.00 - i * 0.020
-
 
 
 def test_learn_one_symbol():
@@ -215,7 +213,6 @@ def test_delete_symbol():
     classifier.delete_symbol('test2')
     classifier.symbol_list.append("test3")
     classifier.save_symbol_list()
-
 
     assert filecmp.cmp(TEST_LOCATION + 'symbol-list.dat',
                        TEST_LOCATION + 'expected_test_delete_symbol.dat')
