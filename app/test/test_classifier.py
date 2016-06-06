@@ -7,6 +7,7 @@ import operator
 import filecmp
 import pickle
 import shutil
+import platform
 from math import fabs
 
 from classifier import classifier as classifier_module
@@ -176,33 +177,35 @@ def test__load_training_set():
 
 def test__learn_one_symbol():
     """Test learning specific symbol"""
-    classifier = classifier_module.Classifier(True, None)
-    tolerance = classifier._learn_one_symbol('test')
+    if platform.machine() == 'x86_64':
+        classifier = classifier_module.Classifier(True, None)
+        tolerance = classifier._learn_one_symbol('test')
 
-    file_with_model = open(TEST_LOCATION + 'test_nn_model.dat', 'rb')
-    nbrs_from_file = pickle.load(file_with_model)
+        file_with_model = open(TEST_LOCATION + 'test_nn_model.dat', 'rb')
+        nbrs_from_file = pickle.load(file_with_model)
 
-    assert 'ball_tree' == nbrs_from_file.algorithm
-    assert 30 == nbrs_from_file.leaf_size
-    assert 'minkowski' == nbrs_from_file.metric
-    assert nbrs_from_file.metric_params is None
-    assert 2 == nbrs_from_file.n_neighbors
-    assert 2 == nbrs_from_file.p
-    assert 1.0 == nbrs_from_file.radius
-    assert tolerance < 398.85960989443032 + epsilon
-    assert tolerance > 398.85960989443032 - epsilon
+        assert 'ball_tree' == nbrs_from_file.algorithm
+        assert 30 == nbrs_from_file.leaf_size
+        assert 'minkowski' == nbrs_from_file.metric
+        assert nbrs_from_file.metric_params is None
+        assert 2 == nbrs_from_file.n_neighbors
+        assert 2 == nbrs_from_file.p
+        assert 1.0 == nbrs_from_file.radius
+        assert tolerance < 398.85960989443032 + epsilon
+        assert tolerance > 398.85960989443032 - epsilon
 
 
 def test_classify():
     """Test classifying the given list of points to a symbol"""
-    classifier = classifier_module.Classifier(False, None)
-    for i in range(0, 5):
-        signal_a = Signal_test(1.0 + i * 0.028, 1.00 - i * i * 0.20 * 0.30)
-        signal_b = Signal_test(2.0 - i * 0.011, 2.00 - i * 0.020)
-        signal_list_test = [signal_a, signal_b]
+    if platform.machine() == 'x86_64':
+        classifier = classifier_module.Classifier(False, None)
+        for i in range(0, 5):
+            signal_a = Signal_test(1.0 + i * 0.028, 1.00 - i * i * 0.20 * 0.30)
+            signal_b = Signal_test(2.0 - i * 0.011, 2.00 - i * 0.020)
+            signal_list_test = [signal_a, signal_b]
 
-        symbol = classifier.classify(signal_list_test)
-        assert symbol == 'test'
+            symbol = classifier.classify(signal_list_test)
+            assert symbol == 'test'
 
 
 def test__delete_symbol():
