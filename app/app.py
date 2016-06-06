@@ -119,7 +119,7 @@ def _get_configured_parser():
     # The redraw subcommand section.
     subparser = subparsers.add_parser(REDRAW_SUBCOMMAND, help='redraw a '
                                       'symbol while retaining the command '
-                                      'related to that symbol; simply '
+                                      'related to that symbol; simply, '
                                       'undertake a learning session once '
                                       'again for a specified symbol; the '
                                       'related command, arguments and name '
