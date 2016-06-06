@@ -93,21 +93,25 @@ class Classifier:
                                 self.files[DISTANCE_TOLERANCE_FILE], symbol)
 
                         with open(tolerance_distance_path, 'r') as handle:
-                            self.tolerance_distances.append(float(handle.readline()))
+                            self.tolerance_distances.\
+                                append(float(handle.readline()))
 
                     except FileNotFoundError:
                         print("classifier.py: error: file with the tolerance "
                               "distance doesn't exist; please start the "
-                              "application in the learning mode", file=sys.stderr)
+                              "application in the learning mode",
+                              file=sys.stderr)
                         print(tolerance_distance_path)
                         _thread.interrupt_main()
 
                         sys.exit(1)
 
             self.learning_models = \
-                {sym: mod for sym, mod in zip(self.symbol_list, self.learning_models)}
+                {sym: mod for sym, mod in
+                 zip(self.symbol_list, self.learning_models)}
             self.tolerance_distances = \
-                {sym: dist for sym, dist in zip(self.symbol_list, self.tolerance_distances)}
+                {sym: dist for sym, dist in
+                 zip(self.symbol_list, self.tolerance_distances)}
             self.symbol_list.pop()
 
         # Variables for learning-mode.
@@ -286,18 +290,21 @@ class Classifier:
 
             training_set = self.load_training_set(sym)
             for training_element in training_set:
-                feature_vector = featureextractor.get_features(training_element)
+                feature_vector = \
+                    featureextractor.get_features(training_element)
                 feature_vectors.append(feature_vector)
                 results.append(sym)
         if self.symbol_list:
             knn_model = KNeighborsClassifier(n_neighbors=5).\
                 fit(feature_vectors, results)
-            with open(Classifier._get_file_path(self.files[MODEL_FILE], ""), 'wb') as handle:
+            with open(Classifier._get_file_path(self.files[MODEL_FILE], ""),
+                      'wb') as handle:
                 pickle.dump(knn_model, handle)
 
         else:
             try:
-                os.remove(Classifier._get_file_path(self.files[MODEL_FILE], ""))
+                os.remove(Classifier._get_file_path(self.files[MODEL_FILE],
+                                                    ""))
             except OSError:
                 pass
 
@@ -336,21 +343,25 @@ class Classifier:
                 pickle.dump(self.symbol_list, handle)
 
         else:
-            print('warning: symbol', symbol, 'is not present in classifier database')
+            print('warning: symbol', symbol,
+                  'is not present in classifier database')
             for symbol in self.symbol_list:
                 print(symbol)
 
         print("removing related files...")
         try:
-            os.remove(Classifier._get_file_path(self.files[TRAINING_SET_FILE], symbol))
+            os.remove(Classifier._get_file_path(
+                self.files[TRAINING_SET_FILE], symbol))
         except OSError:
             pass
         try:
-            os.remove(Classifier._get_file_path(self.files[MODEL_FILE], symbol))
+            os.remove(Classifier._get_file_path(
+                self.files[MODEL_FILE], symbol))
         except OSError:
             pass
         try:
-            os.remove(Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol))
+            os.remove(Classifier._get_file_path(
+                self.files[DISTANCE_TOLERANCE_FILE], symbol))
         except OSError:
             pass
 
@@ -380,7 +391,8 @@ class Classifier:
 
         Args:
             template_string (str): Template of file path.
-            symbol_name (str): Name of symbol or empty string for general files.
+            symbol_name (str): Name of symbol or empty string
+                               for general files.
 
         Returns:
             Actual file path.
@@ -415,7 +427,8 @@ class Classifier:
         else:
             file_paths = Classifier._extend_paths(file_paths, USER_DIR)
 
-        file_paths = [operator.add(l, r) for l, r in zip(file_paths, files)]
+        file_paths = [operator.add(l, r)
+                      for l, r in zip(file_paths, files)]
 
         return file_paths
 
