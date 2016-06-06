@@ -73,7 +73,7 @@ def test_reset_training_set():
     assert classifier.ultimate_training_size == 117
 
 
-def test_compute_tolerance_distance():
+def test__compute_tolerance_distance():
     """Test for computing distance.
     We put some list of list of features to calculate
     fixed distance, and check if it's same.
@@ -86,7 +86,7 @@ def test_compute_tolerance_distance():
     L5 = [11.223, 41.0, 1.31]
     AL = [L1, L2, L3, L4, L5]
     symbol = "a"
-    classifier.compute_tolerance_distance(AL, symbol)
+    classifier._compute_tolerance_distance(AL, symbol)
     tolerance_distance_path = \
         classifier_module.Classifier._get_file_path( \
             classifier.files[classifier_module.DISTANCE_TOLERANCE_FILE], symbol)
@@ -139,11 +139,11 @@ def test_add_to_training_set():
         assert SIGNAL_LIST_TEST[i].get_y() == added_list[i].get_y()
 
 
-def test_save_training_set():
+def test__save_training_set():
     """Test learning symbol given the specific training set"""
 
     classifier = classifier_module.Classifier(True, None)
-    classifier.delete_symbol('test')
+    classifier._delete_symbol('test')
     classifier.reset_training_set(7, 'test')
     for i in range(0, 5):
         signal_a = Signal_test(1.0 + i * 0.028, 1.00 - i * i * 0.20 * 0.30)
@@ -152,7 +152,7 @@ def test_save_training_set():
 
         classifier.add_to_training_set(signal_list_test)
 
-    classifier.save_training_set("test")
+    classifier._save_training_set("test")
     assert filecmp.cmp(TEST_LOCATION + 'symbol-list.dat',
                        TEST_LOCATION + 'expected_symbol-list.dat')
     assert filecmp.cmp(TEST_LOCATION + 'training-set_test.dat',
@@ -161,10 +161,10 @@ def test_save_training_set():
                     TEST_LOCATION + 'expected2_training-set_test.dat')
 
 
-def test_load_training_set():
+def test__load_training_set():
     """Test loading training set from file"""
     classifier = classifier_module.Classifier(True, None)
-    set = classifier.load_training_set('test')
+    set = classifier._load_training_set('test')
     for i in range(0, 5):
         signal_list = set[i]
         assert signal_list[0].get_x() == 1.0 + i * 0.028
@@ -174,10 +174,10 @@ def test_load_training_set():
         assert signal_list[1].get_y() == 2.00 - i * 0.020
 
 
-def test_learn_one_symbol():
+def test__learn_one_symbol():
     """Test learning specific symbol"""
     classifier = classifier_module.Classifier(True, None)
-    tolerance = classifier.learn_one_symbol('test')
+    tolerance = classifier._learn_one_symbol('test')
 
     file_with_model = open(TEST_LOCATION + 'test_nn_model.dat', 'rb')
     nbrs_from_file = pickle.load(file_with_model)
@@ -205,14 +205,14 @@ def test_classify():
         assert symbol == 'test'
 
 
-def test_delete_symbol():
+def test__delete_symbol():
     """Test deleting one symbol"""
     classifier = classifier_module.Classifier(True, None)
     classifier.symbol_list.append("test2")
-    classifier.save_symbol_list()
-    classifier.delete_symbol('test2')
+    classifier._save_symbol_list()
+    classifier._delete_symbol('test2')
     classifier.symbol_list.append("test3")
-    classifier.save_symbol_list()
+    classifier._save_symbol_list()
 
     assert filecmp.cmp(TEST_LOCATION + 'symbol-list.dat',
                        TEST_LOCATION + 'expected_test_delete_symbol.dat')
@@ -222,15 +222,15 @@ def test_delete_symbols():
     """Test deleting all symbols"""
     classifier = classifier_module.Classifier(True, None)
 
-    classifier.save_training_set("test2")
-    classifier.save_training_set("test3")
-    classifier.save_training_set("test4")
+    classifier._save_training_set("test2")
+    classifier._save_training_set("test3")
+    classifier._save_training_set("test4")
 
     symbols_list = ['test2', 'test3', 'test4']
     classifier.delete_symbols(symbols_list)
 
     classifier.symbol_list.append("test2")
-    classifier.save_symbol_list()
+    classifier._save_symbol_list()
 
     assert filecmp.cmp(TEST_LOCATION + 'symbol-list.dat',
                        TEST_LOCATION + 'expected_test_delete_symbols.dat')
