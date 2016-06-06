@@ -54,11 +54,9 @@ class Classifier:
         # Symbol list loading.
         try:
 
-            file_with_symbols = \
-                open(self.files[SYMBOL_LIST_FILE], 'rb')
+            with open(self.files[SYMBOL_LIST_FILE], 'rb') as handle:
+                self.symbol_list = pickle.load(handle)
 
-            self.symbol_list = pickle.load(file_with_symbols)
-            file_with_symbols.close()
         except FileNotFoundError:
             self.symbol_list = []
 
@@ -73,16 +71,18 @@ class Classifier:
                     model_path = Classifier.\
                         _get_file_path(self.files[MODEL_FILE], symbol)
 
-                    file_with_model = open(model_path, 'rb')
+                    with open(model_path, 'rb') as handle:
+                        self.learning_models.append(pickle.load(handle))
+
                 except FileNotFoundError:
                     print("classifier.py: error: file with the learning model "
                           "doesn't exist; please start the application in the "
                           "learning mode", file=sys.stderr)
+                    print(model_path)
                     _thread.interrupt_main()
                     sys.exit(1)
 
-                self.learning_models.append(pickle.load(file_with_model))
-                file_with_model.close()
+
 
                 if symbol != "":
                     try:
@@ -90,8 +90,10 @@ class Classifier:
                         tolerance_distance_path = \
                             Classifier._get_file_path( \
                                 self.files[DISTANCE_TOLERANCE_FILE], symbol)
-                        file_with_tolerance_distance = \
-                            open(tolerance_distance_path, 'r')
+
+                        with open(tolerance_distance_path, 'r') as handle:
+                            self.tolerance_distances.append(float(handle.readline()))
+
                     except FileNotFoundError:
                         print("classifier.py: error: file with the tolerance "
                               "distance doesn't exist; please start the "
@@ -99,9 +101,7 @@ class Classifier:
                         _thread.interrupt_main()
                         sys.exit(1)
 
-                    self.tolerance_distances.append( \
-                        float(file_with_tolerance_distance.readline()))
-                    file_with_tolerance_distance.close()
+
 
             self.learning_models = \
                 {sym: mod for sym, mod in zip(self.symbol_list, self.learning_models)}
@@ -121,7 +121,9 @@ class Classifier:
             training_path = Classifier.\
                 _get_file_path(self.files[TRAINING_SET_FILE], symbol)
 
-            file_with_training = open(training_path, 'rb')
+            with open(training_path, 'rb') as handle:
+                training_set = pickle.load(handle)
+
         except FileNotFoundError:
             print("classifier.py: error: file with training set doesn't "
                   "exist; please start the application in the learning mode",
@@ -129,8 +131,7 @@ class Classifier:
             _thread.interrupt_main()
             sys.exit(1)
 
-        training_set = pickle.load(file_with_training)
-        file_with_training.close()
+
         return training_set
 
     def reset_training_set(self, new_training_size, symbol_name):
@@ -217,11 +218,9 @@ class Classifier:
         tolerance_distance_path = \
             Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol)
 
-        file_with_tolerance_distance = \
-            open(tolerance_distance_path, 'w')
-        file_with_tolerance_distance.write("%.16f\n"
-                                           % tolerance_distance)
-        file_with_tolerance_distance.close()
+
+        with open(tolerance_distance_path, 'w') as handle:
+            handle.write("%.16f\n" % tolerance_distance)
 
         return tolerance_distance
 
@@ -231,19 +230,15 @@ class Classifier:
         file_with_training_path = \
             Classifier._get_file_path(self.files[TRAINING_SET_FILE], symbol)
 
-        file_with_training = \
-            open(file_with_training_path, 'wb')
-        pickle.dump(self.training_set, file_with_training)
-        file_with_training.close()
+
+        with open(file_with_training_path, 'wb') as handle:
+            pickle.dump(self.training_set, handle)
 
     def save_symbol_list(self):
         """Save actual list of symbols."""
 
-        file_with_symbols = \
-            open(self.files[SYMBOL_LIST_FILE], 'wb')
-
-        pickle.dump(self.symbol_list, file_with_symbols)
-        file_with_symbols.close()
+        with open(self.files[SYMBOL_LIST_FILE], 'wb') as handle:
+            pickle.dump(self.symbol_list, handle)
 
     def save_training_set(self, symbol):
         """Save the drawn training set to file.
@@ -278,9 +273,9 @@ class Classifier:
         model_path = Classifier.\
             _get_file_path(self.files[MODEL_FILE], symbol)
 
-        file_with_model = open(model_path, 'wb')
-        pickle.dump(nbrs, file_with_model)
-        file_with_model.close()
+        with open(model_path, 'wb') as handle:
+            pickle.dump(nbrs, handle)
+
         return self.compute_tolerance_distance(sample, symbol)
 
     def learn_all_symbols_together(self):
@@ -302,10 +297,9 @@ class Classifier:
         if self.symbol_list:
             knn_model = KNeighborsClassifier(n_neighbors=5).\
                 fit(feature_vectors, results)
-            file_with_model = \
-                open(Classifier._get_file_path(self.files[MODEL_FILE], ""), 'wb')
-            pickle.dump(knn_model, file_with_model)
-            file_with_model.close()
+            with open(Classifier._get_file_path(self.files[MODEL_FILE], ""), 'wb') as handle:
+                pickle.dump(knn_model, handle)
+
         else:
             try:
                 os.remove(Classifier._get_file_path(self.files[MODEL_FILE], ""))
@@ -332,7 +326,7 @@ class Classifier:
         else:
             for sym in self.symbol_list:
                 print("learning", sym, "symbol...")
-                self.learn_one_symbol(sym) 
+                self.learn_one_symbol(sym)
 
         print("learning all together...")
         self.learn_all_symbols_together()
@@ -341,12 +335,10 @@ class Classifier:
         print('removing symbol', symbol, 'from classifier...')
         if symbol in self.symbol_list:
             self.symbol_list.remove(symbol)
-            file_with_symbols = \
-                open(self.files[SYMBOL_LIST_FILE], 'wb')
+            with open(self.files[SYMBOL_LIST_FILE], 'wb') as handle:
+                handle.truncate()
+                pickle.dump(self.symbol_list, handle)
 
-            file_with_symbols.truncate()
-            pickle.dump(self.symbol_list, file_with_symbols)
-            file_with_symbols.close()
         else:
             print('warning: symbol', symbol, 'is not present in classifier database')
             for symbol in self.symbol_list:
@@ -375,7 +367,7 @@ class Classifier:
         if not symbols_to_delete:
             print('removing all symbols from classifier')
             symbols_to_delete = self.symbol_list
-        
+
         if symbols_to_delete:
             for symbol in symbols_to_delete:
                 self.delete_symbol(symbol)
