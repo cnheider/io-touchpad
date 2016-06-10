@@ -206,8 +206,13 @@ def _activate(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    databox.activate(args.symbols)
-    sys.exit(0)
+    classifier = classifier_module.Classifier(learning_mode=True)
+    if classifier.activate_symbols(args.symbols):
+        databox.activate(args.symbols)
+        sys.exit(0)
+    else:
+        print('activation failed')
+        sys.exit(1)
 
 
 def _add(args):
@@ -233,6 +238,8 @@ def _deactivate(args):
     Args:
         args (dict): Parsed command line arguments.
     """
+    classifier = classifier_module.Classifier(learning_mode=True)
+    classifier.deactivate_symbols(args.symbols)
     databox.deactivate(args.symbols)
     sys.exit(0)
 
