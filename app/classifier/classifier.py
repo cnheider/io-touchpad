@@ -461,15 +461,12 @@ class Classifier:
         """
         if not symbols_to_delete:
             print('removing all symbols from classifier')
-            symbols_to_delete = self.symbol_list
+            symbols_to_delete = self.symbol_list.copy()
 
         if symbols_to_delete:
             for symbol in symbols_to_delete:
-                print(symbol)
                 self._delete_symbol(symbol)
 
-        for symbol in self.symbol_list:
-            print(symbol)
         print("learning all together...")
         self._learn_all_symbols_together()
 

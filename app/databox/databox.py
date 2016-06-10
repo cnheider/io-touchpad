@@ -123,7 +123,7 @@ def _set_status(symbols, status):
     for symbol in symbols:
         if symbol in _USER_DEFINED_COMMANDS:
             _USER_DEFINED_COMMANDS[symbol].status = status
-            print('the status of ', symbol, 'has been set on ', status)
+            print('the status of', symbol, 'has been set on', status)
         else:
             print('warning: symbol', symbol, 'is not present in databox')
     with open(DATA_PATH + USER_DEFINED_COMMANDS_FILE, 'wb') as handle:
