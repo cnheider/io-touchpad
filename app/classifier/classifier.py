@@ -48,7 +48,6 @@ class Classifier:
                 (with respect to the provided bitness) will be recogniezed
                 instead of the user defined symbols.
         """
-
         file_names = [DISTANCE_TOLERANCE_FILE, MODEL_FILE,
                       TRAINING_SET_FILE, SYMBOL_LIST_FILE,
                       EXPORT_SAVING_FILE]
@@ -124,7 +123,6 @@ class Classifier:
         self.training_set = []
         self.symbol_name = None
 
-
     def _load_training_set(self, symbol, file_not_found_ignore=False):
         """Load and return traning symbols from file."""
         try:
@@ -168,7 +166,6 @@ class Classifier:
         file_with_export = open(export_path, 'wb')
         pickle.dump(box, file_with_export)
         file_with_export.close()
-
 
     def import_files(self, settings_name):
         """Import saved settings from file.
@@ -238,7 +235,6 @@ class Classifier:
         self.training_size = 0
         self.training_set = []
         self.symbol_name = symbol_name
-
 
     def add_to_training_set(self, signal_list):
         """Add the symbol to training set.

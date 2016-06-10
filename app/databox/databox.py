@@ -10,6 +10,8 @@ Global variables:
 import errno
 import pickle
 import os
+import sys
+import _thread
 
 
 class Command(object):
@@ -211,6 +213,7 @@ def get_command_and_arguments(command_id):
     else:
         return None
 
+
 def export_settings(settings_name):
     """Export saved settings to file.
 
@@ -224,6 +227,7 @@ def export_settings(settings_name):
         os.makedirs(EXPORT_PATH)
     with open(EXPORT_PATH + settings_name, 'wb') as handle:
         pickle.dump(_USER_DEFINED_COMMANDS, handle)
+
 
 def import_settings(settings_name):
     """Import saved settings from file.
