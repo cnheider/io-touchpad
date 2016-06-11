@@ -33,7 +33,7 @@ EXPORT_SAVING_FILE = 'exports/$sym'
 MODEL_FILE = 'nn-model$sym.dat'
 TRAINING_SET_FILE = 'training-set$sym.dat'
 SYMBOL_LIST_FILE = 'symbol-list.dat'
-
+INACTIVE_SYMBOLS_FILE = 'inactive-symbols.dat'
 
 class Classifier:
     """Class for learning and classifying drawn symbols."""
@@ -351,13 +351,12 @@ class Classifier:
             self.symbol_list.append(symbol)
             self._save_symbol_list()
 
-    def _get_inactive_symbols(self)
+    def _get_inactive_symbols(self):
         try:
-            inactive_symbols_path = Classifier.\
-                _get_file_path(self.files[INACTIVE_SYMBOLS_FILE], symbol)
 
-            with open(inactive_symbols_path, 'rb') as handle:
+            with open(self.files[INACTIVE_SYMBOLS_FILE], 'rb') as handle:
                 inactive_symbols = pickle.load(handle)
+            print(inactive_symbols)
             return inactive_symbols
 
         except FileNotFoundError:
@@ -392,6 +391,7 @@ class Classifier:
 
     def _learn_all_symbols_together(self):
         """Build file of knn-classifier model of all training elements."""
+        print('learning all together...')
         feature_vectors = []
         results = []
         for sym in self.symbol_list:
@@ -438,12 +438,11 @@ class Classifier:
                 print("learning", sym, "symbol...")
                 self._learn_one_symbol(sym)
 
-        print("learning all together...")
         self._learn_all_symbols_together()
 
     def _delete_symbol(self, symbol):
         print('removing symbol', symbol, 'from classifier...')
-        inactive_symbols = self._get_inactive_symbols)
+        inactive_symbols = self._get_inactive_symbols()
         if symbol in self.symbol_list:
             self.symbol_list.remove(symbol)
             with open(self.files[SYMBOL_LIST_FILE], 'wb') as handle:
@@ -491,24 +490,23 @@ class Classifier:
             for symbol in symbols_to_delete:
                 self._delete_symbol(symbol)
 
-        print("learning all together...")
         self._learn_all_symbols_together()
 
     def activate_symbols(self, symbols):
-        if not symbols:
-            symbols = self.symbol_list.copy()
         inactive_symbols = self._get_inactive_symbols()
+        if not symbols:
+            symbols = inactive_symbols.copy()
         allowed = True
         for symbol in symbols:
             if symbol in inactive_symbols:
-                print("activating", symbol, "symbol in classifier...")
+                print("activating symbol", symbol, "in classifier...")
                 if not os.path.isfile(Classifier._get_file_path(self.files[TRAINING_SET_FILE], symbol)):
                     print("File with training set of symbol", symbol, "is missing. Activation is impossible.")
                     allowed = False
                 elif not os.path.isfile(Classifier._get_file_path(self.files[MODEL_FILE], symbol)):
                     print("File with learning model of symbol", symbol, "is missing. Activation is impossible.")
                     allowed = False
-                elif not os.path.isfile(Classifier._get_file_path(self.files[TOLERANCE_DISTANCE_FILE], symbol)):
+                elif not os.path.isfile(Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol)):
                     print("File with the tolerance distance of symbol", symbol, "is missing. Activation is impossible.")
                     allowed = False
                 else:
@@ -522,7 +520,7 @@ class Classifier:
             self._learn_all_symbols_together()
             print("activation in classifier passed with success")
             return True
-         return False
+        return False
 
     def deactivate_symbols(self, symbols):
         if not symbols:
@@ -530,7 +528,7 @@ class Classifier:
         inactive_symbols = self._get_inactive_symbols()
         for symbol in symbols:
             if symbol in self.symbol_list:
-                print("deactivating", symbol, "symbol in classifier...")
+                print("deactivating symbol", symbol, "in classifier...")
                 self.symbol_list.remove(symbol)
                 inactive_symbols.append(symbol)
             elif symbol not in inactive_symbols:
