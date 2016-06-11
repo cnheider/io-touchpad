@@ -227,7 +227,8 @@ def _add(args):
               '{0}'.format(MIN_TRAINING_SIZE), file=sys.stderr)
         sys.exit(1)
     databox.bind_symbol_with_command(args.symbol_name, args.shell_command,
-                                     args.shell_command_arguments)
+                                     args.shell_command_arguments,
+                                     stop_when_overwriting=True)
     _start_threads(learning_mode=True, symbol_name=args.symbol_name,
                    training_size=args.training_size)
 

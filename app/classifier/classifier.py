@@ -30,10 +30,11 @@ EXPORT_DIR = 'exports/'
 
 DISTANCE_TOLERANCE_FILE = 'distance-tolerance$sym.dat'
 EXPORT_SAVING_FILE = 'exports/$sym'
-MODEL_FILE = 'nn-model$sym.dat'
-TRAINING_SET_FILE = 'training-set$sym.dat'
-SYMBOL_LIST_FILE = 'symbol-list.dat'
 INACTIVE_SYMBOLS_FILE = 'inactive-symbols.dat'
+MODEL_FILE = 'nn-model$sym.dat'
+SYMBOL_LIST_FILE = 'symbol-list.dat'
+TRAINING_SET_FILE = 'training-set$sym.dat'
+
 
 class Classifier:
     """Class for learning and classifying drawn symbols."""
@@ -80,15 +81,7 @@ class Classifier:
                     self.learning_models.append(pickle.load(handle))
 
             except FileNotFoundError:
-                if learning_mode:
-                    self.learning_models.append({})
-                else:
-                    print("classifier.py: error: file with the learning model "
-                          "doesn't exist; please start the application in the "
-                          "learning mode", file=sys.stderr)
-                    print(model_path)
-                    _thread.interrupt_main()
-                    sys.exit(1)
+                self.learning_models.append({})
 
             if symbol != "":
                 try:
@@ -102,16 +95,7 @@ class Classifier:
                             append(float(handle.readline()))
 
                 except FileNotFoundError:
-                    if learning_mode:
-                        self.tolerance_distances.append(0)
-                    else:
-                        print("classifier.py: error: file with the tolerance "
-                              "distance doesn't exist; please start the "
-                              "application in the learning mode",
-                              file=sys.stderr)
-                        print(tolerance_distance_path)
-                        _thread.interrupt_main()
-                        sys.exit(1)
+                    self.tolerance_distances.append(0)
 
         self.learning_models = \
             {sym: mod for sym, mod in
@@ -355,7 +339,8 @@ class Classifier:
 
         self._write_training_set_to_file(symbol)
 
-        if symbol not in self.symbol_list:
+        inactive_symbols = self._get_inactive_symbols()
+        if symbol not in self.symbol_list.copy() + inactive_symbols:
             self.symbol_list.append(symbol)
             self._save_symbol_list()
 
@@ -365,7 +350,6 @@ class Classifier:
 
             with open(self.files[INACTIVE_SYMBOLS_FILE], 'rb') as handle:
                 inactive_symbols = pickle.load(handle)
-            print(inactive_symbols)
             return inactive_symbols
 
         except FileNotFoundError:
@@ -378,7 +362,7 @@ class Classifier:
             inactive_symbols (list of str): Current inactive symbols.
         """
         with open(self.files[INACTIVE_SYMBOLS_FILE], 'wb') as handle:
-            pickle.dump(inactive_symbols, handle)        
+            pickle.dump(inactive_symbols, handle)
 
     def _learn_one_symbol(self, symbol):
         """Learn given symbol basing on training set from file.
@@ -442,13 +426,17 @@ class Classifier:
         """
         if symbol is None:
             symbol = ""
+        inactive_symbols = self._get_inactive_symbols()
+        available_symbols = self.symbol_list.copy() + inactive_symbols
         if symbol != "":
             print("learning", symbol, "symbol...")
             if not load_from_file:
                 self._save_training_set(symbol)
+            elif symbol not in available_symbols:
+                print('symbol', symbol, 'not found in classifier database')
             self._learn_one_symbol(symbol)
         else:
-            for sym in self.symbol_list:
+            for sym in available_symbols:
                 print("learning", sym, "symbol...")
                 self._learn_one_symbol(sym)
 
@@ -514,20 +502,32 @@ class Classifier:
         for symbol in symbols:
             if symbol in inactive_symbols:
                 print("activating symbol", symbol, "in classifier...")
-                if not os.path.isfile(Classifier._get_file_path(self.files[TRAINING_SET_FILE], symbol)):
-                    print("File with training set of symbol", symbol, "is missing. Activation is impossible.")
+                training_set_path = \
+                    Classifier._get_file_path(self.files[TRAINING_SET_FILE],
+                                              symbol)
+                model_path = \
+                    Classifier._get_file_path(self.files[MODEL_FILE], symbol)
+                distace_tolerance_path = \
+                    Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE],
+                                              symbol)
+                if not os.path.isfile(training_set_path):
+                    print("File with training set of symbol", symbol,
+                          "is missing. Activation is impossible.")
                     allowed = False
-                elif not os.path.isfile(Classifier._get_file_path(self.files[MODEL_FILE], symbol)):
-                    print("File with learning model of symbol", symbol, "is missing. Activation is impossible.")
+                elif not os.path.isfile(model_path):
+                    print("File with learning model of symbol", symbol,
+                          "is missing. Activation is impossible.")
                     allowed = False
-                elif not os.path.isfile(Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE], symbol)):
-                    print("File with the tolerance distance of symbol", symbol, "is missing. Activation is impossible.")
+                elif not os.path.isfile(distace_tolerance_path):
+                    print("File with the tolerance distance of symbol", symbol,
+                          "is missing. Activation is impossible.")
                     allowed = False
                 else:
                     self.symbol_list.append(symbol)
                     inactive_symbols.remove(symbol)
             elif symbol not in self.symbol_list:
-                print("warning: symbol", symbol, "is not present in classifier database")
+                print("warning: symbol", symbol,
+                      "is not present in classifier database")
         if allowed:
             self._save_symbol_list()
             self._save_inactive_symbols(inactive_symbols)
@@ -546,7 +546,8 @@ class Classifier:
                 self.symbol_list.remove(symbol)
                 inactive_symbols.append(symbol)
             elif symbol not in inactive_symbols:
-                print("warning: symbol", symbol, "is not present in classifier database")
+                print("warning: symbol", symbol,
+                      "is not present in classifier database")
         self._save_symbol_list()
         self._save_inactive_symbols(inactive_symbols)
         self._learn_all_symbols_together()

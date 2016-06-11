@@ -173,7 +173,8 @@ def delete_symbols(symbols):
         pickle.dump(_USER_DEFINED_COMMANDS, handle)
 
 
-def bind_symbol_with_command(symbol, command='touch', command_arguments=None):
+def bind_symbol_with_command(symbol, command='touch', command_arguments=None,
+                             stop_when_overwriting=False):
     """Bind the symbol's name with the provided command.
     The default command is touch and the command_arguments will be set to
     '/tmp/created_by_' + symbol.
@@ -184,6 +185,10 @@ def bind_symbol_with_command(symbol, command='touch', command_arguments=None):
     """
     global _USER_DEFINED_COMMANDS
     _check_and_load_commands()
+    if stop_when_overwriting and symbol in _USER_DEFINED_COMMANDS:
+        print("symbol", symbol, 'is already in database')
+        _thread.interrupt_main()
+        sys.exit(1)        
     if command == 'touch' and command_arguments is None:
         command_arguments = '/tmp/created_by_' + symbol
 
