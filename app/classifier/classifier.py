@@ -67,20 +67,22 @@ class Classifier:
             self.symbol_list = []
 
         # Loading classifying models and distance tolerances
-        if not learning_mode:
-            self.learning_models = []
-            self.tolerance_distances = []
-            self.symbol_list.append("")
-            for symbol in self.symbol_list:
-                try:
+        self.learning_models = []
+        self.tolerance_distances = []
+        self.symbol_list.append("")
+        for symbol in self.symbol_list:
+            try:
 
-                    model_path = Classifier.\
-                        _get_file_path(self.files[MODEL_FILE], symbol)
+                model_path = Classifier.\
+                    _get_file_path(self.files[MODEL_FILE], symbol)
 
-                    with open(model_path, 'rb') as handle:
-                        self.learning_models.append(pickle.load(handle))
+                with open(model_path, 'rb') as handle:
+                    self.learning_models.append(pickle.load(handle))
 
-                except FileNotFoundError:
+            except FileNotFoundError:
+                if learning_mode:
+                    self.learning_models.append({})
+                else:
                     print("classifier.py: error: file with the learning model "
                           "doesn't exist; please start the application in the "
                           "learning mode", file=sys.stderr)
@@ -88,34 +90,36 @@ class Classifier:
                     _thread.interrupt_main()
                     sys.exit(1)
 
-                if symbol != "":
-                    try:
+            if symbol != "":
+                try:
 
-                        tolerance_distance_path = \
-                            Classifier._get_file_path(
-                                self.files[DISTANCE_TOLERANCE_FILE], symbol)
+                    tolerance_distance_path = \
+                        Classifier._get_file_path(
+                            self.files[DISTANCE_TOLERANCE_FILE], symbol)
 
-                        with open(tolerance_distance_path, 'r') as handle:
-                            self.tolerance_distances.\
-                                append(float(handle.readline()))
+                    with open(tolerance_distance_path, 'r') as handle:
+                        self.tolerance_distances.\
+                            append(float(handle.readline()))
 
-                    except FileNotFoundError:
+                except FileNotFoundError:
+                    if learning_mode:
+                        self.tolerance_distances.append(0)
+                    else:
                         print("classifier.py: error: file with the tolerance "
                               "distance doesn't exist; please start the "
                               "application in the learning mode",
                               file=sys.stderr)
                         print(tolerance_distance_path)
                         _thread.interrupt_main()
-
                         sys.exit(1)
 
-            self.learning_models = \
-                {sym: mod for sym, mod in
-                 zip(self.symbol_list, self.learning_models)}
-            self.tolerance_distances = \
-                {sym: dist for sym, dist in
-                 zip(self.symbol_list, self.tolerance_distances)}
-            self.symbol_list.pop()
+        self.learning_models = \
+            {sym: mod for sym, mod in
+             zip(self.symbol_list, self.learning_models)}
+        self.tolerance_distances = \
+            {sym: dist for sym, dist in
+             zip(self.symbol_list, self.tolerance_distances)}
+        self.symbol_list.pop()
 
         # Variables for learning-mode.
         self.training_size = 0
@@ -278,7 +282,11 @@ class Classifier:
         print("classifying...")
         feature_vector = featureextractor.get_features(signal_list)
         models = self.learning_models
+        if models[""] == {}:
+            return None
         symbol_candidate = models[""].predict([feature_vector])[0]
+        if models[symbol_candidate] == {}:
+            return None
         distances, _ = models[symbol_candidate] \
             .kneighbors(np.array([feature_vector]))
         mean_distance = np.mean(distances[0])
@@ -324,7 +332,7 @@ class Classifier:
         return tolerance_distance
 
     def _write_training_set_to_file(self, symbol):
-        """Write actual training set to file."""
+        """Write current training set to file."""
 
         file_with_training_path = \
             Classifier._get_file_path(self.files[TRAINING_SET_FILE], symbol)
@@ -352,6 +360,7 @@ class Classifier:
             self._save_symbol_list()
 
     def _get_inactive_symbols(self):
+        """Fetch list of inactive symbols from file."""
         try:
 
             with open(self.files[INACTIVE_SYMBOLS_FILE], 'rb') as handle:
@@ -363,6 +372,11 @@ class Classifier:
             return []
 
     def _save_inactive_symbols(self, inactive_symbols):
+        """Save given inactive symbols list to file.
+
+        Args:
+            inactive_symbols (list of str): Current inactive symbols.
+        """
         with open(self.files[INACTIVE_SYMBOLS_FILE], 'wb') as handle:
             pickle.dump(inactive_symbols, handle)        
 

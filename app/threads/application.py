@@ -125,4 +125,4 @@ def send_points_to_interpreter(signal_list, learning_mode, classifier):
             print("execution")
             executor.execute(item)
         else:
-            print("not similar")
+            print("not similar to any symbol")

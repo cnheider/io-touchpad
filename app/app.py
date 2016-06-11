@@ -262,7 +262,7 @@ def _export_settings(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    classifier = classifier_module.Classifier(learning_mode=False)
+    classifier = classifier_module.Classifier(learning_mode=True)
     classifier.export_files(args.settings_name)
     databox.export_settings(args.settings_name)
 
