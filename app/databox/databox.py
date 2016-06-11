@@ -188,7 +188,7 @@ def bind_symbol_with_command(symbol, command='touch', command_arguments=None,
     if stop_when_overwriting and symbol in _USER_DEFINED_COMMANDS:
         print("symbol", symbol, 'is already in database')
         _thread.interrupt_main()
-        sys.exit(1)        
+        sys.exit(1)
     if command == 'touch' and command_arguments is None:
         command_arguments = '/tmp/created_by_' + symbol
 

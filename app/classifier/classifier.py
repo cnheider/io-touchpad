@@ -495,6 +495,11 @@ class Classifier:
         self._learn_all_symbols_together()
 
     def activate_symbols(self, symbols):
+        """Activate symbols.
+
+        Args:
+            symbols (list of str): Symbols to activate.
+        """
         inactive_symbols = self._get_inactive_symbols()
         if not symbols:
             symbols = inactive_symbols.copy()
@@ -537,6 +542,11 @@ class Classifier:
         return False
 
     def deactivate_symbols(self, symbols):
+        """Deactivate symbols.
+
+        Args:
+            symbols (list of str): Symbols to deactivate.
+        """
         if not symbols:
             symbols = self.symbol_list.copy()
         inactive_symbols = self._get_inactive_symbols()
