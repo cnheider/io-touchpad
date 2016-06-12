@@ -7,10 +7,7 @@ from signalcollection import signalcollection
 COLLECTION = signalcollection.SignalCollection()
 
 
-class TestSignal():
-
-    def __init__(self):
-        self.time = 0
+class TestSignal:
 
     def set_time(self, time):
         self.time = time
@@ -66,6 +63,7 @@ def test_is_head_too_old():
 
     # We put signal with time 0.
     signal_zero = TestSignal()
+    signal_zero.set_time(0)
 
     COLLECTION.signal_list.append(signal_zero)
 
@@ -86,13 +84,13 @@ def test_is_recent_enough():
 
     # We put signal with time 0.
     signal_zero = TestSignal()
+    signal_zero.set_time(0)
 
     COLLECTION.signal_list.append(signal_zero)
-
-    assert COLLECTION.is_recent_enough(signalcollection
-                                       .MAX_BREAK_BETWEEN_TWO_SIGNALS) is True
-    assert COLLECTION.is_recent_enough(signalcollection
-                                       .MAX_BREAK_BETWEEN_TWO_SIGNALS +
+    assert COLLECTION.is_recent_enough(COLLECTION
+                                       .get_max_break_between_two_points()) is True
+    assert COLLECTION.is_recent_enough(COLLECTION
+                                       .get_max_break_between_two_points() +
                                        0.1) is False
 
     COLLECTION.reset()
@@ -103,6 +101,7 @@ def test__need_to_remove_head():
 
     # We put signal with time 0.
     signal_zero = TestSignal()
+    signal_zero.set_time(0)
 
     # assert on Empty
     assert COLLECTION._need_to_remove_head(signal_zero) is False

@@ -48,6 +48,9 @@ class SignalCollection:
                 self.END_ON_RAISE = pickle.load(handle)
             else:
                 self.END_ON_RAISE = False
+        else:
+            self.MAX_BREAK_BETWEEN_TWO_SIGNALS = STANDARD_MAX_BREAK_VALUE
+            self.END_ON_RAISE = False
 
     def save_settings(self):
         """Save saved settings from file.
@@ -87,9 +90,6 @@ class SignalCollection:
             imported = pickle.load(handle)
             self.MAX_BREAK_BETWEEN_TWO_SIGNALS = imported[0]
             self.END_ON_RAISE = imported[1]
-        else:
-            self.MAX_BREAK_BETWEEN_TWO_SIGNALS = STANDARD_MAX_BREAK_VALUE
-            self.END_ON_RAISE = False
         self.save_settings()
 
     def export_settings(self, settings_name):
@@ -149,6 +149,11 @@ class SignalCollection:
         else:
             result = current_time - tail_time <= self.MAX_BREAK_BETWEEN_TWO_SIGNALS
         return result
+
+    def get_max_break_between_two_points(self):
+        """Get max timewait."""
+
+        return self.MAX_BREAK_BETWEEN_TWO_SIGNALS
 
     def get_time_when_old_enough(self, current_time):
         """Get the amount of time left for the tail to get old.
