@@ -34,7 +34,7 @@ LIST_SUBCOMMAND = 'list'
 MODIFY_SUBCOMMAND = 'modify'
 REDRAW_SUBCOMMAND = 'redraw'
 REPEAT_SUBCOMMAND = 'repeat'
-SET_MAX_WAITTIME = 'set_waittime'
+SET_MAX_WAITTIME_SUBCOMMAND = 'set_waittime'
 RUN_SUBCOMMAND = 'run'
 RUN_USER_MODE = 'user'
 RUN_32_MODE = '32'
@@ -164,16 +164,18 @@ def _get_configured_parser():
                            'repeated for each symbol known to the app')
 
     # The set_max_waittime subcommand section.
-    subparser = subparsers.add_parser(SET_MAX_WAITTIME,
+    subparser = subparsers.add_parser(SET_MAX_WAITTIME_SUBCOMMAND,
                                       help='set time (in seconds)'
                                       'which program will wait '
                                       'for continuation of a '
                                       'symbol until classifying. ')
     subparser.add_argument(dest='max_timewait', metavar='VALUE',
                            help='time (in seconds) program will wait for'
-                                'continuation of drawing until he starts classifying '
+                                'continuation of drawing until'
+                                ' he starts classifying '
                                 'Standard value is 0.3'
-                                'Setting to 0 means: end symbol on a raise of a finger',
+                                'Setting to 0 means: end symbol'
+                                ' on a raise of a finger',
                                 type=float)
 
     # The run subcommand section.
@@ -392,7 +394,7 @@ def main():
         _redraw(args)
     elif args.subcommand == REPEAT_SUBCOMMAND:
         _repeat(args)
-    elif args.subcommand == SET_MAX_WAITTIME:
+    elif args.subcommand == SET_MAX_WAITTIME_SUBCOMMAND:
         _set_max_waittime(args)
     elif args.subcommand == RUN_SUBCOMMAND:
         _run(args)

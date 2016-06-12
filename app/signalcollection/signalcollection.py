@@ -39,7 +39,8 @@ class SignalCollection:
         and END_ON_RAISE"""
         if os.path.exists(DATA_PATH):
             if os.path.isfile(DATA_PATH + 'MAX_BREAK_BETWEEN_TWO_SIGNALS'):
-                handle = open(DATA_PATH + 'MAX_BREAK_BETWEEN_TWO_SIGNALS', 'rb')
+                handle = open(DATA_PATH + 'MAX_BREAK_BETWEEN_TWO_SIGNALS',
+                              'rb')
                 self.MAX_BREAK_BETWEEN_TWO_SIGNALS = pickle.load(handle)
             else:
                 self.MAX_BREAK_BETWEEN_TWO_SIGNALS = STANDARD_MAX_BREAK_VALUE
