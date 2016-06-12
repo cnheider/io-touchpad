@@ -5,11 +5,16 @@
 A signal is an item taken out of the queue. It might be something more than a
 touchpad event.
 """
+import os
+import pickle
 
-MAX_BREAK_BETWEEN_TWO_SIGNALS = 0.3
+STANDARD_MAX_BREAK_VALUE = 0.3
+
 MAX_NUMBER_OF_SIGNALS_IN_GROUP = 3000
 MAX_DURATION_OF_GROUP = 4
 
+DATA_PATH = 'signalcollection/data/'
+EXPORT_PATH = 'signalcollection/exports/'
 
 class SignalCollection:
     """Collection of signals to interpret.
@@ -25,6 +30,86 @@ class SignalCollection:
         Simply initializes an empty list.
         """
         self.reset()
+        self.load_settings()
+
+    def load_settings(self):
+        """Load saved settings from file.
+
+        loads MAX_NUMBER_OF_SIGNALS_IN_GROUP
+        and END_ON_RAISE"""
+        if os.path.exists(DATA_PATH):
+            if os.path.isfile(DATA_PATH + 'MAX_BREAK_BETWEEN_TWO_SIGNALS'):
+                handle = open(DATA_PATH + 'MAX_BREAK_BETWEEN_TWO_SIGNALS',
+                              'rb')
+                self.MAX_BREAK_BETWEEN_TWO_SIGNALS = pickle.load(handle)
+            else:
+                self.MAX_BREAK_BETWEEN_TWO_SIGNALS = STANDARD_MAX_BREAK_VALUE
+            if os.path.isfile(DATA_PATH + 'END_ON_RAISE'):
+                handle = open(DATA_PATH + 'END_ON_RAISE', 'rb')
+                self.END_ON_RAISE = pickle.load(handle)
+            else:
+                self.END_ON_RAISE = False
+        else:
+            self.MAX_BREAK_BETWEEN_TWO_SIGNALS = STANDARD_MAX_BREAK_VALUE
+            self.END_ON_RAISE = False
+
+    def save_settings(self):
+        """Save saved settings from file.
+
+        saves MAX_NUMBER_OF_SIGNALS_IN_GROUP
+        and END_ON_RAISE"""
+        if not os.path.exists(DATA_PATH):
+            os.makedirs(DATA_PATH)
+        with open(DATA_PATH + 'MAX_BREAK_BETWEEN_TWO_SIGNALS', 'wb') as handle:
+            pickle.dump(self.MAX_BREAK_BETWEEN_TWO_SIGNALS, handle)
+        with open(DATA_PATH + 'END_ON_RAISE', 'wb') as handle:
+            pickle.dump(self.END_ON_RAISE, handle)
+
+    def set_max_break_between_two_signals(self, new_value):
+        """Set new max_break_between_two signals and save settings."""
+
+        if new_value > 0:
+            self.MAX_BREAK_BETWEEN_TWO_SIGNALS = new_value
+            self.END_ON_RAISE = False
+
+        elif new_value == 0:
+            print("Setting end on raise finger")
+            self.END_ON_RAISE = True
+
+        self.save_settings()
+
+    def import_settings(self, settings_name):
+        """Load saved settings from file.
+
+        imports MAX_NUMBER_OF_SIGNALS_IN_GROUP
+        and END_ON_RAISE"""
+        print("importing in signalcollection")
+
+        if os.path.exists(EXPORT_PATH) and \
+                os.path.isfile(EXPORT_PATH + settings_name):
+            handle = open(EXPORT_PATH + settings_name, 'rb')
+            imported = pickle.load(handle)
+            self.MAX_BREAK_BETWEEN_TWO_SIGNALS = imported[0]
+            self.END_ON_RAISE = imported[1]
+        self.save_settings()
+
+    def export_settings(self, settings_name):
+        """Save saved settings from file.
+
+        exports MAX_NUMBER_OF_SIGNALS_IN_GROUP
+        and END_ON_RAISE"""
+        print("exporting in signalcollection")
+
+        exported = [self.MAX_BREAK_BETWEEN_TWO_SIGNALS, self.END_ON_RAISE]
+        if not os.path.exists(EXPORT_PATH):
+            os.makedirs(EXPORT_PATH)
+        with open(EXPORT_PATH + settings_name, 'wb') as handle:
+            pickle.dump(exported, handle)
+
+    def is_ending_on_raise(self):
+        """Return if the signal should end on raising finger."""
+
+        return self.END_ON_RAISE
 
     def reset(self):
         """Erase the signal_list."""
@@ -55,7 +140,8 @@ class SignalCollection:
 
         Retruns:
             True if the (current_time - tail_time) is less or equal
-            MAX_BREAK_BETWEEN_TWO_SIGNALS. True is returned if the signal_list
+            MAX_BREAK_BETWEEN_TWO_SIGNALS.
+            True is returned if the signal_list
             is empty. False otherwise.
         """
         try:
@@ -63,8 +149,14 @@ class SignalCollection:
         except IndexError:
             result = True
         else:
-            result = current_time - tail_time <= MAX_BREAK_BETWEEN_TWO_SIGNALS
+            result = current_time - tail_time <= \
+                     self.MAX_BREAK_BETWEEN_TWO_SIGNALS
         return result
+
+    def get_max_break_between_two_points(self):
+        """Get max timewait."""
+
+        return self.MAX_BREAK_BETWEEN_TWO_SIGNALS
 
     def get_time_when_old_enough(self, current_time):
         """Get the amount of time left for the tail to get old.
