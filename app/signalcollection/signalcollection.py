@@ -139,7 +139,8 @@ class SignalCollection:
 
         Retruns:
             True if the (current_time - tail_time) is less or equal
-            MAX_BREAK_BETWEEN_TWO_SIGNALS. True is returned if the signal_list
+            MAX_BREAK_BETWEEN_TWO_SIGNALS.
+            True is returned if the signal_list
             is empty. False otherwise.
         """
         try:
@@ -147,7 +148,8 @@ class SignalCollection:
         except IndexError:
             result = True
         else:
-            result = current_time - tail_time <= self.MAX_BREAK_BETWEEN_TWO_SIGNALS
+            result = current_time - tail_time <= \
+                     self.MAX_BREAK_BETWEEN_TWO_SIGNALS
         return result
 
     def get_max_break_between_two_points(self):

@@ -88,7 +88,8 @@ def test_is_recent_enough():
 
     COLLECTION.signal_list.append(signal_zero)
     assert COLLECTION.is_recent_enough(COLLECTION
-                                       .get_max_break_between_two_points()) is True
+                                       .get_max_break_between_two_points())\
+        is True
     assert COLLECTION.is_recent_enough(COLLECTION
                                        .get_max_break_between_two_points() +
                                        0.1) is False

@@ -34,7 +34,7 @@ LIST_SUBCOMMAND = 'list'
 MODIFY_SUBCOMMAND = 'modify'
 REDRAW_SUBCOMMAND = 'redraw'
 REPEAT_SUBCOMMAND = 'repeat'
-SET_MAX_WAITTIME= 'set_waittime'
+SET_MAX_WAITTIME = 'set_waittime'
 RUN_SUBCOMMAND = 'run'
 RUN_USER_MODE = 'user'
 RUN_32_MODE = '32'
@@ -165,8 +165,10 @@ def _get_configured_parser():
 
     # The set_max_waittime subcommand section.
     subparser = subparsers.add_parser(SET_MAX_WAITTIME,
-                                      help='set time (in seconds) which program will wait '
-                                      'for continuation of a symbol until classifying. ')
+                                      help='set time (in seconds)'
+                                      'which program will wait '
+                                      'for continuation of a '
+                                      'symbol until classifying. ')
     subparser.add_argument(dest='max_timewait', metavar='VALUE',
                            help='time (in seconds) program will wait for'
                                 'continuation of drawing until he starts classifying '
