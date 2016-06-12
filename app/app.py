@@ -20,6 +20,7 @@ from databox import databox
 from terminationhandler import terminationhandler
 from threads import application
 from threads import listener
+from signalcollection import signalcollection
 
 MIN_TRAINING_SIZE = 5
 
@@ -33,6 +34,7 @@ LIST_SUBCOMMAND = 'list'
 MODIFY_SUBCOMMAND = 'modify'
 REDRAW_SUBCOMMAND = 'redraw'
 REPEAT_SUBCOMMAND = 'repeat'
+SET_MAX_WAITTIME= 'set_waittime'
 RUN_SUBCOMMAND = 'run'
 RUN_USER_MODE = 'user'
 RUN_32_MODE = '32'
@@ -161,6 +163,17 @@ def _get_configured_parser():
                            'the learning process will be '
                            'repeated for each symbol known to the app')
 
+    # The set_max_waittime subcommand section.
+    subparser = subparsers.add_parser(SET_MAX_WAITTIME,
+                                      help='set time (in seconds) which program will wait '
+                                      'for continuation of a symbol until classifying. ')
+    subparser.add_argument(dest='max_timewait', metavar='VALUE',
+                           help='time (in seconds) program will wait for'
+                                'continuation of drawing until he starts classifying '
+                                'Standard value is 0.3'
+                                'Setting to 0 means: end symbol on a raise of a finger',
+                                type=float)
+
     # The run subcommand section.
     subparser = subparsers.add_parser(RUN_SUBCOMMAND, help='run the app '
                                       'using either hardcoded or user-defined '
@@ -266,6 +279,8 @@ def _export_settings(args):
     classifier = classifier_module.Classifier(learning_mode=True)
     classifier.export_files(args.settings_name)
     databox.export_settings(args.settings_name)
+    sigcol = signalcollection.SignalCollection()
+    sigcol.export_settings(args.settings_name)
 
 
 def _import_settings(args):
@@ -277,7 +292,8 @@ def _import_settings(args):
     classifier = classifier_module.Classifier(learning_mode=True)
     classifier.import_files(args.settings_name)
     databox.import_settings(args.settings_name)
-
+    sigcol = signalcollection.SignalCollection()
+    sigcol.import_settings(args.settings_name)
 
 def _list():
     """Wrap up the list subcommand to make main() less complex."""
@@ -323,6 +339,16 @@ def _repeat(args):
     sys.exit(0)
 
 
+def _set_max_waittime(args):
+    """Wrap up the set_timewait subcommand to make main() less complex.
+
+        Args:
+            args (dict): Parsed command line arguments.
+        """
+    print('Setting new value for waiting between signals.')
+    sigcol = signalcollection.SignalCollection()
+    sigcol.set_max_break_between_two_signals(args.max_timewait)
+
 def _run(args):
     """Wrap up the run subcommand to make main() less complex.
 
@@ -364,7 +390,10 @@ def main():
         _redraw(args)
     elif args.subcommand == REPEAT_SUBCOMMAND:
         _repeat(args)
+    elif args.subcommand == SET_MAX_WAITTIME:
+        _set_max_waittime(args)
     elif args.subcommand == RUN_SUBCOMMAND:
         _run(args)
+
 
 main()

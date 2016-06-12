@@ -7,6 +7,7 @@ This module communicates with the touchpadlib directly.
 """
 
 from touchpadlib import touchpadlib
+from signalcollection import signalcollection
 
 
 class TouchpadSignal:
@@ -57,11 +58,12 @@ class TouchpadSignal:
 
     def is_stop_signal(self):
         """Check if the signal is a stop signal."""
-        # @TODO Implement this method. Not in the first iteration.
-        # We could set condition pressure<1 but for now the only reason
-        # to end the group is a long break between signals.
-        # Issue #121.
-        return False
+
+        sigcol = signalcollection.SignalCollection()
+        if sigcol.is_ending_on_raise():
+            return self.is_raising_finger_signal()
+        else:
+            return False
 
     def is_raising_finger_signal(self):
         """Check if the signal has pressure equal to 0."""
