@@ -223,7 +223,7 @@ def _activate(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    classifier = classifier_module.Classifier(learning_mode=True)
+    classifier = classifier_module.Classifier()
     if classifier.activate_symbols(args.symbols):
         databox.activate(args.symbols)
         sys.exit(0)
@@ -256,7 +256,7 @@ def _deactivate(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    classifier = classifier_module.Classifier(learning_mode=True)
+    classifier = classifier_module.Classifier()
     classifier.deactivate_symbols(args.symbols)
     databox.deactivate(args.symbols)
     sys.exit(0)
@@ -268,7 +268,7 @@ def _delete(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    classifier = classifier_module.Classifier(learning_mode=True)
+    classifier = classifier_module.Classifier()
     classifier.delete_symbols(args.symbols)
     databox.delete_symbols(args.symbols)
     sys.exit(0)
@@ -280,7 +280,7 @@ def _export_settings(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    classifier = classifier_module.Classifier(learning_mode=True)
+    classifier = classifier_module.Classifier()
     classifier.export_files(args.settings_name)
     databox.export_settings(args.settings_name)
     sigcol = signalcollection.SignalCollection()
@@ -293,7 +293,7 @@ def _import_settings(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    classifier = classifier_module.Classifier(learning_mode=True)
+    classifier = classifier_module.Classifier()
     classifier.import_files(args.settings_name)
     databox.import_settings(args.settings_name)
     sigcol = signalcollection.SignalCollection()
@@ -338,7 +338,7 @@ def _repeat(args):
         args (dict): Parsed command line arguments.
     """
     print('Repeating the learning process from traning-set file.')
-    classifier = classifier_module.Classifier(learning_mode=True)
+    classifier = classifier_module.Classifier()
     classifier.learn(True, args.symbol_name)
     sys.exit(0)
 
