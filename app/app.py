@@ -350,9 +350,9 @@ def _repeat(args):
 def _set_max_waittime(args):
     """Wrap up the set_timewait subcommand to make main() less complex.
 
-        Args:
-            args (dict): Parsed command line arguments.
-        """
+    Args:
+        args (dict): Parsed command line arguments.
+    """
     print('Setting new value for waiting between signals.')
     sigcol = signalcollection.SignalCollection()
     sigcol.set_max_break_between_two_signals(args.max_timewait)
