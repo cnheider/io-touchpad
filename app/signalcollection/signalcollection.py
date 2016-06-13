@@ -32,7 +32,7 @@ class SignalCollection:
         """
         self.signal_list = []
         self.max_waittime = STANDARD_MAX_BREAK_VALUE
-        self.is_ending_on_raise = False
+        self.end_on_raise = False
         self.reset()
         self.load_settings()
 
@@ -51,12 +51,12 @@ class SignalCollection:
                 self.max_waittime = STANDARD_MAX_BREAK_VALUE
             if os.path.isfile(DATA_PATH + 'END_ON_RAISE'):
                 handle = open(DATA_PATH + 'END_ON_RAISE', 'rb')
-                self.is_ending_on_raise = pickle.load(handle)
+                self.end_on_raise = pickle.load(handle)
             else:
-                self.is_ending_on_raise = False
+                self.end_on_raise = False
         else:
             self.max_waittime = STANDARD_MAX_BREAK_VALUE
-            self.is_ending_on_raise = False
+            self.end_on_raise = False
 
     def save_settings(self):
         """Save saved settings from file.
@@ -69,17 +69,17 @@ class SignalCollection:
         with open(DATA_PATH + 'MAX_BREAK_BETWEEN_TWO_SIGNALS', 'wb') as handle:
             pickle.dump(self.max_waittime, handle)
         with open(DATA_PATH + 'END_ON_RAISE', 'wb') as handle:
-            pickle.dump(self.is_ending_on_raise, handle)
+            pickle.dump(self.end_on_raise, handle)
 
     def set_max_break_between_two_signals(self, new_value):
         """Set new max_break_between_two signals and save settings."""
         if new_value > 0:
             self.max_waittime = new_value
-            self.is_ending_on_raise = False
+            self.end_on_raise = False
 
         elif new_value == 0:
             print("Setting end on raise finger")
-            self.is_ending_on_raise = True
+            self.end_on_raise = True
 
         self.save_settings()
 
@@ -96,7 +96,7 @@ class SignalCollection:
             handle = open(EXPORT_PATH + settings_name, 'rb')
             imported = pickle.load(handle)
             self.max_waittime = imported[0]
-            self.is_ending_on_raise = imported[1]
+            self.end_on_raise = imported[1]
         self.save_settings()
 
     def export_settings(self, settings_name):
@@ -107,7 +107,7 @@ class SignalCollection:
         """
         print("exporting in signalcollection")
 
-        exported = [self.max_waittime, self.is_ending_on_raise]
+        exported = [self.max_waittime, self.end_on_raise]
         if not os.path.exists(EXPORT_PATH):
             os.makedirs(EXPORT_PATH)
         with open(EXPORT_PATH + settings_name, 'wb') as handle:
@@ -115,7 +115,7 @@ class SignalCollection:
 
     def is_ending_on_raise(self):
         """Return if the signal should end on raising finger."""
-        return self.is_ending_on_raise
+        return self.end_on_raise
 
     def reset(self):
         """Erase the signal_list."""
