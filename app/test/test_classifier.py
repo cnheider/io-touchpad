@@ -67,7 +67,7 @@ def setup_function(test_function):
 
 def test_reset_training_set():
     """Test for load training set."""
-    classifier = classifier_module.Classifier(True, None)
+    classifier = classifier_module.Classifier(None)
     classifier.reset_training_set(117, "a")
     assert classifier.training_set == []
     assert classifier.training_size == 0
@@ -79,7 +79,7 @@ def test__compute_tolerance_distance():
     We put some list of list of features to calculate
     fixed distance, and check if it's same.
     """
-    classifier = classifier_module.Classifier(True, None)
+    classifier = classifier_module.Classifier(None)
     L1 = [11.2, 41.43, 1.33]
     L2 = [10.9, 41.45, 1.34]
     L3 = [12.0, 41.4412, 1.001]
@@ -129,7 +129,7 @@ def test__extend_paths():
 
 def test_add_to_training_set():
     """Test if added list of points is in the set"""
-    classifier = classifier_module.Classifier(True, None)
+    classifier = classifier_module.Classifier(None)
     classifier.add_to_training_set(SIGNAL_LIST_TEST)
 
     training_size = classifier.training_size
@@ -143,7 +143,7 @@ def test_add_to_training_set():
 def test__save_training_set():
     """Test learning symbol given the specific training set"""
 
-    classifier = classifier_module.Classifier(True, None)
+    classifier = classifier_module.Classifier(None)
     classifier._delete_symbol('test')
     classifier.reset_training_set(7, 'test')
     for i in range(0, 5):
@@ -164,7 +164,7 @@ def test__save_training_set():
 
 def test__load_training_set():
     """Test loading training set from file"""
-    classifier = classifier_module.Classifier(True, None)
+    classifier = classifier_module.Classifier(None)
     set = classifier._load_training_set('test')
     for i in range(0, 5):
         signal_list = set[i]
@@ -178,7 +178,7 @@ def test__load_training_set():
 def test__learn_one_symbol():
     """Test learning specific symbol"""
     if platform.machine() == 'x86_64':
-        classifier = classifier_module.Classifier(True, None)
+        classifier = classifier_module.Classifier(None)
         tolerance = classifier._learn_one_symbol('test')
 
         file_with_model = open(TEST_LOCATION + 'test_nn_model.dat', 'rb')
@@ -198,7 +198,7 @@ def test__learn_one_symbol():
 def test_classify():
     """Test classifying the given list of points to a symbol"""
     if platform.machine() == 'x86_64':
-        classifier = classifier_module.Classifier(False, None)
+        classifier = classifier_module.Classifier(None)
         for i in range(0, 5):
             signal_a = Signal_test(1.0 + i * 0.028, 1.00 - i * i * 0.20 * 0.30)
             signal_b = Signal_test(2.0 - i * 0.011, 2.00 - i * 0.020)
@@ -210,7 +210,7 @@ def test_classify():
 
 def test__delete_symbol():
     """Test deleting one symbol"""
-    classifier = classifier_module.Classifier(True, None)
+    classifier = classifier_module.Classifier(None)
     classifier.symbol_list.append("test2")
     classifier._save_symbol_list()
     classifier._delete_symbol('test2')
@@ -223,7 +223,7 @@ def test__delete_symbol():
 
 def test_delete_symbols():
     """Test deleting all symbols"""
-    classifier = classifier_module.Classifier(True, None)
+    classifier = classifier_module.Classifier(None)
 
     classifier._save_training_set("test2")
     classifier._save_training_set("test3")

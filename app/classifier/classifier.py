@@ -39,7 +39,7 @@ TRAINING_SET_FILE = 'training-set$sym.dat'
 class Classifier:
     """Class for learning and classifying drawn symbols."""
 
-    def __init__(self, learning_mode=False, system_bitness=None):
+    def __init__(self, system_bitness=None):
         """Constructor. Loads the learning model from files.
 
         Args:
