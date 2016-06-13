@@ -16,6 +16,7 @@ MAX_DURATION_OF_GROUP = 4
 DATA_PATH = 'signalcollection/data/'
 EXPORT_PATH = 'signalcollection/exports/'
 
+
 class SignalCollection:
     """Collection of signals to interpret.
 
@@ -29,6 +30,7 @@ class SignalCollection:
 
         Simply initializes an empty list.
         """
+        self.signal_list = []
         self.max_waittime = STANDARD_MAX_BREAK_VALUE
         self.is_ending_on_raise = False
         self.reset()
@@ -71,7 +73,6 @@ class SignalCollection:
 
     def set_max_break_between_two_signals(self, new_value):
         """Set new max_break_between_two signals and save settings."""
-
         if new_value > 0:
             self.max_waittime = new_value
             self.is_ending_on_raise = False
@@ -114,7 +115,6 @@ class SignalCollection:
 
     def is_ending_on_raise(self):
         """Return if the signal should end on raising finger."""
-
         return self.is_ending_on_raise
 
     def reset(self):
@@ -156,12 +156,11 @@ class SignalCollection:
             result = True
         else:
             result = current_time - tail_time <= \
-                     self.max_waittime
+                   self.max_waittime
         return result
 
     def get_max_break_between_two_points(self):
         """Get max timewait."""
-
         return self.max_waittime
 
     def get_time_when_old_enough(self, current_time):
