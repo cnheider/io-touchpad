@@ -58,7 +58,6 @@ class TouchpadSignal:
 
     def is_stop_signal(self):
         """Check if the signal is a stop signal."""
-
         sigcol = signalcollection.SignalCollection()
         if sigcol.is_ending_on_raise():
             return self.is_raising_finger_signal()
