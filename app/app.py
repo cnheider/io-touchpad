@@ -20,6 +20,7 @@ from databox import databox
 from terminationhandler import terminationhandler
 from threads import application
 from threads import listener
+from signalcollection import signalcollection
 
 MIN_TRAINING_SIZE = 5
 
@@ -33,6 +34,7 @@ LIST_SUBCOMMAND = 'list'
 MODIFY_SUBCOMMAND = 'modify'
 REDRAW_SUBCOMMAND = 'redraw'
 REPEAT_SUBCOMMAND = 'repeat'
+SET_MAX_WAITTIME_SUBCOMMAND = 'set_waittime'
 RUN_SUBCOMMAND = 'run'
 RUN_USER_MODE = 'user'
 RUN_32_MODE = '32'
@@ -161,6 +163,21 @@ def _get_configured_parser():
                            'the learning process will be '
                            'repeated for each symbol known to the app')
 
+    # The set_max_waittime subcommand section.
+    subparser = subparsers.add_parser(SET_MAX_WAITTIME_SUBCOMMAND,
+                                      help='set time (in seconds)'
+                                      'which program will wait '
+                                      'for continuation of a '
+                                      'symbol until classifying. ')
+    subparser.add_argument(dest='max_timewait', metavar='VALUE',
+                           help='time (in seconds) program will wait for'
+                                'continuation of drawing until'
+                                ' he starts classifying '
+                                'Standard value is 0.3'
+                                'Setting to 0 means: end symbol'
+                                ' on a raise of a finger',
+                                type=float)
+
     # The run subcommand section.
     subparser = subparsers.add_parser(RUN_SUBCOMMAND, help='run the app '
                                       'using either hardcoded or user-defined '
@@ -206,8 +223,13 @@ def _activate(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    databox.activate(args.symbols)
-    sys.exit(0)
+    classifier = classifier_module.Classifier()
+    if classifier.activate_symbols(args.symbols):
+        databox.activate(args.symbols)
+        sys.exit(0)
+    else:
+        print('activation failed')
+        sys.exit(1)
 
 
 def _add(args):
@@ -222,7 +244,8 @@ def _add(args):
               '{0}'.format(MIN_TRAINING_SIZE), file=sys.stderr)
         sys.exit(1)
     databox.bind_symbol_with_command(args.symbol_name, args.shell_command,
-                                     args.shell_command_arguments)
+                                     args.shell_command_arguments,
+                                     stop_when_overwriting=True)
     _start_threads(learning_mode=True, symbol_name=args.symbol_name,
                    training_size=args.training_size)
 
@@ -233,6 +256,8 @@ def _deactivate(args):
     Args:
         args (dict): Parsed command line arguments.
     """
+    classifier = classifier_module.Classifier()
+    classifier.deactivate_symbols(args.symbols)
     databox.deactivate(args.symbols)
     sys.exit(0)
 
@@ -243,7 +268,7 @@ def _delete(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    classifier = classifier_module.Classifier(learning_mode=True)
+    classifier = classifier_module.Classifier()
     classifier.delete_symbols(args.symbols)
     databox.delete_symbols(args.symbols)
     sys.exit(0)
@@ -255,9 +280,11 @@ def _export_settings(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    classifier = classifier_module.Classifier(learning_mode=False)
+    classifier = classifier_module.Classifier()
     classifier.export_files(args.settings_name)
     databox.export_settings(args.settings_name)
+    sigcol = signalcollection.SignalCollection()
+    sigcol.export_settings(args.settings_name)
 
 
 def _import_settings(args):
@@ -266,10 +293,11 @@ def _import_settings(args):
     Args:
         args (dict): Parsed command line arguments.
     """
-    classifier = classifier_module.Classifier(learning_mode=True)
+    classifier = classifier_module.Classifier()
     classifier.import_files(args.settings_name)
     databox.import_settings(args.settings_name)
-
+    sigcol = signalcollection.SignalCollection()
+    sigcol.import_settings(args.settings_name)
 
 def _list():
     """Wrap up the list subcommand to make main() less complex."""
@@ -284,12 +312,13 @@ def _modify(args):
         args (dict): Parsed command line arguments.
     """
     databox.bind_symbol_with_command(args.symbol_name, args.shell_command,
-                                     args.shell_command_arguments)
+                                     args.shell_command_arguments, False,
+                                     True)
     sys.exit(0)
 
 
 def _redraw(args):
-    """Wrap up the redraw subcommand to make main() less complex.
+    """Wrap up the redraw  subcommand to make main() less complex.
 
     Args:
         args (dict): Parsed command line arguments.
@@ -297,6 +326,9 @@ def _redraw(args):
     if args.training_size < MIN_TRAINING_SIZE:
         print('app.py: error: the training size should be at least '
               '{0}'.format(MIN_TRAINING_SIZE), file=sys.stderr)
+        sys.exit(1)
+    if not databox.symbol_available_in_user_made(args.symbol_name):
+        print('symbol', args.symbol_name, 'is not available in database')
         sys.exit(1)
     _start_threads(learning_mode=True, symbol_name=args.symbol_name,
                    training_size=args.training_size)
@@ -310,10 +342,20 @@ def _repeat(args):
         args (dict): Parsed command line arguments.
     """
     print('Repeating the learning process from traning-set file.')
-    classifier = classifier_module.Classifier(learning_mode=True)
+    classifier = classifier_module.Classifier()
     classifier.learn(True, args.symbol_name)
     sys.exit(0)
 
+
+def _set_max_waittime(args):
+    """Wrap up the set_timewait subcommand to make main() less complex.
+
+    Args:
+        args (dict): Parsed command line arguments.
+    """
+    print('Setting new value for waiting between signals.')
+    sigcol = signalcollection.SignalCollection()
+    sigcol.set_max_break_between_two_signals(args.max_timewait)
 
 def _run(args):
     """Wrap up the run subcommand to make main() less complex.
@@ -356,7 +398,10 @@ def main():
         _redraw(args)
     elif args.subcommand == REPEAT_SUBCOMMAND:
         _repeat(args)
+    elif args.subcommand == SET_MAX_WAITTIME_SUBCOMMAND:
+        _set_max_waittime(args)
     elif args.subcommand == RUN_SUBCOMMAND:
         _run(args)
+
 
 main()

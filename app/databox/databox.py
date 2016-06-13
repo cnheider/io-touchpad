@@ -83,6 +83,16 @@ _BUILTIN_COMMANDS = {
 }
 
 
+def symbol_available_in_user_made(symbol):
+    """Check if given symbol is present in user-made database.
+
+    Args:
+        symbol (str): name of the symbol which we check
+    """
+    _check_and_load_commands()
+    return symbol in _USER_DEFINED_COMMANDS
+
+
 def is_active(symbol):
     """Check if given symbol is active.
 
@@ -173,7 +183,9 @@ def delete_symbols(symbols):
         pickle.dump(_USER_DEFINED_COMMANDS, handle)
 
 
-def bind_symbol_with_command(symbol, command='touch', command_arguments=None):
+def bind_symbol_with_command(symbol, command='touch', command_arguments=None,
+                             stop_when_overwriting=False,
+                             stop_when_new=False):
     """Bind the symbol's name with the provided command.
     The default command is touch and the command_arguments will be set to
     '/tmp/created_by_' + symbol.
@@ -184,10 +196,20 @@ def bind_symbol_with_command(symbol, command='touch', command_arguments=None):
     """
     global _USER_DEFINED_COMMANDS
     _check_and_load_commands()
+    if stop_when_overwriting and symbol in _USER_DEFINED_COMMANDS:
+        print("symbol", symbol, 'is already in database')
+        _thread.interrupt_main()
+        sys.exit(1)
+    if stop_when_new and symbol not in _USER_DEFINED_COMMANDS:
+        print("symbol", symbol, 'is not present in database')
+        _thread.interrupt_main()
+        sys.exit(1)
     if command == 'touch' and command_arguments is None:
         command_arguments = '/tmp/created_by_' + symbol
 
     _USER_DEFINED_COMMANDS[symbol] = Command(command, command_arguments)
+    if not os.path.exists(DATA_PATH):
+        os.makedirs(DATA_PATH)
     with open(DATA_PATH + USER_DEFINED_COMMANDS_FILE, 'wb') as handle:
         pickle.dump(_USER_DEFINED_COMMANDS, handle)
     print('symbol ', symbol, 'has been binded with command')

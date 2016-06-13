@@ -41,8 +41,7 @@ def application_thread(queue, condition, learning_mode=False, training_size=0,
             the listener thread. Mostly touchpad events but not necessarily.
 
     """
-    classifier = classifier_module.Classifier(learning_mode=learning_mode,
-                                              system_bitness=system_bitness)
+    classifier = classifier_module.Classifier(system_bitness=system_bitness)
     if learning_mode:
         classifier.reset_training_set(training_size, symbol_name)
 
@@ -125,4 +124,4 @@ def send_points_to_interpreter(signal_list, learning_mode, classifier):
             print("execution")
             executor.execute(item)
         else:
-            print("not similar")
+            print("not similar to any symbol")
