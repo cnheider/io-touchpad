@@ -29,8 +29,8 @@ class SignalCollection:
 
         Simply initializes an empty list.
         """
-        self.max_waittime
-        self.is_ending_on_raise
+        self.max_waittime = STANDARD_MAX_BREAK_VALUE
+        self.is_ending_on_raise = False
         self.reset()
         self.load_settings()
 
