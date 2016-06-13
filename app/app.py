@@ -312,12 +312,13 @@ def _modify(args):
         args (dict): Parsed command line arguments.
     """
     databox.bind_symbol_with_command(args.symbol_name, args.shell_command,
-                                     args.shell_command_arguments)
+                                     args.shell_command_arguments, False,
+                                     True)
     sys.exit(0)
 
 
 def _redraw(args):
-    """Wrap up the redraw subcommand to make main() less complex.
+    """Wrap up the redraw  subcommand to make main() less complex.
 
     Args:
         args (dict): Parsed command line arguments.
@@ -325,6 +326,9 @@ def _redraw(args):
     if args.training_size < MIN_TRAINING_SIZE:
         print('app.py: error: the training size should be at least '
               '{0}'.format(MIN_TRAINING_SIZE), file=sys.stderr)
+        sys.exit(1)
+    if not databox.symbol_available_in_user_made(args.symbol_name):
+        print('symbol', args.symbol_name, 'is not available in database')
         sys.exit(1)
     _start_threads(learning_mode=True, symbol_name=args.symbol_name,
                    training_size=args.training_size)
