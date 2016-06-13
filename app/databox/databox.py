@@ -82,6 +82,7 @@ _BUILTIN_COMMANDS = {
     'large_sigma': Command('touch', '/tmp/created-by-large_sigma'),
 }
 
+
 def symbol_available_in_user_made(symbol):
     """Check if given symbol is present in user-made database.
 

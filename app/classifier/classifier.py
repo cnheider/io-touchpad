@@ -512,9 +512,10 @@ class Classifier:
                                               symbol)
                 model_path = \
                     Classifier._get_file_path(self.files[MODEL_FILE], symbol)
+                dt_pattern = \
+                    self.files[DISTANCE_TOLERANCE_FILE]
                 distace_tolerance_path = \
-                    Classifier._get_file_path(self.files[DISTANCE_TOLERANCE_FILE],
-                                              symbol)
+                    Classifier._get_file_path(dt_pattern, symbol)
                 if not os.path.isfile(training_set_path):
                     print("File with training set of symbol", symbol,
                           "is missing. Activation is impossible.")
